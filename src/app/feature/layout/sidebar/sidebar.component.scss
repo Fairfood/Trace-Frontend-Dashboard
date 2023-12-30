@@ -1,0 +1,115 @@
+@import 'src/styles/responsive';
+
+.sidebar {
+  border-radius: 0;
+  position: fixed;
+  z-index: 1000;
+  top: 100px;
+  left: 0;
+  width: 225px;
+  margin-left: -235px;
+  border: none;
+  border-radius: 0;
+  overflow-y: auto;
+  background-color: var(--color-sidebar-light);
+  bottom: 0;
+  overflow-x: hidden;
+  padding-bottom: 10px;
+  transition: all 0.2s ease-in-out;
+
+  @include devices(tablet-md) {
+    left: 235px;
+  }
+}
+
+.slanted-bg {
+  background-color: var(--color-white);
+}
+
+.slanted-div {
+  clip-path: polygon(0 0, 100% 90%, 100% 100%, 0% 100%);
+  background-color: var(--color-sidebar-light);
+  height: 35px !important;
+  margin-bottom: -1px !important;
+}
+
+.nav-list {
+  .list-group-item {
+    background: var(--color-sidebar-light);
+    border: 0;
+    border-radius: 0;
+    color: var(--color-sidebar-secondary);
+    letter-spacing: 1px;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 15px 10px 15px 40px;
+    font-family: var(--font-medium);
+    &:hover {
+      color: var(--color-sidebar-secondary);
+    }
+    &.router-link-active {
+      background: var(--color-sidebar-light);
+      color: var(--color-sidebar-secondary);
+      border-radius: 2px;
+      font-family: var(--font-bold);
+    }
+  }
+
+  .header-fields {
+    padding-top: 10px;
+    @include devices(tablet-md) {
+      display: none;
+    }
+
+    > .list-group-item:first-child {
+      border-top: 1px solid var(--border-color);
+    }
+  }
+}
+
+.nested-menu {
+  padding: 10px 0;
+  .list-group-item {
+    cursor: pointer;
+  }
+  .nested {
+    list-style-type: none;
+  }
+  ul.submenu {
+    display: none;
+    height: 0;
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+  & .expand {
+    ul.submenu {
+      display: block;
+      list-style-type: none;
+      height: auto;
+      li {
+        a {
+          color: var(--color-sidebar-secondary);
+          padding: 10px;
+          display: block;
+          text-decoration: none;
+          font-size: 12px;
+          font-family: var(--font-medium);
+          @include devices(tablet-md) {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.company-bottom {
+  position: absolute !important;
+  bottom: 25px;
+}
+
+::ng-deep.push-right {
+  .sidebar {
+    left: 235px !important;
+  }
+}

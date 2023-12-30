@@ -1,0 +1,121 @@
+<!-- Internal transactions like merge, convert and remove -->
+<!-- External transactions include sent and receive stock  -->
+
+<h3 class="font-1-bold">
+    {{ transactionData.transaction === 'internal' && transactionData.type === 2 ? 'Removed stock details':'Source details' }}
+</h3>
+<aside aria-label="Source details" class="d-flex source-content">
+    <section class="content-area">
+        <ng-container *ngIf="transactionData.transaction === 'external'">
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Seller name', itemValue: transactionData?.source?.name}">
+            </ng-container>
+
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Type', itemValue: transactionData?.source?.primary_operation?.name}">
+            </ng-container>
+            <article class="item">
+                <span class="key">Source address</span>
+                <span class="value">
+                    <app-common-wallet [type]="transactionData?.source_wallet?.wallet_type"
+                        [url]="transactionData?.source_wallet?.explorer_url"
+                        [wallet]="transactionData?.source_wallet?.public">
+                    </app-common-wallet>
+                </span>
+            </article>
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Buyer reference number', itemValue: transactionData?.buyer_ref_number}">
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Seller reference number', itemValue: transactionData?.seller_ref_number}">
+            </ng-container>
+            <ng-container *ngIf="transactionData.type === 2">
+                <ng-container [ngTemplateOutlet]="keyValuePair"
+                    [ngTemplateOutletContext]="{label: 'Price', itemValue: transactionData?.priceText }">
+                </ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="transactionData.transaction === 'internal'">
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Source product(s)', itemValue: transactionData?.sourceProductNames}">
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Total quantity', itemValue: transactionData?.source_quantity.toFixed(2) + ' kg'}">
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="productListing" [ngTemplateOutletContext]="{dataSource: dataSource1 }">
+            </ng-container>
+            <ng-container *ngIf="transactionData.type === 2" [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Reason for removing stock', itemValue: transactionData?.comment }">
+            </ng-container>
+        </ng-container>
+    </section>
+</aside>
+<ng-container *ngIf="transactionData.transaction === 'internal' && transactionData.type !==2 ">
+
+    <h3 class="font-1-bold">
+        Destination details
+    </h3>
+    <aside aria-label="Source details" class="d-flex source-content no-broder">
+        <section class="content-area">
+            <ng-container [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Destination product(s)', itemValue: transactionData?.destinationProductNames}">
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="productListing" [ngTemplateOutletContext]="{dataSource: dataSource2 }">
+            </ng-container>
+        </section>
+    </aside>
+</ng-container>
+
+
+<!-- Note section only for external transaction like reversal, sent and receive stock  -->
+<ng-container *ngIf="transactionData.transaction === 'external' && transactionData.comment">
+    <h3 class="font-1-bold">Note</h3>
+    <aside aria-label="Notes" class="d-flex source-content">
+        <section class="content-area">
+            <article class="item">
+                <span class="key">Note</span>
+                <span class="value" id="comments">
+                    {{ transactionData.comment }}
+                </span>
+            </article>
+        </section>
+    </aside>
+</ng-container>
+<ng-template #keyValuePair let-label="label" let-itemValue="itemValue">
+    <article class="item">
+        <span class="key">
+            {{label}}
+        </span>
+        <span class="value" id="value{{itemValue}}">
+            {{itemValue || '-'}}
+        </span>
+    </article>
+</ng-template>
+
+
+<ng-template #productListing let-dataSource="dataSource">
+    <section class="ff-table-container">
+        <table mat-table [dataSource]="dataSource" class="claim-verification-table" aria-label="Product listing data">
+            <ng-container matColumnDef="number">
+                <th class="normal-column" mat-header-cell *matHeaderCellDef>Number</th>
+                <td mat-cell *matCellDef="let element" class="normal-column">
+                    {{element.number}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th class="large-column" mat-header-cell *matHeaderCellDef>Product</th>
+                <td mat-cell *matCellDef="let element" class="large-column ellipsis-text">
+                    {{element.name}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="quantity">
+                <th class="normal-column" mat-header-cell *matHeaderCellDef>Quantity</th>
+                <td mat-cell *matCellDef="let element" class="normal-column">
+                    {{element.quantity.toFixed(2)}} kg
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row class="table-row" *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </section>
+</ng-template>

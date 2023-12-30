@@ -1,0 +1,60 @@
+
+$breakpoint-mobile-xs: 320px;
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-tablet-md: 992px;
+$breakpoint-laptop: 1280px;
+$breakpoint-laptop-lg: 1440px;
+$breakpoint-laptop-xlg: 1600px;
+$breakpoint-desktop: 1920px;
+
+@mixin devices($breakpoint) {
+  //the name of the mixin is devices
+
+  @if $breakpoint == desktop {
+    @media only screen and (min-width: $breakpoint-desktop) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == laptop-xlg {
+    @media only screen and (min-width: $breakpoint-laptop-xlg) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == laptop-lg {
+    @media only screen and (min-width: $breakpoint-laptop-lg) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == laptop {
+    @media only screen and (min-width: $breakpoint-laptop) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == tablet {
+    @media only screen and (min-width: $breakpoint-tablet) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == tablet-md {
+    @media only screen and (min-width: $breakpoint-tablet-md) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == mobile {
+    @media only screen and (min-width: $breakpoint-mobile) {
+      @content;
+    }
+  }
+  @if $breakpoint == mobile-xs {
+    @media only screen and (min-width: $breakpoint-mobile-xs) {
+      @content;
+    }
+  }
+}

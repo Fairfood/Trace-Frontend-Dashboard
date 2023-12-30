@@ -1,0 +1,49 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+
+%common-image {
+  height: 90px;
+  width: 90px;
+  @include devices(desktop) {
+    height: 120px;
+    width: 120px;
+  }
+}
+
+.img-round {
+  border-radius: 50%;
+  @extend %common-image;
+}
+
+.avatar-round {
+  @include set-avatar-props(90px, var(--color-white), var(--font-color));
+  font-size: 30px;
+  @include devices(desktop) {
+    font-size: 36px;
+  }
+}
+
+.avatar-wrapper {
+  position: relative;
+  @extend %common-image;
+}
+
+.overlay {
+  z-index: 3;
+  background: rgb(0 58 96);
+  opacity: 0.5;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  border-radius: 50%;
+}
+.edit-propic {
+  position: absolute;
+  font-size: 26px;
+  color: var(--color-white);
+  z-index: 3;
+}

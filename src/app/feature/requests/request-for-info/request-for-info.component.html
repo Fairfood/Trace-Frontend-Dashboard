@@ -1,0 +1,50 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        Request for information
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+<section class="main-div" *ngIf="!loading">
+    <mat-radio-group id="selectAllOptions" aria-label="Select an option">
+        <mat-radio-button value="page" class="font-1-normal text-xs text-blue radio-items"
+            (change)="radioButtonChanged($event)" [value]="'supplier'" [checked]="selectingOptions==='supplier'">
+            Request to map suppliers
+
+        </mat-radio-button>
+        <mat-radio-button value="all" class="font-1-normal text-xs text-blue radio-items"
+            [checked]="selectingOptions==='info'" [value]="'info'" (change)="radioButtonChanged($event)">
+            Request supplier information
+        </mat-radio-button>
+    </mat-radio-group>
+
+    <form [formGroup]="mapSupplierForm">
+        <article class="receive-row-item mb-20 m-r-0">
+            <app-ff-dropdown label="Supply chain" [defaultValue]="fcontrol.supplyChain.value"
+                [dropdownOptions]="supplyChainList" inputClass="profile" (selectionChange)="setSupplyChain($event)">
+            </app-ff-dropdown>
+        </article>
+        <article class="mb-20 flex-column">
+            <label class="has-float-label custom-input"
+                [ngClass]="{'has-error': fcontrol.supplier.invalid && fcontrol.supplier.touched }">
+                <input placeholder=" " formControlName="supplier" type="text" class="stock"
+                    [matAutocomplete]="sendRequestTo" />
+                <span class="label">Send request to*</span>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+            </label>
+            <mat-autocomplete #sendRequestTo="matAutocomplete">
+                <aside class=" inside-container" aria-label="">
+                    <ng-container *ngFor="let item of filteredOptionsSupplier$ | async">
+                        <mat-option [value]="item.name">
+                            {{ item?.name }}
+                        </mat-option>
+                    </ng-container>
+                </aside>
+            </mat-autocomplete>
+           
+        </article>
+    </form>
+
+    <form [formGroup]="informationForm">
+
+    </form>
+</section>

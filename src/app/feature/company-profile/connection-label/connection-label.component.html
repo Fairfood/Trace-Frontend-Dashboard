@@ -1,0 +1,108 @@
+<div class="team-members-table flex-column">
+    <section class="header ff-flex-between">
+        <h3 *ngIf="!addScreenVisible">
+            Connection labels
+        </h3>
+        <h3 *ngIf="addScreenVisible">
+            {{isEdit?'Update connection label':'Create connection label'}}
+        </h3>
+        <aside class="ff-flex-start" aria-label="Action section">
+            <app-buttons buttonType="stroked" (buttonClicked)="toggleAddScreen()">
+                {{!addScreenVisible?'Add connection label':'Cancel'}}
+            </app-buttons>
+            <app-buttons buttonType="fill" *ngIf="addScreenVisible" (buttonClicked)="createNewLabel()">
+                {{isEdit?'Update label': 'Create label'}}
+            </app-buttons>
+        </aside>
+
+    </section>
+
+    <section class="ff-table-container w-100" *ngIf="!addScreenVisible">
+        <table aria-label="Connection label listing">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of connectionLabelsDispaly" class="{{item?.class}}">
+                        <article class="ff-flex-start pointer">
+                            {{item.name}}
+                        </article>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of connectionLabels" class="pointer">
+                    <td class="mat-cell large-column ff-flex-start">
+                        {{element?.name}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        <span *ngFor="let item of element.supply_chains; let i = index; let l = count" class="mb-0">
+                            <span *ngIf="i < 2">
+                                <span>{{item?.name}}</span>
+                                <span *ngIf="l > 1 && i != l - 1">,</span>
+                            </span>
+                        </span>
+                        <span *ngIf="element.supply_chains.length == 0">-</span>
+                        <span *ngIf="element.supply_chains.length > 2" matTooltip="{{element.supplychains}}"
+                            matTooltipPosition="above" class="text-primary cursor-pointer">
+                            +{{element.supply_chains.length - 2 }} more</span>
+                    </td>
+                    <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+                        <span class="pointer" [matMenuTriggerFor]="moreOptionsTeam">
+                            <mat-icon>more_vert</mat-icon>
+                        </span>
+                        <mat-menu class="mat-menu" #moreOptionsTeam="matMenu" xPosition="before">
+                            <button *ngIf="memberType != 3" (click)="editStarted(element)" class="text-xs text-blue"
+                                mat-menu-item>Edit
+                            </button>
+                            <button *ngIf="memberType != 3" class="text-xs text-blue"
+                                (click)="removeConnectionLabel(element)" mat-menu-item>
+                                Remove
+                            </button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="connectionLabelsCount === 0" [hidden]="dataLoading">
+            No connection labels found
+        </div>
+
+        <app-loader [loaderText]="'Loading labels'" [loaderType]="'type1'" *ngIf="dataLoading"
+            class="min-h-300"></app-loader>
+    </section>
+
+    <app-ff-pagination [totalCount]="connectionLabelsCount" (paginationAction)="paginatorEvent($event)"
+        *ngIf="!addScreenVisible"></app-ff-pagination>
+
+    <section class="add-member-form row" *ngIf="addScreenVisible" [formGroup]="labelForm">
+        <aside class="col-lg-6 flex-column" aria-label="">
+            <app-ff-input label="Connection label *" [parentFormGroup]="labelForm" controlName="label" inputSize="full"
+                inputType="text" class="w-90">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'label'}">
+            </ng-container>
+
+        </aside>
+        <aside class="col-lg-6 flex-column" aria-label="">
+            <app-ff-multi-select-dropdown [dropdownOptions]="availableSupplyChains"
+                [defaultValue]="labelForm.controls.supplyChain.value || []" label="Supply chain *"
+                (selectionChange)="setSupplychain($event)" class="w-100"></app-ff-multi-select-dropdown>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:'supplyChain'}">
+            </ng-container>
+
+        </aside>
+    </section>
+
+</div>
+
+
+<!-- created a template to show error messages  -->
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <!-- showing required error message  -->
+    <span class="error-message"
+        *ngIf="labelForm.controls[formcontrol]?.errors?.required && (submitted || labelForm.controls[formcontrol]?.touched)">
+        This field is required *
+    </span>
+</ng-template>

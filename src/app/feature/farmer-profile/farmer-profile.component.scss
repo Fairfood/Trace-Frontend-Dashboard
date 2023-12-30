@@ -1,0 +1,106 @@
+@import 'src/styles/typography';
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+
+@include key-value-pair;
+@include common-list-styles;
+@include common-farmer-profile;
+
+.utils {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.top-box {
+  border-radius: 3px;
+  margin-top: 15px;
+  background-color: var(--color-table-row-active);
+  display: flex;
+  padding: 20px 30px;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+  .badge-white {
+    background-color: var(--color-white);
+    color: var(--color-primary-1) !important;
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 5px;
+    }
+  }
+
+  .badge-ff {
+    color: var(--color-white);
+  }
+  .badge-ff,
+  .value-tr,
+  .label-tr {
+    margin-bottom: 5px;
+  }
+
+  .data {
+    margin-left: 15px;
+  }
+}
+.heading-section,
+.utils,
+.tab-content {
+  ::ng-deep.tab-item {
+    min-width: 120px;
+  }
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.tab-content {
+  padding: 24px 0;
+  height: auto;
+  transition: height 0.25s ease-in;
+}
+.badges {
+  margin-bottom: 5px;
+  display: flex;
+}
+
+.first-row {
+  justify-content: space-between;
+  align-items: center;
+  .icon-wrapper {
+    padding: 20px 10px;
+  }
+  img,
+  mat-icon {
+    height: 54px;
+    width: 54px;
+    margin-right: 10px;
+  }
+  mat-icon {
+    font-size: 50px;
+  }
+  .editing {
+    align-self: flex-start;
+    padding: 20px 10px;
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+      margin-right: 6px;
+      padding-top: 3px;
+    }
+  }
+}
+
+.location {
+  margin: 5px 0;
+  img {
+    width: 30px;
+    height: 20px;
+    margin-right: 10px;
+  }
+}
+.no-ref {
+  padding: 0;
+  margin-bottom: 10px;
+  width: 100%;
+}

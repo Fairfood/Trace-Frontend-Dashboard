@@ -1,0 +1,71 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        Change profile picture
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+<section class="content ff-flex-center">
+    <ng-container *ngIf="!deleteProfilePic">
+        <article *ngIf="!imageChangedEvent || croppedImg" class="col-12 ff-flex-center">
+            <img *ngIf="!croppedImg" class="img-not-crop" [ngClass]="roundCrope ? 'img-crop-round' : ''"
+                [src]="data.image || '../../../../assets/images/mock_image.svg'" alt="">
+            <img *ngIf="croppedImg" [ngClass]="roundCrope ? 'img-crop-round' : ''" class="img-crop" [src]="croppedImg"
+                alt="">
+        </article>
+        <article *ngIf="imageChangedEvent != '' && !croppedImg" class="col-12 crop-section">
+            <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="roundCrope" output="base64"
+                [roundCropper]="roundCrope" format="png" (imageCropped)="imageCropped($event)"
+                (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed()">
+            </image-cropper>
+        </article><!-- col-12 -->
+    </ng-container>
+    <ng-container *ngIf="deleteProfilePic">
+        <h5 class="mx-0 text-sm text-blue font-1-normal">Are you sure you want to delete profile picture?</h5>
+    </ng-container>
+</section>
+
+<section class="action">
+    <ng-container *ngIf="deleteProfilePic">
+        <aside aria-label="" class="ff-flex-between">
+            <app-buttons buttonType="stroked" (buttonClicked)="cancel()">
+                Cancel
+            </app-buttons>
+            <app-buttons buttonType="fill" (buttonClicked)="confirmDelete()">
+                Delete
+            </app-buttons>
+        </aside>
+    </ng-container>
+    <aside aria-label="" class="ff-flex-center">
+        <ng-container *ngIf="!deleteProfilePic">
+            <ng-container *ngIf="!imageChangedEvent" class="col p-0 ff-flex-end">
+                <app-buttons buttonType="stroked" (buttonClicked)="delete()" *ngIf="data.image">
+                    Delete picture
+                </app-buttons>
+            </ng-container>
+            <ng-container *ngIf="!imageChangedEvent">
+                <input [hidden]="!uploader" type="file" (change)="fileChangeEvent($event)" accept="image/*" #file>
+                <app-buttons buttonType="fill" (buttonClicked)="file.click()" *ngIf="data.image">
+                    Change picture
+                </app-buttons>
+                <app-buttons buttonType="fill" (buttonClicked)="file.click()" *ngIf="!data.image">
+                    Upload picture
+                </app-buttons>
+            </ng-container>
+
+            <ng-container *ngIf="imageChangedEvent != ''">
+                <app-buttons buttonType="stroked" (buttonClicked)="crop()" *ngIf="!croppedImg">
+                    Crop image
+                </app-buttons>
+            </ng-container>
+
+            <ng-container *ngIf="imageChangedEvent != ''">
+                <app-buttons buttonType="fill" (buttonClicked)="upload()" *ngIf="!croppedImg || savePro">
+                    <img [hidden]="!loader" src="../../.././../assets/images/loading-white.svg" width="20" alt="">
+                    Set as profile picture
+                </app-buttons>
+            </ng-container>
+
+        </ng-container>
+    </aside>
+
+</section>

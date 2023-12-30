@@ -1,0 +1,60 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+
+.main-wrapper {
+  margin-top: 15px;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.utils {
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+
+  ::ng-deep.tab-item {
+    min-width: 150px;
+  }
+
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.farmer-box {
+  border-radius: 3px;
+  margin-top: 15px;
+  background-color: var(--color-table-row-active);
+  padding: 20px 50px;
+  padding-left: 0;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+
+  .left {
+    width: 20%;
+    
+  }
+
+  .right {
+    width: 80%;
+    padding: 20px 50px 20px 10px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.items {
+  padding: 5px 0;
+  svg {
+    margin-right: 10px;
+  }
+  &.trans {
+    margin-left: 10px;
+  }
+}
+
+.desc {
+  max-width: 70%;
+  word-wrap: break-word;
+}

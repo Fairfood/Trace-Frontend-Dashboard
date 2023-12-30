@@ -1,0 +1,27 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading" id="pageHeading">
+            {{pageHeading}}
+        </h1>
+        <aside class="right-section" aria-label="export icon" *ngIf="isListing">
+            <article aria-label="need help" class="need-help" (click)="showHideHelp()" id="needHelp">
+                Need help ?
+            </article>
+            <span>|</span>
+            <app-export-icon></app-export-icon>
+        </aside>
+    </section>
+    <section class="w-100 ff-flex-end" *ngIf="toggleHelp">
+        <div class="help-box ff-flex-align-center">
+            <img src="../../../assets/images/help.png" alt="help image">
+            <span>
+                Add stock by clicking on “Receive stock” then you can add stock from farm or anonymous, and also you can
+                request stock from a supplier. Select some stock from the list to Send or Convert it.
+            </span>
+            <mat-icon (click)="showHideHelp()" id="closeHelp">close</mat-icon>
+        </div>
+    </section>
+    <section>
+        <router-outlet></router-outlet>
+    </section>
+</div>

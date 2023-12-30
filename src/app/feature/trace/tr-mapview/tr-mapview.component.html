@@ -1,0 +1,6 @@
+<ng-container *ngIf="apiLoaded | async">
+    <div style="height: 350px;" *ngIf="actorLoaded && stagesLoaded">
+        <google-map (mapInitialized)="mapReady($event)" height="350px" width="100%" [zoom]="2"
+            [options]="mapDefaultOptions"></google-map>
+    </div>
+</ng-container>

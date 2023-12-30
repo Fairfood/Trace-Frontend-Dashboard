@@ -1,0 +1,16 @@
+@import 'src/styles/utils';
+@import '../process-stock.common.scss';
+@include input-common-css;
+@include key-value-pair;
+.stock-merge-item {
+  width: 100%;
+  @include devices(tablet) {
+    width: 48%;
+  }
+  @include devices(laptop-lg) {
+    width: 32%;
+  }
+  &.mr-10 {
+    margin-right: 10px;
+  }
+}

@@ -1,0 +1,22 @@
+::ng-deep .mat-dialog-container {
+  padding: 0px !important;
+}
+
+.action,
+.content {
+  margin-top: 25px;
+  padding: 0 40px 10px 40px;
+}
+
+.img-not-crop {
+  width: 225px;
+  padding-top: 9px;
+}
+
+.img-crop {
+  width: 225px;
+  padding-top: 9px;
+}
+.img-crop-round {
+  border-radius: 100%;
+}

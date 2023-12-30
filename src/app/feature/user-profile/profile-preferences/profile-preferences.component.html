@@ -1,0 +1,45 @@
+<div class="row-md">
+    <section class="col-md-6" *ngIf="!loading">
+        <article class="flex-column mt-30">
+            <span class="value-tr">Notification preferences</span>
+            <span class="label-tr">Configure the company notification preferences</span>
+        </article>
+        <section class="ff-table-container w-100">
+            <table class="stock-listing-table" aria-label="Profile preference selection table">
+                <thead>
+                    <tr>
+                        <th>Company name</th>
+                        <th class="large-column">
+                            <article class="ff-flex-between">
+                                <span>
+                                    Allow notifications
+                                </span>
+                                <label class="switch mr-40">
+                                    <input type="checkbox" id="select-all-view-switch" name="view-all"
+                                        (change)="selectAllCompany($event)">
+                                    <span class="slider round"></span>
+                                </label>
+                            </article>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let comp of companyList">
+                        <td>
+                            {{comp.name}}
+                        </td>
+                        <td>
+                            <article class="ff-flex-end mr-40">
+                                <label class="switch">
+                                    <input type="checkbox" id="company-noti-switch" name="select-company"
+                                        (change)="toggleCompanySettings($event, comp)" [checked]="comp.selected">
+                                    <span class="slider round"></span>
+                                </label>
+                            </article>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </section>
+</div>

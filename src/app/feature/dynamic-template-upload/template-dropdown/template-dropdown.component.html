@@ -1,0 +1,45 @@
+<!-- template selection autocomplete  -->
+<div class="flex-column border-bottom form-item" [formGroup]="form">
+    <label class="has-float-label custom-input">
+        <input placeholder=" " formControlName="templateName" type="text" class="stock"
+            [matAutocomplete]="templateSelection" />
+        <span class="label">Choose or add new template*</span>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+    </label>
+    <mat-autocomplete #templateSelection="matAutocomplete">
+        <section class="inside-container" aria-label="">
+            <ng-container *ngIf="templateLoader">
+                <mat-option>
+                    <app-loader [noText]="true" loaderType="type2"></app-loader>
+                </mat-option>
+            </ng-container>
+            <ng-container *ngFor="let item of templateList$ | async">
+                <ng-container *ngIf="item.is_active">
+                    <mat-option [value]="item.name" (click)="initTemplateData(item)">
+                        {{ item.name }}
+                    </mat-option>
+                </ng-container>
+            </ng-container>
+            <span class="autocomplete-heading">
+                Create your own excel template
+            </span>
+            <mat-option class="ff-flex-between" *ngIf="!showRemove" (click)="$event.preventDefault()">
+                <span>
+                    Upload your own excel file to create a template
+                </span>
+                <app-buttons buttonType="stroked" (buttonClicked)="customUpload()" buttonSize="medium">
+                    Upload
+                </app-buttons>
+            </mat-option>
+
+            <mat-option class="ff-flex-between" *ngIf="showRemove" (click)="$event.preventDefault()">
+                <span>
+                    Remove current file and choose something else
+                </span>
+                <app-buttons buttonType="stroked" (buttonClicked)="customUpload()">
+                    Remove
+                </app-buttons>
+            </mat-option>
+        </section>
+    </mat-autocomplete>
+</div>

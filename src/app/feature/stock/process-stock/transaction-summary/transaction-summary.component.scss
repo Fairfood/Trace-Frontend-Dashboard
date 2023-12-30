@@ -1,0 +1,32 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+
+@include key-value-pair;
+
+.flex-wrap {
+  margin-top: 30px;
+}
+
+.batches {
+  min-width: 100%;
+  .text-overflow {
+    max-width: 300px;
+  }
+}
+.finalize {
+  padding-left: 10px;
+  margin-top: 25px;
+}
+.illustration {
+  width: auto;
+  @include devices(tablet-md) {
+    width: 80%;
+  }
+  @include devices(laptop-lg) {
+    width: auto;
+  }
+}
+
+.m-30 {
+  margin-top: 30px;
+}

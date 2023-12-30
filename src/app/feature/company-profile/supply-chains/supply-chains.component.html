@@ -1,0 +1,43 @@
+<section class="supply-chain-table-tab flex-column">
+    <div class="header ff-flex-between mb-10">
+        <h3>{{supplyChainCount}} active supply chains</h3>
+    </div>
+    <section class="ff-table-container w-100">
+        <table aria-label="Supply chain table">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of supplyChainColumns" class="{{item?.class}}">
+                        <article class="ff-flex-align-center pointer">
+                            {{item.name}}
+                        </article>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of supplyChainData" class="pointer">
+                    <td class="mat-cell large-column">
+                        {{element.supply_chain?.name}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.primary_operation?.name}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.company_count}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.farmer_count}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="supplyChainCount === 0" [hidden]="loader">
+            No supply chain found
+        </div>
+
+        <app-loader [loaderText]="'Loading supply chain'" [loaderType]="'type1'" *ngIf="loader"
+            class="min-h-300"></app-loader>
+    </section>
+    <app-ff-pagination [totalCount]="supplyChainCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+
+</section>

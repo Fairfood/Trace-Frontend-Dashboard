@@ -1,0 +1,26 @@
+@import 'src/styles/utils';
+
+@include notification-list-common;
+.noti-wrapper {
+  position: relative;
+  margin-top: 20px;
+  .notification-list {
+    overflow-y: auto;
+    height: 40vh;
+    @include scrollbar;
+  }
+  .ff-heading3 {
+    padding: 10px 0;
+    color: var(--color-primary-1);
+  }
+}
+
+.mark-wrapper {
+  align-items: center;
+  .value-tr {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+  }
+}
+

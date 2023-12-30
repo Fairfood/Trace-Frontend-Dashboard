@@ -1,0 +1,61 @@
+// color variables
+@import '../process-stock.common.scss';
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include key-value-pair;
+
+.claim-listing {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li {
+    padding: 12px 15px;
+    border: 1px solid var(--color-tr-claims);
+    border-radius: 6px;
+    margin-bottom: 15px;
+
+    svg {
+      margin-right: 5px;
+    }
+
+    &.selected {
+      background-color: var(--color-table-row-active);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .left-side {
+      mat-icon {
+        font-size: 34px;
+        height: 34px;
+        width: 34px;
+        margin-right: 25px;
+        color: var(--color-tr-claims);
+      }
+    }
+
+    .content-claim {
+
+      .desc {
+        max-width: 300px;
+        color: var(--font-color-2);
+        display: block;
+      }
+    }
+  }
+}
+.header-wrap {
+  margin-top: 15px;
+}
+
+.inherited-label {
+  border-radius: 3px;
+  background-color: var(--font-color-2);
+  color: var(--color-white);
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 12px;
+  margin-left: 6px;
+}

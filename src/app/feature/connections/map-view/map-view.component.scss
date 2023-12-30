@@ -1,0 +1,214 @@
+@import 'src/styles/utils.scss';
+
+.map-view {
+  height: calc(100vh - 215px);
+  width: 100%;
+  display: block;
+}
+
+// map legends
+.map-legend-box {
+  position: absolute;
+  right: 50px;
+  bottom: 140px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px;
+  border-radius: 2px;
+  background-color: var(--color-white);
+  width: 40px;
+  border: 1px solid var(--border-color);
+}
+
+.legend-item {
+  padding-top: 10px;
+}
+.legend-item-info {
+  margin-top: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.legend-icon {
+  height: 32px;
+  width: 40px;
+  cursor: pointer;
+  padding-bottom: 11px;
+}
+
+.info-container .h-2.d-inline {
+  display: inline-flex !important;
+}
+
+::ng-deep .info-container {
+  padding: 10px !important;
+  padding-top: 20px !important;
+  width: 300px;
+}
+
+::ng-deep .gm-style-iw-d{
+  max-height: 360px!important;
+}
+
+::ng-deep .info-container .btn {
+  height: 34px !important;
+  line-height: 0px !important;
+  font-size: 12px !important;
+  font-family: var(--font-medium) !important;
+  margin: 4px;
+  margin-top: 10px;
+  border-radius: 6px !important;
+}
+
+::ng-deep .info-container button {
+  font-family: 'Moderat Medium' !important;
+  height: 34px !important;
+  border-radius: 0px !important;
+  border-radius: 6px !important;
+}
+
+::ng-deep .infowindow-title {
+  margin-bottom: 25px !important;
+}
+.menu-width {
+  width: 268px !important;
+}
+
+.my-company {
+  fill: var(--map-marker);
+}
+
+.actor {
+  fill: var(--map-marker);
+}
+
+.verified-connection {
+  stroke: var(--map-marker);
+}
+
+.active-connection {
+  stroke: var(--map-selected);
+}
+
+.clustered-img {
+  fill: var(--map-clustor-color);
+}
+
+.active-actor {
+  fill: var(--map-selected);
+}
+
+.connection-label-filter {
+  position: absolute;
+  left: 200px;
+  top: 120px;
+}
+
+.btn-md-white-2 {
+  height: 42px !important;
+  background: var(--color-white);
+  border-width: 1px !important;
+  border-color: var(--border-color) !important;
+  border-style: solid !important;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  line-height: 0px !important;
+  font-size: 14px !important;
+  padding-bottom: 5px !important;
+  border-radius: 6px;
+}
+
+.text-primary1 {
+  color: var(--color-primary-1) !important;
+}
+
+.label-dropdown {
+  max-height: 200px;
+  overflow-y: scroll !important;
+}
+
+::ng-deep .info-container {
+  .inner-left {
+    .txt-img {
+      width: 25px;
+      height: 25px;
+      background: var(--font-color);
+      color: var(--color-white);
+      border-radius: 50% !important;
+      h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding-top: 3px;
+      }
+    }
+  }
+  .inner-right .h-1 {
+    color: var(--font-color);
+    font-family: var(--font-bold);
+    font-size: 14px;
+    text-transform: capitalize;
+    margin-bottom: 8px;
+    word-break: break-all;
+  }
+}
+.select-stream {
+  position: absolute;
+  top: 120px;
+  left: 190px;
+  padding: 6px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px;
+  border-radius: 2px;
+  background-color: white;
+  border: 1px solid #e5ebef;
+  .txt-img {
+    width: 25px;
+    height: 25px;
+    background: var(--font-color);
+    color: var(--color-white);
+    border-radius: 50% !important;
+    h1 {
+      padding-left: 7px;
+      padding-top: 5px;
+    }
+  }
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+
+::ng-deep.gm-ui-hover-effect {
+  top: 2px !important;
+  right: 9px !important;
+  opacity: 1!important;
+  span {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+::ng-deep .h-2 {
+  color: var(--font-color-2);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+::ng-deep .h-1 {
+  color: var(--font-color);
+  font-family: var(--font-bold);
+  font-size: 14px;
+  text-transform: capitalize;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+.avatar-round {
+  @include set-avatar-props(14px, var(--color-white), var(--font-color));
+  font-size: 10px;
+  margin-right: 10px;
+}
+
+.close {
+  height: 18px;
+  width: 18px;
+  font-size: 18px !important;
+  margin-left: 10px;
+}

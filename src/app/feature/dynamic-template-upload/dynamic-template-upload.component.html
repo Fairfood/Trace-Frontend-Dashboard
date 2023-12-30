@@ -1,0 +1,28 @@
+<div class="page-container" *ngIf="canLoad">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            {{ type === 1?'Receive stock': 'Add connection' }}
+        </h1>
+    </section>
+    <app-ff-custom-tab [tabGroupItems]="tabGroup | async" [activeTabId]="currentStep | async"
+        (tabChanged)="changeTab($event)" [withDescription]="true"></app-ff-custom-tab>
+
+    <ng-container [ngSwitch]="(currentStep$ | async)">
+        <ng-container *ngSwitchCase="'upload'">
+            <app-template-selection></app-template-selection>
+        </ng-container>
+        <ng-container *ngSwitchCase="'verification'">
+            <app-template-verification></app-template-verification>
+        </ng-container>
+        <ng-container *ngSwitchCase="'summary'">
+            <app-upload-summary></app-upload-summary>
+        </ng-container>
+        <ng-container *ngSwitchCase="'linkFields'">
+            <app-template-mapping></app-template-mapping>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+            test
+        </ng-container>
+    </ng-container>
+
+</div>

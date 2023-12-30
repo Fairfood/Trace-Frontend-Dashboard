@@ -1,0 +1,23 @@
+<article class="ff-flex-start">
+    <span *ngIf="wallet === ''">Logging in progress...</span>
+    <ng-container *ngIf="wallet !== ''">
+        <a *ngIf="url" [href]="url" target="_blank" class="ff-flex-start text-off-blue">
+            <img [src]="type === 101 ? '../../../../../assets/images/topl.svg': '../../../../../assets/images/hedra.svg'"
+                class="pointer" style="margin-right: 5px;" alt="" title="{{type === 101 ? 'Topl': 'Hedra'}}">
+            <u *ngIf="wallet !== ''">{{(wallet?.length> 20)? (wallet | slice:0:19)+'..':(wallet)}}</u>
+        </a>
+        <aside aria-label="" *ngIf="!url">
+            <img [src]="type === 101 ? '../../../../../assets/images/topl.svg': '../../../../../assets/images/hedra.svg'"
+                class="pointer" style="margin-right: 5px;" alt="" title="{{type === 101 ? 'Topl': 'Hedra'}}">
+            <span *ngIf="wallet !== ''">{{(wallet?.length> 20)? (wallet | slice:0:19)+'..':(wallet)}}</span>
+        </aside>
+    </ng-container>
+    <ng-container *ngIf="showCopyIcon">
+        <span *ngIf="wallet" class="pl-3 ff-flex-center">
+            <mat-icon class="pointer" [cdkCopyToClipboard]="wallet" matTooltip="Copied" #tooltip="matTooltip"
+                matTooltipPosition="above" (mouseenter)="$event.stopImmediatePropagation()"
+                (mouseleave)="$event.stopImmediatePropagation()" (click)="tooltip.show()"
+                [matTooltipHideDelay]="2000">content_copy</mat-icon>
+        </span>
+    </ng-container>
+</article>

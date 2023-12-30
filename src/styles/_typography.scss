@@ -1,0 +1,115 @@
+@import './responsive';
+@font-face {
+  font-family: 'Moderat Regular';
+  src: url('../assets/fonts/Moderat-Regular.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Moderat Medium';
+  src: url('../assets/fonts/Moderat-Medium.woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Moderat Bold';
+  src: url('../assets/fonts/Moderat-Bold.woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+.font-1-bold {
+  font-family: 'Moderat Bold' !important;
+}
+
+.font-1-medium {
+  font-family: 'Moderat Medium' !important;
+}
+
+.font-1-normal {
+  font-family: 'Moderat Regular' !important;
+}
+
+.ff-heading1 {
+  font-size: var(--font-size-heading1);
+  font-family: var(--font-bold);
+}
+
+.ff-heading2 {
+  font-size: var(--font-size-heading2);
+  font-family: var(--font-bold);
+}
+
+.ff-heading3 {
+  font-size: var(--font-size-heading3);
+  font-family: var(--font-bold);
+}
+
+.paragraph1 {
+  font-size: var(--font-size-paragraph1);
+  font-family: var(--font-regular);
+}
+
+.paragraph2 {
+  font-size: var(--font-size-paragraph2);
+  font-family: var(--font-regular);
+}
+
+.paragraph3 {
+  font-size: var(--font-size-paragraph3);
+  font-family: var(--font-regular);
+}
+
+.label {
+  font-size: var(--font-size-label);
+  font-family: var(--font-medium);
+}
+
+.button1 {
+  font-size: var(--font-size-button1);
+  font-family: var(--font-medium);
+}
+
+.button2 {
+  font-size: var(--font-size-button2);
+  font-family: var(--font-medium);
+}
+
+.page-heading {
+  font-size: 20px;
+  color: var(--font-color);
+  font-family: var(--font-bold);
+  padding: 10px 0;
+  margin: 0;
+
+  @include devices(mobile) {
+    font-size: 22px;
+  }
+
+  @include devices(tablet) {
+    font-size: 26px;
+  }
+
+  @include devices(laptop-lg) {
+    font-size: 30px;
+  }
+}
+
+.sub-heading {
+  font-size: 18px;
+  color: var(--font-color);
+  font-family: var(--font-bold);
+  @include devices(mobile) {
+    font-size: 20px;
+  }
+
+  @include devices(tablet) {
+    font-size: 24px;
+  }
+
+  @include devices(laptop-lg) {
+    font-size: 28px;
+  }
+}

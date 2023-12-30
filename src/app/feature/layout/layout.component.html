@@ -1,0 +1,12 @@
+<section aria-label="viewing as admin toolbar" class="toolbar-admin ff-flex-between" *ngIf="viewingAsAdmin">
+  <span id="viewAsAdminText">
+    <mat-icon>remove_red_eye</mat-icon> Viewing as {{companyName}} Admin
+  </span>
+  <span (click)="backtoAdmin()" class="pointer" id="exitAdminView">Exit view<mat-icon>close</mat-icon></span>
+</section>
+<app-header (dataLoading)="loadingStatus($event)"></app-header>
+<app-sidebar (collapsedEvent)="receiveCollapsed($event)"></app-sidebar>
+<section class="main-container" [ngClass]="{collapsed: collapedSideBar}">
+  <router-outlet *ngIf="!loader"></router-outlet>
+  <app-loader loaderType="type1" loaderText="Fetching data. Please wait" *ngIf="loader"></app-loader>
+</section>

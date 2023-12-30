@@ -1,0 +1,65 @@
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="pointer"
+    [matMenuTriggerFor]="exportUI" #languageMenuTrigger="matMenuTrigger">
+    <circle cx="14" cy="14" r="14" fill="#003A60" />
+    <path
+        d="M14.1007 15.7744L14.1006 15.7742L11.3881 12.9327L11.388 12.9325C11.3048 12.8455 11.3671 12.7002 11.4873 12.7002H12.9081H13.1581V12.4502V9.4794C13.1581 9.2615 13.336 9.08359 13.5539 9.08359H14.8456C15.0635 9.08359 15.2414 9.2615 15.2414 9.4794V12.4502V12.7002H15.4914H16.9122C17.0324 12.7002 17.0947 12.8455 17.0115 12.9325L17.0114 12.9327L14.2989 15.7742L14.2988 15.7744C14.2732 15.8013 14.2373 15.8167 14.1998 15.8167C14.1622 15.8167 14.1263 15.8013 14.1007 15.7744Z"
+        fill="white" stroke="#003A60" stroke-width="0.5" />
+    <path
+        d="M19.4955 18.9166H8.90414C8.54364 18.9166 8.25 18.623 8.25 18.2625V18.0042C8.25 17.6437 8.54364 17.35 8.90414 17.35H19.4955C19.856 17.35 20.1497 17.6437 20.1497 18.0042V18.2625C20.1497 18.623 19.856 18.9166 19.4955 18.9166Z"
+        fill="white" stroke="#003A60" stroke-width="0.5" />
+</svg>
+<mat-menu class="export-ui-menu" #exportUI="matMenu" xPosition="before">
+    <ul class="downloading-items" *ngIf="!loading">
+        <ng-container *ngIf="recentExports?.length">
+            <li *ngFor="let item of recentExports;trackBy: exportFn">
+                <article class="row1">
+                    <span class="new-chip">
+                        <ng-container *ngIf="item?.export_type === 1">Stock</ng-container>
+                        <ng-container *ngIf="item?.export_type === 2">Transactions</ng-container>
+                        <ng-container *ngIf="item?.export_type === 3">Stock actions</ng-container>
+                        <ng-container *ngIf="item?.export_type === 6">Company</ng-container>
+                        <ng-container *ngIf="item?.export_type === 5">Farmers</ng-container>
+                        <ng-container *ngIf="item?.export_type === 10">Payments</ng-container>
+                    </span>
+                    <span class="file-name-download text-overflow font-1-medium font-12"
+                        [class.completed]="item.status === exportStatus.COMPLETED"
+                        title="{{item?.file_name}}">{{item?.file_name}}</span>
+                </article>
+                <article class="row2" *ngIf="item.status === 'preparing'">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </article>
+                <article class="row2" *ngIf="item.status === exportStatus.PENDING">
+                    <mat-progress-bar mode="determinate" [value]="item?.progress | async"></mat-progress-bar>
+                </article>
+                <article class="row3">
+                    <span class="cancel font-1-normal pointer font-12"
+                        *ngIf="item.status === exportStatus.PENDING || item.status === exportStatus.FAILED "
+                        (click)="cancelExport(item?.id)">Cancel</span>
+                    <span class="download font-1-normal pointer font-12"
+                        *ngIf="item.status === exportStatus.COMPLETED && downloading !== item.id"
+                        (click)="downloadFile(item); $event.stopPropagation();">
+                        Download
+                    </span>
+                    <span class="download font-1-normal font-12" *ngIf="downloading === item.id">
+                        Downloading . . .
+                    </span>
+                    <ng-container *ngIf="item.status === 'preparing'">
+                        <span class="other-text font-1-normal font-12">Preparing download...</span>
+                    </ng-container>
+                    <span class="status font-1-normal font-12" *ngIf="item.status === exportStatus.PENDING">
+                        {{item?.progress | async}} % completed
+                    </span>
+                    <span class="status font-1-normal font-12" *ngIf="item.status === exportStatus.COMPLETED">
+                        {{+(item?.updated_on)*1000 | date: 'dd MMMM y'}}
+                    </span>
+                    <span class="error-message font-1-medium font-12" *ngIf="item.status === exportStatus.FAILED">
+                        Export failed
+                    </span>
+                </article>
+            </li>
+        </ng-container>
+        <li *ngIf="!recentExports?.length">
+            <span class="font-1-normal text-blue font-12">No data found</span>
+        </li>
+    </ul>
+</mat-menu>

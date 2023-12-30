@@ -1,0 +1,148 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        {{data?.isEdit? 'Edit ': 'Add'}} plot
+    </h4>
+    <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+<section class="tabs">
+    <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="currentStep" (tabChanged)="changeTab($event)"
+        [withDescription]="true"></app-ff-custom-tab>
+</section>
+
+<section class="content" *ngIf="dataLoaded">
+    <ng-container [formGroup]="plotForm">
+
+        <ng-container *ngIf="currentStep === 'basic'">
+            <section formGroupName="addressDetails" class="second-page">
+                <article class="input-container-with-error">
+                    <app-ff-input label="Plot name *" [parentFormGroup]="plotForm.get('addressDetails')"
+                        [controlName]="'plotName'" inputSize="profile" inputType="text">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'plotName', formgroup: 'addressDetails'}">
+                    </ng-container>
+                </article>
+                <h3 class="text-blue font-1-bold">Address details</h3>
+                <aside class="d-flex w-100" aria-label="first row">
+                    <article class="w-50-cc input-container-with-error m-r-12">
+                        <app-ff-input label="Street name" [parentFormGroup]="plotForm.get('addressDetails')"
+                            [controlName]="'street'" inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'street', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc input-container-with-error">
+                        <app-ff-input label="City/Village" [parentFormGroup]="plotForm.get('addressDetails')"
+                            [controlName]="'city'" inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'city', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                </aside>
+
+                <aside class="d-flex w-100" aria-label="second row">
+                    <article class="w-50-cc input-container-with-error m-r-12">
+                        <app-ff-dropdown label="Country *" [dropdownOptions]="countryList" inputClass="profile"
+                            [defaultValue]="plotForm.get('addressDetails.country').value"
+                            (selectionChange)="dropdownChanged($event, 'country')">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'country', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc input-container-with-error">
+                        <app-ff-dropdown label="Province *" [dropdownOptions]="stateList" inputClass="profile"
+                            [defaultValue]="plotForm.get('addressDetails.province').value"
+                            (selectionChange)="dropdownChanged($event, 'province')">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'province', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                </aside>
+                <aside class="d-flex w-100" aria-label="third row">
+                    <article class="w-33-cc input-container-with-error m-r-12">
+                        <app-ff-input label="Latitude *" [parentFormGroup]="plotForm.get('addressDetails')"
+                            [controlName]="'latitude'" inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'latitude', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                    <article class="w-33-cc input-container-with-error m-r-12">
+                        <app-ff-input label="Longitude *" [parentFormGroup]="plotForm.get('addressDetails')"
+                            [controlName]="'longitude'" inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'longitude', formgroup: 'addressDetails'}">
+                        </ng-container>
+                    </article>
+                    <article class="w-33-cc input-container-with-error">
+                        <app-ff-input label="Postal code" [parentFormGroup]="plotForm.get('addressDetails')"
+                            [controlName]="'zipcode'" inputSize="profile" inputType="text">
+                        </app-ff-input>
+                    </article>
+                </aside>
+            </section>
+        </ng-container>
+
+        <ng-container *ngIf="currentStep === 'plot'">
+            <section class="second-page">
+                <article class="w-100 input-container-with-error">
+                    <app-ff-input label="Crop types *" [parentFormGroup]="plotForm.get('plot')"
+                        [controlName]="'cropType'" inputSize="profile" inputType="text">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'cropType', formgroup: 'plot'}">
+                    </ng-container>
+                </article>
+                <article class="w-100 input-container-with-error">
+                    <app-ff-input label="Total plot area *" [parentFormGroup]="plotForm.get('plot')"
+                        [controlName]="'totalArea'" inputSize="profile" inputType="text">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'totalArea', formgroup: 'plot'}">
+                    </ng-container>
+                </article>
+            </section>
+        </ng-container>
+
+    </ng-container>
+    <app-action-buttons [buttonNextState]="nextButtonState" (buttonsClicked)="nextClicked($event)"></app-action-buttons>
+</section>
+
+
+
+
+<ng-template let-formcontrol="formcontrol" let-formgroup="formgroup" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="plotForm.get(formgroup).get(formcontrol)?.errors?.required && plotForm.get(formgroup).get(formcontrol)?.touched">
+        This field shouldn't be empty *
+    </span>
+    <ng-container *ngIf="formcontrol === 'latitude' || formcontrol === 'longitude'">
+        <span class="error-message"
+            *ngIf="plotForm.get(formgroup).get(formcontrol)?.invalid && (plotForm.get(formgroup).get(formcontrol)?.touched)">
+            Invalid value
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'plotName'">
+        <span class="error-message"
+            *ngIf="plotForm.get(formgroup).get(formcontrol)?.errors?.maxlength && (plotForm.get(formgroup).get(formcontrol)?.touched)">
+            Maximum length allowed is 20 characters
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'totalArea'">
+        <span class="error-message"
+            *ngIf="plotForm.get(formgroup).get(formcontrol)?.errors?.maxlength && (plotForm.get(formgroup).get(formcontrol)?.touched)">
+            Maximum 6 digits allowed
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'totalArea'">
+        <span class="error-message"
+            *ngIf="plotForm.get(formgroup).get(formcontrol)?.errors?.pattern && (plotForm.get(formgroup).get(formcontrol)?.touched)">
+            Invalid input
+        </span>
+    </ng-container>
+</ng-template>

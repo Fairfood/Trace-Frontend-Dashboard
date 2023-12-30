@@ -1,0 +1,86 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+
+.search-b {
+  border: 1px solid var(--border-color);
+  padding: 8px 10px;
+  border-radius: 6px;
+  position: relative;
+  @include devices(laptop-xlg) {
+    padding: 8px 12px;
+  }
+  svg {
+    position: absolute;
+    left: 18px;
+    color: var(--font-color-2);
+    height: 18px;
+  }
+  input {
+    border: 0;
+    background-color: transparent;
+    font-size: 14px;
+    color: var(--font-color-2);
+    padding-left: 30px;
+    width: 75%;
+    @include devices(mobile) {
+      width: 35%;
+    }
+    @include devices(laptop) {
+      width: 60%;
+    }
+
+    &::placeholder {
+      color: var(--font-color-2);
+      opacity: 1;
+    }
+    &:hover,
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .search-by {
+    border-left: 1px solid var(--font-color-2);
+    display: none;
+    cursor: pointer;
+    font-size: 14px;
+    .label {
+      font-family: var(--font-regular);
+      color: var(--font-color-2);
+      padding-left: 20px;
+      width: 84px;
+    }
+    .selected {
+      font-family: var(--font-bold);
+      color: var(--font-color);
+      padding: 0 10px;
+      mat-icon {
+        padding-left: 10px;
+      }
+    }
+    @include devices(mobile) {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+  }
+}
+::ng-deep .serach-by {
+  .mat-mdc-menu-content {
+    width: 200px;
+
+    @include reset-ul();
+
+    ul {
+      padding-top: 20px;
+      padding-left: 25px;
+    }
+
+    li {
+      padding: 10px 0;
+      font-size: 14px;
+      color: var(--font-color);
+      font-family: var(--font-regular);
+    }
+  }
+}

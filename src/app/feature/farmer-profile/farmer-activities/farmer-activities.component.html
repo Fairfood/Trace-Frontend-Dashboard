@@ -1,0 +1,24 @@
+<section class="top-box">
+    <h3 class="text-md text-blue font-1-bold">Logs</h3>
+    <ul class="log-list" *ngIf="!activities.loading">
+        <ng-container *ngFor="let log of activities.results">
+            <li>
+                <span class="avatar-round" *ngIf="!log.image">{{log?.username? log.username[0]: 'NA'}}</span>
+                <img class="img-round" [src]="log?.image" alt="img" *ngIf="log.image" />
+                <aside class="d-flex flex-column">
+                    <span class="text-xs text-off-blue font-1-normal">
+                        {{ (log.created_on * 1000) | date:'fullDate'}}
+                    </span>
+                    <span class="text-sm text-blue font-1-normal">{{ log.text }}</span>
+                </aside>
+            </li>
+        </ng-container>
+        <section class="no-data text-xs font-1-medium" *ngIf="activities.count === 0">
+            No logs found
+        </section>
+    </ul>
+</section>
+<div class="col-12 mt-10">
+    <app-ff-pagination [totalCount]="activities.count" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+</div>
+<app-loader loaderText="Loading logs" loaderType="type1" *ngIf="activities.loading"></app-loader>

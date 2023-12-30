@@ -1,0 +1,133 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Farmer profile
+        </h1>
+        <aside aria-label="" class="right-section" *ngIf="!loading" id="lastModified">
+            <span class="label-tr">Last modified on {{profileData?.updated_on * 1000 | date: 'dd MMMM y' }}</span>
+        </aside>
+    </section>
+    <section class="top-box" *ngIf="!loading">
+        <app-profile-avatar [imageUrl]="profileData?.image" [avatar]="profileData?.avatar"></app-profile-avatar>
+        <aside aria-label="important information" class="d-flex flex-column data">
+            <article class="badges">
+                <span class="badge-ff text-xs"
+                    *ngIf="profileData?.primary_operation">{{profileData?.primary_operation?.name}}</span>
+                <span class="badge-ff badge-white text-xs"
+                    [ngStyle]="{'margin-left': profileData?.primary_operation? '10px': '0px'}">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M17.6559 8.33921C17.3852 8.18186 17.142 7.98146 16.9359 7.74587C16.9567 7.41788 17.0348 7.09608 17.1667 6.79504C17.4092 6.11087 17.6834 5.33587 17.2434 4.73337C16.8034 4.13087 15.9725 4.15004 15.2434 4.16671C14.9212 4.19986 14.5957 4.17788 14.2809 4.10171C14.1131 3.8288 13.9933 3.52919 13.9267 3.21587C13.72 2.51171 13.4842 1.71587 12.76 1.47754C12.0617 1.25254 11.415 1.74754 10.8434 2.18254C10.5967 2.40781 10.3109 2.58602 10 2.70837C9.68593 2.58702 9.39693 2.40876 9.14752 2.18254C8.57752 1.75004 7.93335 1.25004 7.23169 1.47837C6.50919 1.71337 6.27335 2.51171 6.06502 3.21587C5.99846 3.52818 5.87986 3.82707 5.71418 4.10004C5.39878 4.17601 5.07287 4.19854 4.75002 4.16671C4.01835 4.14671 3.19418 4.12504 2.75002 4.73337C2.30585 5.34171 2.58335 6.11087 2.82668 6.79421C2.96039 7.0948 3.03967 7.41674 3.06085 7.74504C2.85508 7.98094 2.61216 8.18164 2.34168 8.33921C1.73168 8.75587 1.03918 9.23004 1.03918 10C1.03918 10.77 1.73168 11.2425 2.34168 11.6609C2.6121 11.8182 2.85502 12.0186 3.06085 12.2542C3.0419 12.5824 2.96487 12.9046 2.83335 13.2059C2.59168 13.8892 2.31835 14.6642 2.75752 15.2667C3.19668 15.8692 4.02502 15.85 4.75752 15.8334C5.07999 15.8002 5.40576 15.8222 5.72085 15.8984C5.88784 16.1716 6.00731 16.4711 6.07418 16.7842C6.28085 17.4884 6.51669 18.2842 7.24085 18.5225C7.35695 18.5598 7.4781 18.5789 7.60002 18.5792C8.18603 18.4951 8.73067 18.2286 9.15668 17.8175C9.40336 17.5923 9.68918 17.4141 10 17.2917C10.3141 17.4131 10.6031 17.5913 10.8525 17.8175C11.4234 18.2534 12.07 18.7509 12.7692 18.5217C13.4917 18.2867 13.7275 17.4884 13.9359 16.785C14.0026 16.4722 14.1221 16.1729 14.2892 15.9C14.6034 15.8236 14.9283 15.801 15.25 15.8334C15.9817 15.8509 16.8059 15.875 17.25 15.2667C17.6942 14.6584 17.4167 13.8892 17.1734 13.205C17.0406 12.9047 16.9613 12.5835 16.9392 12.2559C17.1451 12.0198 17.3883 11.819 17.6592 11.6617C18.2692 11.245 18.9617 10.77 18.9617 10C18.9617 9.23004 18.2667 8.75671 17.6559 8.33921Z"
+                            fill="#4DCAF4" />
+                        <path
+                            d="M9.1667 12.2918C9.08462 12.2919 9.00332 12.2758 8.92751 12.2443C8.8517 12.2128 8.78288 12.1667 8.72504 12.1084L7.05837 10.4418C6.94797 10.3233 6.88787 10.1666 6.89072 10.0046C6.89358 9.84273 6.95917 9.68824 7.07368 9.57373C7.18819 9.45922 7.34268 9.39363 7.5046 9.39077C7.66652 9.38791 7.82322 9.44802 7.9417 9.55842L9.22503 10.8418L12.125 8.66675C12.2576 8.56729 12.4243 8.52459 12.5884 8.54803C12.7525 8.57147 12.9006 8.65914 13 8.79175C13.0995 8.92436 13.1422 9.09104 13.1188 9.25514C13.0953 9.41923 13.0076 9.56729 12.875 9.66675L9.5417 12.1668C9.43349 12.2478 9.30192 12.2917 9.1667 12.2918Z"
+                            fill="white" />
+                    </svg>
+
+                    Consent {{profileData?.consent_status.toLowerCase()}}
+                </span>
+            </article>
+            <span class="value-tr text-md font-1-bold">{{profileData?.name}}</span>
+            <article class="d-flex location">
+                <img [src]="profileData?.countryFlag" alt="flag" *ngIf="profileData?.countryFlag">
+                <span class="label-tr text-sm">{{profileData?.province}}, {{profileData?.country}}</span>
+            </article>
+            <span class="label-tr text-sm" *ngIf="profileData?.cards[0]?.fairid">
+                <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M1.77979 0H14.4929C15.4743 0 16.2727 0.798445 16.2727 1.77983V9.40768C16.2727 10.3891 15.4743 11.1875 14.4929 11.1875H1.77979C0.7984 11.1875 -4.57764e-05 10.3891 -4.57764e-05 9.40768V1.77983C-4.57764e-05 0.798445 0.7984 0 1.77979 0ZM14.4929 1.01705H1.77979C1.35921 1.01705 1.017 1.35925 1.017 1.77983V2.79688H15.2557V1.77983C15.2557 1.35925 14.9135 1.01705 14.4929 1.01705ZM1.77979 10.1705H14.4929C14.9135 10.1705 15.2557 9.82826 15.2557 9.40768V3.81393H1.017V9.40768C1.017 9.82826 1.35921 10.1705 1.77979 10.1705Z"
+                        fill="#5691AE" />
+                    <path
+                        d="M12.7131 8.64471H13.2216C13.5024 8.64471 13.7301 8.41702 13.7301 8.13619V7.62766C13.7301 7.34683 13.5024 7.11914 13.2216 7.11914H12.7131C12.4322 7.11914 12.2045 7.34683 12.2045 7.62766V8.13619C12.2045 8.41702 12.4322 8.64471 12.7131 8.64471Z"
+                        fill="#5691AE" />
+                </svg>
+
+                FF {{profileData?.cards[0]?.fairid}}
+            </span>
+        </aside>
+    </section>
+    <section class="utils" *ngIf="!loading">
+        <app-ff-custom-tab [tabGroupItems]="tabItems" [activeTabId]="activeTabId"
+            (tabChanged)="changeTab($event)"></app-ff-custom-tab>
+    </section>
+    <section class="tab-content" *ngIf="!loading">
+        <ng-container *ngIf="activeTabId === 'basic'">
+            <app-farmer-details (editingStarted)="detailsEditing($event)"></app-farmer-details>
+            <ng-container *ngIf="!references.loading && !editingDetails">
+                <h3 class="font-1-bold mb-25">References</h3>
+                <section class="list-detail-container">
+                    <section class="no-ref text-xs font-1-medium" *ngIf="farmerReferences.length === 0">
+                        No reference found
+                    </section>
+                    <app-list-detail [iterationList]="farmerReferences" [activeItem]="activeFarmerRef"
+                        [showAddButton]="profileData?.is_editable" [addButtonText]="'Add reference'"
+                        (listClicked)="referenceItemClicked($event)"
+                        (buttonPressed)="addReference($event)"></app-list-detail>
+                    <aside aria-label="farm details" class="list-information" *ngIf="activeFarmerDetails">
+                        <section class="section-detail">
+                            <aside class="d-flex first-row" aria-label="">
+                                <aside class="d-flex" aria-label="">
+                                    <article class="icon-wrapper">
+                                        <img [src]="activeFarmerDetails?.reference_details?.image" alt="ref"
+                                            *ngIf="activeFarmerDetails?.reference_details?.image">
+                                        <mat-icon
+                                            *ngIf="!activeFarmerDetails?.reference_details?.image">verified_user</mat-icon>
+                                    </article>
+
+                                    <article class="item">
+                                        <span class="value-tr font-1-bold text-md">
+                                            {{activeFarmerDetails?.reference_details?.name}}
+                                        </span>
+                                        <span class="value-tr font-1-normal">
+                                            {{activeFarmerDetails?.reference_details?.description}}
+                                        </span>
+                                    </article>
+                                </aside>
+
+
+                                <span class="editing d-flex pointer"
+                                    *ngIf="activeFarmerDetails?.reference_details?.is_editable"
+                                    (click)="addReference(activeFarmerDetails, true)" id="editIcon">
+                                    <mat-icon>edit</mat-icon> Edit
+                                </span>
+                            </aside>
+                            <article class="underline"></article>
+                            <aside aria-label="list item wrapping" class="d-flex item-wrapper">
+                                <article class="item">
+                                    <span class="value-tr font-1-bold">ID Number</span>
+                                    <span class="value-tr">
+                                        {{activeFarmerDetails?.number}}
+                                    </span>
+                                </article>
+                                <article class="item">
+                                    <span class="value-tr font-1-bold">Added on</span>
+                                    <span class="value-tr">
+                                        {{activeFarmerDetails?.created_on * 1000 | date: 'dd MMMM y'}}
+                                    </span>
+                                </article>
+                            </aside>
+                            <article class="underline"></article>
+                            <span class="value-tr">
+                                Source: {{activeFarmerDetails?.source_details?.full_name}}
+                            </span>
+                        </section>
+                    </aside>
+                </section>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'farm'">
+            <app-farm></app-farm>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'income'">
+            <app-income></app-income>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'logs'">
+            <app-farmer-activities [farmerId]="profileData.id"></app-farmer-activities>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'docs'">
+            <app-docs [farmerId]="profileData.id" [isEditable]="profileData?.is_editable"></app-docs>
+        </ng-container>
+    </section>
+</div>
+
+<app-loader loaderText="Loading profile data" loaderType="type1" *ngIf="loading"></app-loader>

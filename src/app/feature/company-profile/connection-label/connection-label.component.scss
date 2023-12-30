@@ -1,0 +1,25 @@
+.team-members-table {
+  .header {
+    width: 100%;
+    h3 {
+      color: var(--font-color);
+      font-family: var(--font-bold);
+      font-size: 18px;
+      padding-left: 20px;
+    }
+  }
+}
+.add-member-form {
+  padding: 30px 20px;
+  padding-right: 0;
+  display: flex;
+
+  .col-lg-6 {
+    display: flex;
+    width: 100%;
+  }
+}
+
+.w-90 {
+  width: 90%;
+}

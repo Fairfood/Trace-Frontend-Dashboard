@@ -1,0 +1,106 @@
+<div class="w-100 row-md m-30">
+    <div class="col-md-6 flex-wrap">
+        <ng-container *ngIf="currentAction === 'send'">
+            <article class="item">
+                <span class="key">Receiving company</span>
+                <span class="value">{{transactionSummary?.companyName}}</span>
+            </article>
+        </ng-container>
+
+        <ng-container *ngIf="currentAction === 'receive'">
+            <article class="item">
+                <span class="key">Farmer name</span>
+                <span class="value">{{transactionSummary?.farmerName}}</span>
+            </article>
+        </ng-container>
+
+        <article class="item">
+            <span class="key">Transaction date</span>
+            <span class="value">{{transactionSummary?.transactionDate | date: 'dd MMMM y'}}</span>
+        </article>
+        <ng-container *ngIf="currentAction === 'send'">
+            <article class="item">
+                <span class="key">Product</span>
+                <span class="value">{{transactionSummary?.product}}</span>
+            </article>
+            <article class="item">
+                <span class="key">Quantity(kg)</span>
+                <span class="value">{{transactionSummary?.totalQuantity}}</span>
+            </article>
+            <article class="item">
+                <span class="key">Seller reference number</span>
+                <span class="value">{{formData?.sellerRefNo || '-'}}</span>
+            </article>
+            <article class="item">
+                <span class="key">Buyer reference number</span>
+                <span class="value">{{formData?.buyerRefNo || '-'}}</span>
+            </article>
+        </ng-container>
+        <ng-container *ngIf="currentAction === 'receive'">
+            <article class="item">
+                <span class="key">Product</span>
+                <span class="value">{{transactionSummary?.product}}</span>
+            </article>
+            <article class="item">
+                <span class="key">Quantity/kg</span>
+                <span class="value">{{transactionSummary?.totalQuantity}}/kg</span>
+            </article>
+            <article class="item">
+                <span class="key">Total price/Currency</span>
+                <span class="value">{{transactionSummary?.totalPrice}}/{{transactionSummary?.currency || '-'}}</span>
+            </article>
+        </ng-container>
+
+        <article class="item batches" *ngIf="currentAction !== 'receive'">
+            <span class="key">Batches added({{batchData.length}})</span>
+            <article class="ff-flex-align-center">
+                <span class="value text-overflow" title="{{batchData.slice(0,3).join(', ')}}">
+                    {{batchData.slice(0,3).join(', ')}}
+                </span>
+                <span class="additional-count pointer" *ngIf="batchData.length>3">
+                    +{{batchData.length-3}}
+                </span>
+            </article>
+        </article>
+        <ng-container *ngIf="currentAction === 'convert'">
+            <article class="item">
+                <span class="key">Destination product{{transactionSummary?.destinationProducts.length>1?'s': ''}}</span>
+                <span class="value">{{transactionSummary.destinationProducts.join(', ')}}</span>
+            </article>
+            <article class="item">
+                <span class="key">Destination Quantity(kg)</span>
+                <span class="value">{{transactionSummary?.destinationQuantity}}</span>
+            </article>
+        </ng-container>
+
+        <ng-container *ngIf="currentAction === 'merge'">
+            <article class="item">
+                <span class="key">Merged product</span>
+                <span class="value">
+                    {{transactionSummary?.product}} - <span
+                        class="font-1-medium">{{transactionSummary?.totalQuantity}}kg</span>
+                </span>
+            </article>
+        </ng-container>
+        <ng-container *ngIf="currentAction !== 'merge'">
+            <article class="item">
+                <span class="key">Claims added</span>
+                <span class="value">
+                    {{claimList?.join(', ') || '-'}}
+                </span>
+            </article>
+        </ng-container>
+    </div>
+    <div class="col-md-6 ff-flex-align-center flex-wrap">
+        <img src="../../../../../assets/images/image-summary.png" alt="" class="illustration">
+    </div>
+</div>
+
+<section class="w-100 finalize">
+    <mat-checkbox class="text-sm text-blue font-1-normal" [(ngModel)]="checkFinalize"
+        (ngModelChange)="confirmTransaction(checkFinalize)" class="w-100">
+        I confirm that the above information is correct.
+    </mat-checkbox>
+</section>
+<app-stock-action-button [buttonNextState]="nextButtonState" (buttonsClicked)="finalize($event)">
+</app-stock-action-button>

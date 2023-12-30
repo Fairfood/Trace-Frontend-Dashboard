@@ -1,0 +1,12 @@
+<section class="ff-flex-align-center top-wrapper">
+    <app-search-box [placeholder]="'Search here'" [hideOptions]="false" [searchByOptions]="searchOptions"
+        [clearSearch]="clearSearch" (searchText)="searchFilter($event)" class="search-wrap"></app-search-box>
+    <app-listing-action class="filter-wrap" (filterChanged)="callStockApi(); clearSearch = true"></app-listing-action>
+</section>
+
+<app-listing-filters *ngIf="toggleFilter" (filterChanged)="callStockApi()"></app-listing-filters>
+
+<app-stock-table [stocks]="stocks" [dataLoading]="dataLoading" [tableLength]="tableLength"
+    (rowSelection)="rowSelectionCondition($event)" (filterChanged)="callStockApi()">
+
+</app-stock-table>

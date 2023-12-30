@@ -1,0 +1,39 @@
+@import 'src/styles/utils';
+.first-details,
+.second-details {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+  .form-items {
+    min-width: 260px;
+    padding: 15px 10px;
+    padding-bottom: 0;
+  }
+
+  @include key-value-pair;
+}
+
+.first-details {
+  .item {
+    min-width: 300px;
+  }
+}
+.edit {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  padding-top: 3px;
+  margin-right: 5px;
+}
+.form-button {
+  padding: 10px;
+}
+h3 {
+  font-size: 16px;
+  color: var(--font-color);
+  padding: 0 10px;
+  margin: 10px 0 0;
+}

@@ -1,0 +1,123 @@
+<div class="page-container" *ngIf="!pageLoader" >
+    <section class="heading-section" >
+        <h1 class="page-heading">
+            Transaction report: TR {{transactionData?.number}}
+        </h1>
+        <aside class="right-section" aria-label="story telling navigation"
+            *ngIf="transactionData?.badgeText !== 'Stock loss'">
+            <span class="need-help story-telling" (click)="openStoryTelling()" id="openStoryTelling">
+                <mat-icon class="ff-flex-align-center">remove_red_eye</mat-icon>View Storytelling
+            </span>
+        </aside>
+    </section>
+    <section class="reject ff-flex-between" *ngIf="transactionData?.rejectable && memberType !== 3">
+        <article class="ff-flex-align-center">
+            <!-- avoiding image download from server : using svg directly  -->
+            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M7.89429 15.3764C7.89411 15.3764 7.89438 15.3764 7.8942 15.3764C5.30178 15.3764 3.12066 15.2547 1.42122 15.1057C0.37371 15.0138 -0.282206 13.9294 0.119421 12.9575C1.23332 10.2617 2.60871 7.59862 4.22205 5.01578C5.32024 3.25768 6.38045 1.77588 7.27698 0.609962C7.90228 -0.203143 9.12544 -0.20341 9.75065 0.609696C10.6427 1.76975 11.6973 3.24321 12.79 4.99049C14.3951 7.55708 15.7653 10.2034 16.8774 12.8826C17.2812 13.8553 16.6228 14.9413 15.5737 15.0336C12.983 15.2614 10.4084 15.3764 7.89429 15.3764Z"
+                    fill="#DD636E" />
+                <path
+                    d="M8.51386 9.71803C8.13505 9.71803 7.82812 9.41102 7.82812 9.0323V4.04511C7.82812 3.66639 8.13513 3.35938 8.51386 3.35938C8.89259 3.35938 9.1996 3.66639 9.1996 4.04511V9.03221C9.19969 9.41093 8.89268 9.71803 8.51386 9.71803Z"
+                    fill="#F9F6F9" />
+                <path
+                    d="M8.51386 12.7728C8.13505 12.7728 7.82812 12.4658 7.82812 12.0871V12.0295C7.82812 11.6508 8.13513 11.3438 8.51386 11.3438C8.89259 11.3438 9.1996 11.6508 9.1996 12.0295V12.0871C9.19969 12.4657 8.89268 12.7728 8.51386 12.7728Z"
+                    fill="#F9F6F9" />
+            </svg>
+            <span class="value-tr">
+                You can reject this transaction if the provided details are incorrect.
+            </span>
+        </article>
+        <app-buttons buttonType="stroked" buttonSize="medium" (buttonClicked)="rejectTransactionDialog()" id="rejectTransaction">
+            Reject transaction
+        </app-buttons>
+    </section>
+    <section class="col-12 top-box d-flex" aria-label="top box">
+        <aside aria-label="transaction details" class="left">
+            <app-batch-info></app-batch-info>
+            <ng-container *ngIf="transactionData?.claims?.length > 0">
+                <ul class="d-flex claim-list">
+                    <ng-container *ngFor="let item of transactionData?.claims.slice(0, 3)">
+                        <li class="text-xs pointer ff-flex-align-center" (click)="gotoClaimTab()" id="claimTab">
+                            <ng-container [ngTemplateOutlet]="claimIconTemplate"
+                                [ngTemplateOutletContext]="{imageUrl: item?.image}">
+                            </ng-container>
+                            <span class="claim">
+                                {{(item?.name?.length>25)?item.name+'...': item?.name}}
+                            </span>
+                            <mat-icon class="ff-flex-center">keyboard_arrow_right</mat-icon>
+                        </li>
+                    </ng-container>
+                </ul>
+            </ng-container>
+            <article class="m-20 d-flex">
+                <span class="label-tr text-sm">Transaction hash:&nbsp;</span>
+                <span class="value-tr">
+                    <app-common-wallet [type]="transactionData?.wallet_type" [url]="transactionData?.explorer_url"
+                        [wallet]="transactionData?.blockchain_address">
+                    </app-common-wallet>
+                </span>
+            </article>
+            <article class="d-flex m-20">
+                <span class="label-tr text-sm">
+                    Transaction date:&nbsp;
+                </span>
+                <span class="value-tr">
+                    {{ transactionData?.date * 1000 | date: 'dd MMMM y' }}
+                </span>
+                <ng-container [ngTemplateOutlet]="dotIcon"></ng-container>
+                <span class="label-tr text-sm">
+                    Logged date:&nbsp;
+                </span>
+                <span class="value-tr">
+                    {{ transactionData?.logged_time * 1000 | date: 'dd MMMM y' }}
+                </span>
+            </article>
+        </aside>
+        <aside aria-label="qr code wrapper" class="qr-code ff-flex-start"
+            *ngIf="transactionData?.badgeText !== 'Stock loss'">
+            <app-qr-code-generator [storyTellingUrl]="storyTellingUrl" [qrCodeValue]="qrCodeValue">
+            </app-qr-code-generator>
+        </aside>
+    </section>
+    <section class="utils" *ngIf="!pageLoader">
+        <app-ff-custom-tab [tabGroupItems]="tabItems" [activeTabId]="activeTab"
+            (tabChanged)="changeTab($event)"></app-ff-custom-tab>
+    </section>
+    <section class="content-area">
+
+        <ng-container *ngIf="activeTab === 'basic'">
+            <app-basic-details></app-basic-details>
+            <ng-container *ngIf="transactionData.transaction == 'external'">
+                <app-batch-list (navigateToTrace)="gotoTraceTab($event)"></app-batch-list>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="activeTab === 'trace'">
+            <app-trace></app-trace>
+        </ng-container>
+        <ng-container *ngIf="activeTab === 'claims'">
+            <app-tr-claims [isReversal]="transactionData?.badgeText === 'Reversal'? true: false"
+                [attachedClaims]="transactionData?.claims" [transactionId]="transactionData?.id"
+                (claimAttached)="reloadDetails($event)"></app-tr-claims>
+        </ng-container>
+        <ng-container *ngIf="activeTab === 'docs'">
+            <app-receipt [transactionId]="transactionData?.id"></app-receipt>
+        </ng-container>
+    </section>
+
+   
+</div>
+<section class="loader-container ff-flex-center" *ngIf="pageLoader">
+    <app-loader [loaderText]="'Fetching transaction details'" [loaderType]="'type1'"></app-loader>
+</section>
+
+
+<ng-template #dotIcon>
+    <article class="dot-wrap">
+        <span class="dot"></span>
+    </article>
+</ng-template>
+<ng-template #claimIconTemplate let-imageUrl="imageUrl">
+    <mat-icon *ngIf="!imageUrl" class="claim-icon ff-flex-center">verified_user</mat-icon>
+    <img src="imageUrl" class="claim-icon" alt="c-ic" *ngIf="imageUrl">
+</ng-template>

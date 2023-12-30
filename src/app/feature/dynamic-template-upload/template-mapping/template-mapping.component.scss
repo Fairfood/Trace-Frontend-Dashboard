@@ -1,0 +1,42 @@
+.m50 {
+  margin-top: 50px;
+}
+
+.bg-light {
+  background-color: var(--color-table-row-active);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.new-chip-template {
+  margin: 8px;
+  padding: 5px 10px;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  &.inactive {
+    background-color: var(--color-chip-inactive);
+  }
+  &.active-required {
+    background-color: var(--font-color-2);
+  }
+  &.active-optional {
+    background-color: var(--color-primary-2);
+  }
+  .check {
+    color: var(--color-white);
+    height: 16px;
+    width: 16px;
+    font-size: 16px;
+    margin-left: 10px;
+  }
+}
+
+.p10 {
+  padding: 10px 0;
+}

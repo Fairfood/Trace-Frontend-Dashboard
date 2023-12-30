@@ -1,0 +1,10 @@
+@import 'src/styles/utils';
+@include reset-ul;
+@include company-selection;
+
+.load-more {
+  font-size: 14px;
+  text-decoration: underline;
+  margin: 0 10px;
+  cursor: pointer;
+}

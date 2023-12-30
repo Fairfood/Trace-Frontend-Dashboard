@@ -1,0 +1,28 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+@import 'src/styles/flex';
+%common-text-styles {
+  font-size: 12px;
+  color: var(--font-color);
+  font-family: var(--font-bold);
+}
+
+.export {
+  margin-left: 10px;
+  @extend %common-text-styles;
+  @extend %flex-common-center;
+  .text {
+    @extend %common-text-styles;
+    font-size: 14px;
+    @include devices(desktop) {
+      font-size: 16px;
+    }
+  }
+  img {
+    margin-right: 10px;
+    width: 15px;
+    @include devices(desktop) {
+      width: 20px;
+    }
+  }
+}

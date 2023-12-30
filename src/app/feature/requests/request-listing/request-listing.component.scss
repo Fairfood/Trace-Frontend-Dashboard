@@ -1,0 +1,92 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+@include reset-ul;
+@include company-selection;
+
+.img-contain {
+  object-fit: cover;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+}
+.tab-container {
+  border-bottom: 1px solid var(--border-color);
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.utils {
+  padding: 10px 0;
+}
+::ng-deep .ff-dropdown-container {
+  margin: 6px;
+}
+.w-50 {
+  width: 32%;
+  margin-right: 27px;
+}
+.request-container {
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+.req-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 15px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 10px;
+}
+
+.avatar-round {
+  @include set-avatar-props(19px, var(--color-white), var(--font-color));
+  font-size: 10px;
+}
+
+.avatar-round,
+.img-contain {
+  margin-right: 10px;
+  display: flex;
+  align-self: baseline;
+}
+.mb-1 {
+  margin-bottom: 10px;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+.bg-light-blue {
+  padding: 20px 40px;
+  flex-direction: column;
+}
+.pb-3 {
+  padding: 10px 0;
+}
+.border-grey {
+  border: 1px solid var(--border-color);
+  background-color: var(--color-white);
+}
+
+.selected-request {
+  background: var(--color-primary-3);
+  border: 0;
+}
+
+.detail-content {
+  padding: 20px 40px;
+  border: 1px solid var(--border-color);
+}
+.request-list,
+.req-info {
+  height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+  @include scrollbar;
+}
+
+.p20-40 {
+  padding: 20px 40px;
+}

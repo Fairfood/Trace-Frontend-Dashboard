@@ -1,0 +1,158 @@
+<div class="page-container" *ngIf="!loading">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            User profile
+        </h1>
+        <aside class="right-section" aria-label="terms and conditions">
+            <a aria-label="Terms" class="need-help" href="https://fairfood.org/en/privacy-statement/" target="_blank" id="terms">
+                Terms and conditions
+            </a>
+            <span>|</span>
+            <a aria-label="Privacy statement" class="need-help" href="https://fairfood.org/en/terms-and-conditions/"
+                target="_blank" id="privacyStatement">
+                Privacy statement
+            </a>
+
+        </aside>
+    </section>
+
+    <section class="top-box ff-flex-align-center">
+        <app-profile-avatar [imageUrl]="userPic" [avatar]="userData?.first_name[0]+userData.last_name[0]"
+            [isEditing]="isEdit" (itemClicked)="openImageUpload($event)"
+            [ngClass]="{'baseline': isEdit}"></app-profile-avatar>
+
+        <ng-container *ngIf="!isEdit">
+            <aside aria-label="important information" class="flex-column data">
+                <span class="value-tr text-capitalize text-md font-1-bold" id="userName">
+                    {{userData?.first_name+' '+ userData.last_name}}
+                </span>
+                <span class="value-tr text-sm">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        class="icon">
+                        <circle cx="6" cy="6" r="6" fill="#003A60" />
+                        <path
+                            d="M7.95002 7.79995C8.07502 7.79995 8.18122 7.75615 8.26862 7.66855C8.35622 7.58115 8.40002 7.47495 8.40002 7.34995V4.64995C8.40002 4.52495 8.35622 4.41875 8.26862 4.33135C8.18122 4.24375 8.07502 4.19995 7.95002 4.19995H4.05002C3.92502 4.19995 3.81882 4.24375 3.73142 4.33135C3.64382 4.41875 3.60002 4.52495 3.60002 4.64995V7.34995C3.60002 7.47495 3.64382 7.58115 3.73142 7.66855C3.81882 7.75615 3.92502 7.79995 4.05002 7.79995H7.95002ZM6.00002 6.29995L7.95002 5.18125V7.34995H4.05002V5.18125L6.00002 6.29995ZM6.00002 5.76865L4.05002 4.64995H7.95002L6.00002 5.76865ZM7.95002 5.18125V4.64995V7.34995V5.18125Z"
+                            fill="white" />
+                    </svg>
+                    <span id="userEmail">
+                        {{userData?.email}}
+                    </span>
+                    <span class="new-chip" *ngIf="!userData?.email_verified">Verification pending</span>
+                </span>
+                <span class="value-tr text-sm">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        class="icon">
+                        <circle cx="6" cy="6" r="6" fill="#003A60" />
+                        <g clip-path="url(#clip0_1028_128)">
+                            <path
+                                d="M7.82301 7.08976C7.48714 6.80249 7.14628 6.62848 6.81454 6.91531L6.61645 7.08867C6.47151 7.21451 6.20204 7.8025 5.16015 6.60396C4.11849 5.40695 4.73837 5.22057 4.88352 5.09582L5.0827 4.92224C5.41271 4.63476 5.28817 4.27285 5.05015 3.90032L4.90652 3.67467C4.66742 3.30301 4.40706 3.05892 4.07618 3.34597L3.8974 3.50218C3.75116 3.60871 3.34239 3.955 3.24324 4.61284C3.12391 5.40218 3.50035 6.30607 4.3628 7.29783C5.22416 8.29002 6.06752 8.7884 6.86639 8.77972C7.53032 8.77256 7.93127 8.4163 8.05668 8.28677L8.23612 8.13034C8.56612 7.8435 8.36109 7.55146 8.02501 7.26355L7.82301 7.08976Z"
+                                fill="white" />
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_1028_128">
+                                <rect width="5.55981" height="5.55981" fill="white"
+                                    transform="translate(3.03259 3.22009)" />
+                            </clipPath>
+                        </defs>
+                    </svg>
+
+                    {{userData?.phone.dial_code + ' '+ userData?.phone.phone}}
+                </span>
+            </aside>
+            <span class="edit-icon pointer text-blue ff-flex-align-center" *ngIf="!isEdit" (click)="toggleEdit()">
+                <mat-icon class="edit" id="editIcon">edit</mat-icon> Edit
+            </span>
+        </ng-container>
+
+        <ng-container *ngIf="isEdit">
+            <div [formGroup]="detailsForm" class="flex-column edit-form">
+                <section class="row-md m-10">
+                    <article class="col-md-4">
+                        <app-ff-input label="First name *" [parentFormGroup]="detailsForm" controlName="firstName"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol: fcontrol.firstName }">
+                        </ng-container>
+                    </article>
+                    <article class="col-md-4">
+                        <app-ff-input label="Last name *" [parentFormGroup]="detailsForm" controlName="lastName"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol: fcontrol.lastName }">
+                        </ng-container>
+                    </article>
+                    <article class="col-md-4">
+                        <app-ff-input label="Email *" [parentFormGroup]="detailsForm" controlName="email"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol: fcontrol.email }">
+                        </ng-container>
+                    </article>
+                </section>
+                <section class="row-md m-10">
+                    <article class="col-md-4">
+                        <app-ff-dropdown label="Country code *" [dropdownOptions]="countryCodeList"
+                            [defaultValue]="fcontrol.dialCode.value" (newSelectionValue)="dropdownChanged($event)">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol: fcontrol.dialCode }">
+                        </ng-container>
+                    </article>
+                    <article class="col-md-4">
+                        <app-ff-input label="Mobile number *" [parentFormGroup]="detailsForm" controlName="mobile"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol: fcontrol.mobile }">
+                        </ng-container>
+                    </article>
+                </section>
+                <section class="row-md m-10">
+                    <app-buttons buttonType="stroked" (buttonClicked)="toggleEdit()" id="cancelButton">
+                        Cancel
+                    </app-buttons>
+                    <app-buttons buttonType="fill" (buttonClicked)="saveUserData()">
+                        Save changes
+                    </app-buttons>
+                </section>
+            </div>
+
+        </ng-container>
+    </section>
+    <div class="tab-container ff-flex-align-center">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="activeTabId" (tabChanged)="changeTab($event)"
+            class="w-100">
+        </app-ff-custom-tab>
+    </div>
+    <section class="tab-content">
+        <ng-container *ngIf="activeTabId === 'notification'">
+            <app-notification-home></app-notification-home>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'settings'">
+            <app-profile-preferences></app-profile-preferences>
+        </ng-container>
+    </section>
+</div>
+<!-- loader section -->
+<section class="loader-wrapper ff-flex-center" *ngIf="loading">
+    <app-loader loaderText="Loading profile data" [loaderType]="'type1'"></app-loader>
+</section>
+
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message" *ngIf="formcontrol.errors?.required && (submitted || formcontrol?.touched)">
+        {{'commonValidationError'|translate}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'mobile'">
+        <span class="error-message" *ngIf="formcontrol.errors?.pattern && (submitted || formcontrol?.touched)">
+            Invalid mobile number
+        </span>
+        <span class="error-message" *ngIf="formcontrol.errors?.minlength && (submitted || formcontrol?.touched)">
+            Invalid mobile number
+        </span>
+    </ng-container>
+</ng-template>

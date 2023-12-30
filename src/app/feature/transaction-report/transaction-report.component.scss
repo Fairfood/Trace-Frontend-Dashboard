@@ -1,0 +1,144 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+
+.reject,
+.top-box {
+  border-radius: 3px;
+  margin-top: 15px;
+  background-color: var(--color-filter-active);
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.reject {
+  padding: 10px 20px;
+  .value-tr {
+    margin-left: 10px;
+  }
+}
+
+.top-box {
+  padding: 35px;
+  flex-wrap: wrap;
+  @include devices(tablet-md) {
+    padding-right: 10px;
+  }
+  @include devices(laptop) {
+    padding-right: 0;
+  }
+
+  .left,
+  .qr-code {
+    width: 100%;
+  }
+
+  .left {
+    @include devices(tablet-md) {
+      width: 69%;
+    }
+  }
+  .qr-code {
+    margin-top: 25px;
+    @include devices(tablet-md) {
+      width: 30%;
+      padding-left: 10px;
+      justify-content: center;
+      margin-top: 0;
+    }
+  }
+}
+
+.claim-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  padding-top: 15px;
+  flex-wrap: wrap;
+  li {
+    background-color: var(--color-white);
+    color: var(--font-color);
+    margin: 5px 15px 5px 0;
+    position: relative;
+    padding: 2px;
+    padding-right: 10px;
+    border: 1px solid var(--color-primary-3);
+    font-family: var(--font-regular);
+    .claim-icon {
+      margin-right: 10px;
+      background-color: rgba(175, 235, 255, 0.48);
+    }
+    mat-icon {
+      height: 35px;
+      width: 35px;
+      font-size: 18px;
+      display: flex !important;
+    }
+    .claim {
+      max-width: 220px;
+    }
+  }
+}
+
+.m-20 {
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+.loader-container {
+  min-height: 500px;
+}
+
+.utils {
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+
+  ::ng-deep.tab-item {
+    min-width: 120px;
+  }
+
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.content-area {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.need-help {
+  font-size: 12px;
+  color: var(--font-color);
+  font-family: var(--font-bold);
+  cursor: pointer;
+  margin-right: 10px;
+  @include devices(laptop) {
+    font-size: 14px;
+  }
+  @include devices(desktop) {
+    font-size: 16px;
+  }
+  svg {
+    margin-right: 10px;
+  }
+}
+
+.story-telling {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  color: var(--color-secondary);
+  margin-right: 0;
+  mat-icon {
+    font-size: 18px;
+    height: 24px;
+    width: 24px;
+    padding-top: 4px;
+  }
+}
+
+.heading-section {
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}

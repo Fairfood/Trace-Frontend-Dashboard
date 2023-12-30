@@ -1,0 +1,19 @@
+<section class="pop-header ff-flex-between">
+  <h4>
+    {{data?.map?'Request to map suppliers':'Send invitation'}}
+  </h4>
+  <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+
+<section class="flex-column p-20-button">
+  <app-ff-input [label]="'Note'" [parentFormGroup]="detailsForm" [controlName]="'note'" inputClass="profile"
+    [isTextarea]="true" class="w-100">
+  </app-ff-input>
+</section>
+
+<section class="ff-flex-between p-20-button">
+  <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+  <app-buttons buttonType="fill" (buttonClicked)="buttonAction()">
+    {{data?.map?'Send request':'Send invite'}}
+  </app-buttons>
+</section>

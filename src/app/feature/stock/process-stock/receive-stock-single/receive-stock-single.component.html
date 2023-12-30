@@ -1,0 +1,209 @@
+<section class="wrapper d-flex">
+    <section class="col px-0 left">
+        <aside aria-label="card" class="no-border flex-column">
+            <h3 class="text-sm text-blue font-1-bold header-wrap">
+                Farmer details
+            </h3>
+
+            <section class="req-selected" *ngIf="farmers?.length === 0">
+                <mat-icon>error_outline</mat-icon>
+                It looks like you are not connected to any farmers. <br>
+                You can add new farmers below, or you can request stock from a non-farmer supplier
+
+                <app-buttons buttonType="fill" (buttonClicked)="requestStock()" buttonSize="medium">
+                    Request stock
+                </app-buttons>
+            </section>
+
+            <section [formGroup]="farmerForm">
+                <!-- farmer selection autocomplete  -->
+                <article class="mb-20 flex-column">
+                    <label class="has-float-label custom-input"
+                        [ngClass]="{'has-error': ccontrol.name.invalid && ccontrol.name.touched }">
+                        <input placeholder=" " formControlName="name" type="text" class="stock"
+                            [matAutocomplete]="fromFarmer" />
+                        <span class="label">Farmer name*</span>
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                    </label>
+                    <mat-autocomplete #fromFarmer="matAutocomplete">
+                        <aside class="inside-container" aria-label=" auto complete options for the farmers">
+                            <ng-container *ngIf="farmerSearchLoader">
+                                <mat-option>
+                                    <app-loader [noText]="true" loaderType="type1"></app-loader>
+                                </mat-option>
+                            </ng-container>
+                            <ng-container *ngFor="let item of farmerFilterOptions | async">
+                                <ng-container *ngIf="!farmerSearchLoader">
+                                    <mat-option [value]="item.name" (click)="selectFarmer(item)">
+                                        <article>
+                                            <span class="avatar-round">
+                                                {{item.first_name[0]}} {{item.last_name[0]}}
+                                            </span>
+                                            {{item.first_name}} {{item.last_name}}
+                                        </article>
+                                    </mat-option>
+                                </ng-container>
+
+                            </ng-container>
+                            <mat-option *ngIf="newFarmer">
+                                {{ccontrol.name.value || 'Add farmer as T1 supplier to Receive from farm.'}}
+                                <app-buttons buttonType="fill" buttonSize="medium"
+                                    (buttonClicked)="addConnection(true)">
+                                    Add connection
+                                </app-buttons>
+                            </mat-option>
+                        </aside>
+
+                    </mat-autocomplete>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'name'}">
+                    </ng-container>
+                </article>
+                <!-- product selection autocomplete  -->
+                <article class="mb-20 flex-column">
+                    <label class="has-float-label custom-input"
+                        [ngClass]="{'has-error': ccontrol.productName.invalid && ccontrol.productName.touched }">
+                        <input placeholder=" " formControlName="productName" type="text" class="stock"
+                            [matAutocomplete]="productSection" />
+                        <span class="label">Product*</span>
+                        <span class="new-chip" *ngIf="newProduct">New</span>
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                    </label>
+                    <mat-autocomplete #productSection="matAutocomplete">
+                        <aside class="inside-container" aria-label="">
+                            <span class="autocomplete-heading" *ngIf="!(ccontrol.productName.value && newProduct)">
+                                Available products
+                            </span>
+                            <mat-option *ngIf="productLoader">
+                                <app-loader [noText]="true" loaderType="type1"></app-loader>
+                            </mat-option>
+                            <ng-container *ngFor="let item of productFilterOptions | async">
+                                <ng-container *ngIf="!productLoader">
+                                    <mat-option [value]="item.name" (click)="selectProduct(item)">
+                                        {{ item.name }}
+                                    </mat-option>
+                                </ng-container>
+                            </ng-container>
+                            <!-- if user starts typing or product input has a value show this option  -->
+                            <ng-container *ngIf="ccontrol.productName.value && newProduct">
+                                <span class="autocomplete-heading">
+                                    Add as new product <span class="new-chip">New</span>
+                                </span>
+                                <mat-option [value]="ccontrol.productName.value" (click)="selectProduct(null)">
+                                    {{ccontrol.productName.value}}
+                                </mat-option>
+                            </ng-container>
+                        </aside>
+                    </mat-autocomplete>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'productName'}">
+                    </ng-container>
+                </article>
+                <div class="quantity-row flex-wrap">
+                    <article class="receive-row-item mb-20 margin-rig">
+                        <app-ff-input label="Quantity*" inputSize="profile" [parentFormGroup]="farmerForm"
+                            controlName="quantity">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'quantity'}">
+                        </ng-container>
+                    </article>
+                    <article class="receive-row-item mb-20">
+                        <app-ff-dropdown label="Unit" [defaultValue]="ccontrol.unit.value" [dropdownOptions]="units"
+                            inputClass="profile" [hideSearch]="true">
+                        </app-ff-dropdown>
+                    </article>
+                    <article class="receive-row-item mb-20 margin-rig">
+                        <app-ff-input label="Total price*" inputSize="profile" [parentFormGroup]="farmerForm"
+                            controlName="price">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'price'}">
+                        </ng-container>
+                    </article>
+                    <article class="receive-row-item mb-20 m-r-0">
+                        <app-ff-dropdown label="Currency" [defaultValue]="ccontrol.currency.value"
+                            [dropdownOptions]="currencies" inputClass="profile" (selectionChange)="setCurrency($event)">
+                        </app-ff-dropdown>
+                    </article>
+                </div>
+                <article class="w-50 m-r-12">
+                    <article class="mb-20 flex-column">
+                        <label class="has-float-label custom-input">
+                            <input placeholder=" " matInput [matDatepicker]="transactionDate" [max]="maxDate"
+                                formControlName="date" type="text" class="date-picker" readonly />
+                            <span class="label">Transaction date*</span>
+                            <mat-icon class="pointer" (click)="transactionDate.open()">calendar_today</mat-icon>
+                        </label>
+                        <mat-datepicker #transactionDate></mat-datepicker>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'date'}">
+                        </ng-container>
+                    </article>
+                </article>
+                <p class="add-attachment">
+                    Add attachment
+                </p>
+                <article class="ff-flex-align-center">
+                    <span class="file-name text-overflow"
+                        *ngIf="ccontrol.receipt.value">{{ccontrol.receipt.value.name}}</span>
+                    <app-buttons *ngIf="!ccontrol.receipt.value" buttonType="fill" (buttonClicked)="attachFile.click()"
+                        buttonSize="medium">
+                        Upload file
+                    </app-buttons>
+                    <input type="file" #attachFile (click)="attachFile.value = null" value=""
+                        (change)="fileUpload($event)" class="input-file" placeholder="No file chosen" hidden
+                        accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+                    <app-buttons *ngIf="ccontrol.receipt.value" buttonType="stroked" (buttonClicked)="removeFile()"
+                        buttonSize="medium">
+                        Remove
+                    </app-buttons>
+                </article>
+            </section>
+
+
+        </aside>
+    </section>
+    <aside aria-label="illustration here" class="right ff-flex-align-center">
+        <img src="../../../../../assets/images/image-summary.png" alt="">
+    </aside>
+</section>
+
+<app-stock-action-button [buttonNextState]="nextButtonState" (buttonsClicked)="navigationOutOfComponent($event)">
+</app-stock-action-button>
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched || submitted)">
+        {{'commonValidationError'|translate}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'productName'">
+        <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched || submitted)">
+            <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
+                {{'productMaxLength'|translate}}
+            </span>
+            <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
+                {{'productMinLength'|translate}}
+            </span>
+        </article>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'quantity'">
+        <span *ngIf="ccontrol.quantity.invalid && ccontrol.quantity.value && (ccontrol.quantity.touched || submitted)"
+            class="error-message">
+            {{ 'trRequest.invalidQty'|translate }}
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'price'">
+        <span *ngIf="ccontrol.price.invalid && ccontrol.price.value && (ccontrol.price.touched || submitted)"
+            class="error-message">
+            Invalid price
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'date'">
+        <span class="error-message" *ngIf="ccontrol.date.invalid && (ccontrol.date.touched || submitted)">
+            {{ 'stock.invalidDate'|translate }}
+        </span>
+    </ng-container>
+</ng-template>

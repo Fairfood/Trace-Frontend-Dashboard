@@ -1,0 +1,15 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        Data loss Warning !
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+<section class="pop-content">
+    <p>
+        Are you sure you want to switch to previous step? All data will be lost.
+    </p>
+</section>
+<section class="ff-flex-between p-20-button">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">No</app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="remove()">Yes</app-buttons>
+</section>

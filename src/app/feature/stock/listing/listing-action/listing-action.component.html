@@ -1,0 +1,60 @@
+<article class="ff-flex-center">
+    <span class="show-desktop-filter-icon">
+        <app-buttons buttonType="secondary" (buttonClicked)="filterClicked()">
+            <ng-container *ngIf="toggleFilter">
+                <mat-icon>close</mat-icon>
+                <span class="button-text">Clear filters</span>
+            </ng-container>
+            <ng-container *ngIf="!toggleFilter">
+                <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+                <span class="button-text">Filters</span>
+            </ng-container>
+        </app-buttons>
+    </span>
+    <span class="show-mobile-filter">
+        <app-buttons buttonType="secondary" (buttonClicked)="filterClicked()">
+            <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+        </app-buttons>
+    </span>
+</article>
+<article class="ff-flex-center" *ngIf="!(stockAction | async)">
+    <app-buttons buttonType="stroked" (buttonClicked)="createtransparencyRequest()">
+        Request stock
+    </app-buttons>
+    <app-buttons buttonType="fill" [matMenuTriggerFor]="moreButtonOptionsReceive">
+        Receive stock
+        <svg width="8" height="6" class="m-l-10" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L4 4L7 1" stroke="white" stroke-width="2" stroke-linecap="round" />
+        </svg>
+    </app-buttons>
+    <mat-menu class="mat-menu more-button-receive" #moreButtonOptionsReceive="matMenu" xPosition="before">
+        <ul class="button-action">
+            <li class="font-1-medium text-blue pointer" (click)="buttonAction('single')">
+                From single farmer
+            </li>
+            <li class="font-1-medium text-blue pointer" (click)="buttonAction('multiple')">
+                From multiple farmers <span class="new-chip">Excel</span>
+            </li>
+        </ul>
+    </mat-menu>
+</article>
+<article class="ff-flex-center" *ngIf="stockAction | async">
+    <app-buttons buttonType="stroked" [matMenuTriggerFor]="moreButtonOptions" [isDisabled]="!(sendStock | async)">
+        Process stock
+        <svg width="8" height="6" viewBox="0 0 8 6" class="m-l-10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L4 4L7 1" stroke="#EA2553" stroke-width="2" stroke-linecap="round" />
+        </svg>
+    </app-buttons>
+    <mat-menu class="mat-menu more-button" #moreButtonOptions="matMenu" xPosition="before">
+        <ul class="button-action">
+            <ng-container *ngFor="let item of processButtons">
+                <li class="font-1-medium text-blue pointer" *ngIf="!item.hidden" (click)="buttonAction(item.id)">
+                    {{item.name}}
+                </li>
+            </ng-container>
+        </ul>
+    </mat-menu>
+    <app-buttons buttonType="fill" (buttonClicked)="processStock('send')" [isDisabled]="!(sendStock | async)">
+        Send stock
+    </app-buttons>
+</article>

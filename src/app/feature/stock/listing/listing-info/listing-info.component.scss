@@ -1,0 +1,34 @@
+@import 'src/styles/toggle_switch';
+
+.info-wrap {
+  flex-wrap: wrap;
+  margin-top: 20px;
+  background-color: var(--color-primary-2);
+  padding: 9px 20px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-size: 14px;
+  position: relative;
+  .left {
+    max-width: 300px;
+    padding-left: 15px;
+    .pointer {
+      padding-left: 15px;
+    }
+  }
+
+  .right {
+    max-width: 600px;
+    display: flex;
+    padding: 10px;
+
+    .view-selected {
+      padding-left: 15px;
+      display: flex;
+      align-items: center;
+      .value-tr {
+        margin-right: 10px;
+      }
+    }
+  }
+}

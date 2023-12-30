@@ -1,0 +1,1150 @@
+<div class="page-container" id="requests">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            {{'requests.heading'|translate}}
+        </h1>
+        <aside class="right-section" *ngIf="memberType !== 3" aria-label="">
+            <app-buttons buttonType="fill" [matMenuTriggerFor]="moreButtonOptionsRequest">
+                {{'requests.createText'|translate}}
+                <svg width="8" height="6" class="m-l-10" viewBox="0 0 8 6" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1L4 4L7 1" stroke="white" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </app-buttons>
+            <mat-menu class="mat-menu more-button-receive" #moreButtonOptionsRequest="matMenu" xPosition="before">
+                <ul class="button-action">
+                    <li class="font-1-medium text-blue pointer" (click)="createRequest()">
+                        Request for stock
+                    </li>
+                </ul>
+            </mat-menu>
+        </aside>
+    </section>
+    <div class="tab-container ff-flex-align-center">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="activeTab" (tabChanged)="changeTab($event)">
+        </app-ff-custom-tab>
+    </div>
+
+    <section class="utils ff-flex-align-center">
+        <article class="w-50">
+            <app-search-box [placeholder]="'Search here'" [hideOptions]="true" (searchText)="searchFilter($event)"
+                class="search-wrap"></app-search-box>
+        </article>
+        <article class="ff-flex-align-center" *ngIf="dataLoaded">
+            <app-ff-filter-box-wrapper [label]="'requests.reqType'|translate" [hideSearch]="true"
+                [defaultValue]="appliedFilterValues.requestType" [filterMasterData]="requestTypeList"
+                (selectionChange)="filterItems($event, 'requestType')">
+            </app-ff-filter-box-wrapper>
+            <app-ff-filter-box-wrapper label="Status" [defaultValue]="appliedFilterValues.status" [hideSearch]="true"
+                [filterMasterData]="statusList" (selectionChange)="filterItems($event, 'status')">
+            </app-ff-filter-box-wrapper>
+        </article>
+    </section>
+
+    <!-- loader -->
+    <div class="col-md-12 pb-3 text-center mb-4 bg-lighter-blue" *ngIf="!dataLoaded">
+        <app-loader [loaderText]="'requests.loaderText'|translate" [loaderType]="'type1'"></app-loader>
+    </div>
+
+    <div class="row-md mx-0 no-results" *ngIf="dataLoaded && requestList.length == 0">
+        <div class="col-md-12  p-25 text-center text-blue font-1-medium">
+            {{'requests.noRequests'|translate}}
+        </div>
+    </div>
+    <ng-container *ngIf="dataLoaded && requestList.length != 0">
+
+
+        <!-- Incoming requests -->
+        <div *ngIf="appliedFilterValues.direction === 1" class="row-md mx-0 request-container">
+            <div class="col-md-4 col-sm-12 px-0 request-list">
+                <ng-container *ngFor="let item of requestList">
+                    <article class="req-item pointer" [ngClass]="{'selected-request': selectedRequest == item.id}"
+                        (click)="selectRequest(item)" attr.data-test.id="request-item-{{item.id}}">
+                        <!-- common template defined for request types and status  -->
+                        <ng-container [ngTemplateOutlet]="reqTypeListing"
+                            [ngTemplateOutletContext]="{item, requestor: true}">
+                        </ng-container>
+                    </article>
+                </ng-container>
+            </div>
+            <div class="col-md-8 col-sm-12 px-0 req-info">
+                <!-- Incoming request details -->
+                <app-loader [loaderText]="'requests.detailLoader'|translate" [loaderType]="'type1'" class="no-data"
+                    *ngIf="!detailsLoaded"></app-loader>
+
+                <div *ngIf="detailsLoaded" class="row mx-0 py-4">
+
+                    <section class="d-flex bg-light-blue">
+                        <section class="ff-flex-between">
+                            <article class="ff-flex-start">
+                                <ng-container *ngIf="requestDetails.request_type === 1">
+                                    <span class="avatar-round" *ngIf="!requestDetails.node.image">
+                                        {{requestDetails.node?.name|reqAvatarPipe}}
+                                    </span>
+                                    <img *ngIf="requestDetails.node.image" class="img-contain"
+                                        [src]="requestDetails.node.image" alt="test">
+                                    <p class="text-xs text-blue font-1-normal mb-0">
+                                        {{requestDetails.node?.name}}
+                                    </p>
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type !== 1">
+                                    <span class="avatar-round" *ngIf="!requestDetails.requester.image">
+                                        {{requestDetails?.requester?.short_name|reqAvatarPipe}}
+                                    </span>
+                                    <img *ngIf="requestDetails.requester.image" class="img-contain"
+                                        [src]="requestDetails.requester.image" alt="test">
+                                    <p class="text-xs text-blue font-1-normal mb-0">
+                                        {{requestDetails.requester.name}}
+                                    </p>
+                                </ng-container>
+                            </article>
+                            <span class="text-xs text-off-blue font-1-normal">
+                                {{requestDetails.created_on * 1000 | date: 'dd MMMM y'}}
+                            </span>
+                        </section>
+                        <section class="flex-column" aria-label="row 2">
+                            <p class="text-24 text-blue font-1-bold mb-0 pb-3 mt-2">
+                                <ng-container *ngIf="requestDetails.request_type == 4">
+                                    {{'requests.type4'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 2">
+                                    {{'requests.type2'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 3">
+                                    {{'requests.type2'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 1">
+                                    {{'requests.type1'|translate}}
+                                </ng-container>
+                                <span class="text-xs text-off-blue font-1-normal">
+                                    <ng-container [ngTemplateOutlet]="statusText"
+                                        [ngTemplateOutletContext]="{status:requestDetails.status}">
+                                    </ng-container>
+                                </span>
+                            </p>
+                            <p class="mb-4 font-1-normal text-sm text-blue">
+                                <ng-container *ngIf="requestDetails.request_type == 4">
+                                    {{'requests.reqMapSubText'|translate: {name:requestDetails.supply_chain.name} }}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 2">
+                                    {{'requests.reqClaimSubtext'|translate: {name:requestDetails.claim.name} }}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 3">
+                                    {{'requests.reqClaimSubtext'|translate: {name:requestDetails.claim.name} }}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 1">
+                                    {{'requests.reqStockSubtext'|translate}}
+                                </ng-container>
+                            </p>
+                        </section>
+                    </section>
+
+                    <div class="col-md-12 detail-content">
+                        <p class="text-xs text-blue font-1-bold">{{'requests.subheading'|translate}}</p>
+                        <ng-container *ngIf="requestDetails.request_type != 1">
+                            <div class="row-md">
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.reqType'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">
+                                        <ng-container *ngIf="requestDetails.request_type == 4">
+                                            {{'requests.type4'|translate}}
+                                        </ng-container>
+                                        <ng-container *ngIf="requestDetails.request_type == 2">
+                                            {{'requests.type2'|translate}}
+                                        </ng-container>
+                                        <ng-container *ngIf="requestDetails.request_type == 3">
+                                            {{'requests.type3'|translate}}
+                                        </ng-container>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row-md">
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.receivedFrom'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.requester.name}}</p>
+                                </div>
+                                <div *ngIf="requestDetails.request_type == 2 || requestDetails.request_type == 3"
+                                    class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'verification.subheading'|translate}}</p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-off-blue font-1-normal mb-1">
+                                {{'requests.note'|translate}}
+                            </p>
+                            <p class="text-sm text-blue font-1-normal">
+                                {{requestDetails.note? requestDetails.note : '-' }}
+                            </p>
+
+                            <div *ngIf="publicClaimAttached && requestDetails.request_type == 2 && requestDetails.status == 1"
+                                class="col-md-12 bg-light-blue6 py-3 px-4">
+                                <h6 class="text-xxs text-blue font-1-normal m-0 ff-flex-align-center">
+                                    <mat-icon class="mr-2">error_outline</mat-icon>
+                                    {{'requests.alreadyAttached'|translate}}
+                                </h6>
+                            </div>
+
+                            <div class="bg-grey" *ngIf="requestDetails.request_type == 3 && requestDetails.status == 2">
+                                <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
+                                    {{'requests.evidenceText'|translate}}
+                                </h6>
+
+                                <ng-container [ngTemplateOutlet]="claimDetailSection">
+                                </ng-container>
+                            </div>
+
+                            <div *ngIf="requestDetails.request_type == 4 && requestDetails.status == 1 && memberType != 3"
+                                class="ff-flex-end mb-3 pt-3 w-100">
+                                <ng-container [ngTemplateOutlet]="declineButton"></ng-container>
+                                <app-buttons buttonType="fill" (buttonClicked)="mapSupplier(requestDetails)">
+                                    {{'requests.mapSupplier'|translate}}
+                                </app-buttons>
+                            </div>
+
+                            <div *ngIf="requestDetails.request_type == 3 && requestDetails.status == 1 && memberType != 3"
+                                class="ff-flex-end mb-3 pt-3 w-100">
+                                <ng-container [ngTemplateOutlet]="declineButton"></ng-container>
+                                <app-buttons buttonType="fill" (buttonClicked)="respond(requestDetails)">
+                                    {{'requests.respondButton'|translate}}
+                                </app-buttons>
+                            </div>
+
+                            <div *ngIf="requestDetails.request_type == 2  && requestDetails.status == 1 && memberType != 3"
+                                class="ff-flex-end mb-3 pt-3 w-100">
+                                <ng-container [ngTemplateOutlet]="declineButton"></ng-container>
+                                <app-buttons buttonType="fill" (buttonClicked)="respond(requestDetails)"
+                                    [isDisabled]="publicClaimAttached">
+                                    {{'requests.respondButton'|translate}}
+                                </app-buttons>
+                            </div>
+                        </ng-container>
+
+                        <!-- Request stock -->
+                        <ng-container *ngIf="requestDetails.request_type == 1">
+                            <div class="row-md">
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.reqType'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">
+                                        {{'requests.type1'|translate}}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.requestId'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.number}}</p>
+                                </div>
+                            </div>
+                            <div class="row-md">
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.receivedFrom'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.node.name}}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'home.products.thProduct'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.product.name}}</p>
+                                </div>
+                            </div>
+                            <div class="row-md">
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'home.products.thQty'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} Kg</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.priceText'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">
+                                        {{requestDetails.price? requestDetails.price + ' ' +requestDetails.currency :
+                                        'Not
+                                        specified' }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- common claim section for requests  -->
+                            <ng-container [ngTemplateOutlet]="claimsAttached"></ng-container>
+                            <!-- common claim section for requests  -->
+
+                            <p class="text-xs text-off-blue font-1-normal mb-1">
+                                {{'requests.note'|translate}}
+                            </p>
+                            <p class="text-sm text-blue font-1-normal">
+                                {{requestDetails.note? requestDetails.note : '-'}}
+                            </p>
+                            <div *ngIf="requestDetails.status == 1 && memberType != 3"
+                                class="ff-flex-end mb-3 pt-3 w-100">
+                                <app-buttons buttonType="stroked" (buttonClicked)="removetransparencyRequest()">
+                                    {{'requests.declineButton'|translate}}
+                                </app-buttons>
+                                <app-buttons buttonType="fill" (buttonClicked)="sendStock()">
+                                    {{'sendStockButton'|translate}}
+                                </app-buttons>
+                            </div>
+                            <ng-container *ngIf="requestDetails.status == 2;then transactionDetails"></ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- outgoing requests -->
+
+        <div *ngIf="appliedFilterValues.direction === 2" class="row-md mx-0">
+            <div class="col-md-4 col-sm-12 px-0 request-list">
+                <ng-container *ngFor="let item of requestList">
+                    <article class="req-item pointer" [ngClass]="{'selected-request': selectedRequest == item.id}"
+                        (click)="selectRequest(item)" attr.data-test.id="request-item-{{item.id}}">
+                        <!-- common template defined for request types and status  -->
+                        <ng-container [ngTemplateOutlet]="reqTypeListing"
+                            [ngTemplateOutletContext]="{item, requestor: false}">
+                        </ng-container>
+                    </article>
+                </ng-container>
+            </div>
+
+            <div class="col-md-8 col-sm-12 px-0 req-info">
+
+                <app-loader [loaderText]="'requests.detailLoader'|translate" [loaderType]="'type1'" class="no-data"
+                    *ngIf="!detailsLoaded"></app-loader>
+
+                <div class="row mx-0" *ngIf="detailsLoaded">
+
+                    <section class="d-flex bg-light-blue">
+
+                        <ng-container [ngTemplateOutlet]="firstHeadingOutgoing"
+                            [ngTemplateOutletContext]="{response: true}">
+                        </ng-container>
+
+                        <section class="flex-column" aria-label="row 2">
+                            <p class="text-24 text-blue font-1-bold mb-0 pb-3 mt-2">
+                                <ng-container *ngIf="requestDetails.request_type == 4">
+                                    {{'requests.type4'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 2">
+                                    {{'requests.type2'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 3">
+                                    {{'requests.type2'|translate}}
+                                </ng-container>
+                                <ng-container *ngIf="requestDetails.request_type == 1">
+                                    {{'requests.type1'|translate}}
+                                </ng-container>
+                                <span class="text-xs text-off-blue font-1-normal">
+                                    <ng-container [ngTemplateOutlet]="statusText"
+                                        [ngTemplateOutletContext]="{status:requestDetails.status}">
+                                    </ng-container>
+                                </span>
+                            </p>
+                        </section>
+                    </section>
+
+                    <ng-container *ngIf="showRequest">
+                        <div class="col-md-12 detail-content">
+                            <p class="text-xs text-blue font-1-bold">{{'requests.subheading'|translate}}</p>
+                            <ng-container *ngIf="requestDetails.request_type != 1">
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqType'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">
+                                            <ng-container *ngIf="requestDetails.request_type == 4">
+                                                {{'requests.type4'|translate}}
+                                            </ng-container>
+                                            <ng-container *ngIf="requestDetails.request_type == 2">
+                                                {{'requests.type2'|translate}}
+                                            </ng-container>
+                                            <ng-container *ngIf="requestDetails.request_type == 3">
+                                                {{'requests.type3'|translate}}
+                                            </ng-container>
+                                        </p>
+                                    </article>
+                                </section>
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqSentTo'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.requestee.name}}</p>
+                                    </article>
+                                    <article
+                                        *ngIf="requestDetails.request_type == 2 || requestDetails.request_type == 3"
+                                        class="col">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'verification.subheading'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
+                                    </article>
+                                </section>
+                                <p class="text-xs text-off-blue font-1-normal mb-1">
+                                    {{'requests.note'|translate}}
+                                </p>
+                                <p class="text-sm text-blue font-1-normal">
+                                    {{requestDetails.note? requestDetails.note :'-'}}
+                                </p>
+                            </ng-container>
+                            <ng-container *ngIf="requestDetails.request_type == 1">
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqType'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">
+                                            {{'requests.type1'|translate}}
+                                        </p>
+                                    </article>
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.requestId'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.number}}</p>
+                                    </article>
+                                </section>
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqSentTo'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.node.name}}</p>
+                                    </article>
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'home.products.thProduct'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.product.name}}</p>
+                                    </article>
+                                </section>
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'home.products.thQty'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} kg</p>
+                                    </article>
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.priceText'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">
+                                            {{requestDetails.price? requestDetails.price + ' ' +requestDetails.currency
+                                            :
+                                            'Not specified' }}
+                                        </p>
+                                    </article>
+                                </section>
+                                <ng-container [ngTemplateOutlet]="claimsAttached"></ng-container>
+                                <p class="text-xs text-off-blue font-1-normal mb-1">
+                                    {{'requests.note'|translate}}
+                                </p>
+                                <p class="text-sm text-blue font-1-normal">
+                                    {{requestDetails.note? requestDetails.note :'-'}}
+                                </p>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="requestDetails.updated_on && requestDetails.status != 1">
+                        <section class="d-flex p20-40 border-grey">
+                            <ng-container [ngTemplateOutlet]="firstHeadingOutgoing"
+                                [ngTemplateOutletContext]="{response: false}">
+                            </ng-container>
+                        </section>
+                        <div class="col-md-12 detail-content">
+                            <ng-container *ngIf="requestDetails.request_type == 4">
+                                <p class="my-4 font-1-normal text-sm text-blue">
+                                    {{requestDetails.requestee.name}} {{'requests.haveRespondedText'|translate}}
+                                </p>
+                                <section *ngIf="requestDetails.status == 3">
+                                    <p class="text-xs text-blue font-1-bold">
+                                        {{'companyProfile.tab.details'|translate}}
+                                    </p>
+                                    <p class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.reasonForRejection'|translate}}</p>
+                                    <p class="text-sm text-blue font-1-normal">
+                                        {{requestDetails.response? requestDetails.response : '-' }}
+                                    </p>
+                                </section>
+                            </ng-container>
+
+                            <ng-container *ngIf="requestDetails.request_type == 2">
+                                <p class="my-4 font-1-normal text-sm text-blue">
+                                    {{requestDetails.requestee.name}}
+                                    {{'requests.haveResClaim'|translate:{name:requestDetails.claim.name} }}
+                                </p>
+                                <section>
+                                    <p class="text-xs text-blue font-1-bold">
+                                        {{'companyProfile.tab.details'|translate}}
+                                    </p>
+
+                                    <p class="text-sm text-blue font-1-bold mb-1">
+                                        {{'requests.companyClaim'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
+
+                                    <p *ngIf="requestDetails.status == 3"
+                                        class="text-xs text-off-blue font-1-normal mb-1">
+                                        {{'requests.reasonForRejection'|translate}}
+                                    </p>
+                                    <p *ngIf="requestDetails.status == 3" class="text-sm text-blue font-1-normal">
+                                        {{requestDetails.response? requestDetails.response : '-' }}
+                                    </p>
+                                </section>
+                            </ng-container>
+
+                            <ng-container *ngIf="requestDetails.request_type == 1">
+                                <p class="my-4 font-1-normal text-sm text-blue">
+                                    {{requestDetails.node.name}} {{'requests.haveText'|translate}}
+                                    <span *ngIf="requestDetails.status != 3">{{'requests.sentForReq'|translate}}</span>
+                                    <span
+                                        *ngIf="requestDetails.status == 3">{{'requests.declineForReq'|translate}}</span>.
+                                </p>
+                                <p class="text-xs text-blue font-1-bold">{{'requests.subheading'|translate}}</p>
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqType'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{'requests.type1'|translate}}
+                                        </p>
+                                    </article>
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.requestId'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.number}}</p>
+                                    </article>
+                                </section>
+                                <section class="row-md">
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reqSentTo'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.node.name}}</p>
+                                    </article>
+                                    <article class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'home.products.thProduct'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.product?.name}}
+                                        </p>
+                                    </article>
+                                </section>
+                                <div class="row-md">
+                                    <div class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'home.products.thQty'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} Kg
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.priceText'|translate}}</p>
+                                        <p class="text-sm text-blue font-1-normal">
+                                            {{requestDetails.price? requestDetails.price + ' '
+                                            +requestDetails.currency
+                                            : 'Not specified' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <ng-container [ngTemplateOutlet]="claimsAttached"></ng-container>
+                                <p *ngIf="requestDetails.status == 3" class="text-xs text-off-blue font-1-normal mb-1">
+                                    {{'requests.reasonForRejection'|translate}}
+                                </p>
+                                <p class="text-sm text-blue font-1-normal">
+                                    {{requestDetails.response? requestDetails.response : '-' }}
+                                </p>
+                                <ng-container *ngIf="requestDetails.status == 2;then transactionDetails"></ng-container>
+                            </ng-container>
+                            <div class="response-bg mt-3 pt-3 pb-4" *ngIf="requestDetails.request_type == 3">
+                                <div class="mx-86">
+                                    <p class="my-4 font-1-normal text-sm text-blue">
+                                        {{requestDetails.requestee.name}}
+                                        {{'requests.haveResClaim'|translate:{name:requestDetails.claim.name} }}
+                                    </p>
+                                </div>
+
+                                <div class="mx-86 border-grey p-20px">
+                                    <p class="text-xs text-blue font-1-bold">
+                                        {{'companyProfile.tab.details'|translate}}
+                                    </p>
+
+                                    <p class="text-sm text-blue font-1-bold mb-1">
+                                        {{'requests.companyClaim'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
+
+                                    <div *ngIf="requestDetails.status == 3">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reasonForRejection'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.response?
+                                            requestDetails.response : '-' }}
+                                    </div>
+
+                                    <div *ngIf="requestDetails.status == 2">
+                                        <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
+                                            {{'requests.evidenceText'|translate}}
+                                        </h6>
+
+                                        <ng-container [ngTemplateOutlet]="claimDetailSection">
+                                        </ng-container>
+                                    </div>
+
+                                    <div *ngIf="requestDetails.status == 4 && memberType != 3">
+                                        <h6 class="heading text-sm text-blue font-1-bold criteria-heading">
+                                            {{'requests.evidenceText'|translate}}
+                                        </h6>
+
+                                        <ng-container>
+                                            <div class="col-12 px-0 mat-expansion-panel-inner">
+
+                                                <!-- Not Inherited criterias -->
+                                                <div *ngIf="requestDetails.fields.length > 0" class="row m-0">
+
+                                                    <div class="col-12 px-0">
+                                                        <table class="table table-bordered" *ngIf="fileCount > 0"
+                                                            aria-labelledby="evidence">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th class="text-xs text-blue font-1-normal"
+                                                                        scope="col">
+                                                                        {{'requests.climEvidence.file'|translate}}
+                                                                    </th>
+                                                                    <th class="text-xs text-blue font-1-normal"
+                                                                        scope="col">
+                                                                    </th>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tbody>
+                                                                <ng-container
+                                                                    *ngFor="let field of requestDetails.fields">
+                                                                    <tr *ngIf="field.type == 3">
+                                                                        <td class="text-xs text-blue font-1-normal">{{
+                                                                            field.title }}&nbsp;
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            <button *ngIf="!field.file"
+                                                                                (click)="attachFile.click()"
+                                                                                class="tab-btn text-xs text-red">
+                                                                                {{'requests.climEvidence.attachFile'|translate}}
+                                                                            </button>
+                                                                            <button *ngIf="field.file"
+                                                                                (click)="attachFile.click()"
+                                                                                class="tab-btn text-xs text-red">
+                                                                                {{'requests.climEvidence.changeFile'|translate}}
+                                                                            </button>
+                                                                            <input type="file" #attachFile
+                                                                                (click)="attachFile.value = null"
+                                                                                value=""
+                                                                                (change)="claimsFile($event, field)"
+                                                                                class="input-file"
+                                                                                placeholder="{{'themeSettings.noFile'|translate}}"
+                                                                                hidden
+                                                                                accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+                                                                            <button *ngIf="field.file" class="h-100"
+                                                                                mat-button
+                                                                                [matMenuTriggerFor]="beforeMenu">
+                                                                                <mat-icon>more_vert</mat-icon>
+                                                                            </button>
+                                                                            <mat-menu class="mat-menu"
+                                                                                #beforeMenu="matMenu"
+                                                                                xPosition="before">
+                                                                                <button class="text-xs text-blue"
+                                                                                    (click)="viewFiles(field)"
+                                                                                    mat-menu-item>
+                                                                                    {{'requests.climEvidence.viewFile'|translate}}
+                                                                                </button>
+                                                                            </mat-menu>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!-- col-12 -->
+
+                                                    <div class="col-12 px-0">
+                                                        <div class="row">
+                                                            <ng-container *ngFor="let field of requestDetails.fields">
+
+                                                                <div *ngIf="field.type == 1"
+                                                                    class="col-6 form-element m-12">
+                                                                    <mat-form-field class="font-1-normal"
+                                                                        floatLabel='always'>
+                                                                        <h4
+                                                                            class="text-xs text-off-blue font-1-normal ff-flex-align-center mb-1">
+                                                                            {{ field.title }}*&nbsp;
+                                                                        </h4>
+                                                                        <input (change)="checkCompleted(field)"
+                                                                            class="filter-div" matInput
+                                                                            [(ngModel)]="field.response" placeholder="">
+                                                                    </mat-form-field>
+                                                                </div>
+
+                                                                <div *ngIf="field.type == 2"
+                                                                    class="col-6 form-element m-12">
+                                                                    <h5
+                                                                        class="text-xs text-off-blue mb-2 pt-1 font-1-normal">
+                                                                        {{ field.title }}*&nbsp;</h5>
+                                                                    <mat-select
+                                                                        (selectionChange)="checkCompleted(field)"
+                                                                        [(ngModel)]="field.response">
+                                                                        <mat-option *ngFor="let item of field.options"
+                                                                            [value]="item" required>
+                                                                            {{ item }}
+                                                                        </mat-option>
+                                                                    </mat-select>
+                                                                </div><!-- col-6 -->
+
+                                                            </ng-container>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </ng-container>
+
+                                        <p class="text-sm text-blue font-1-normal mt-3">
+                                            {{'requests.addInfoToClaimText'|translate}} {{requestDetails.claim.name}}?
+                                        </p>
+                                        <div class="d-flex justify-content-end mb-3 pt-3 w-100">
+                                            <app-buttons buttonType="stroked" (buttonClicked)="declineRequest()">
+                                                {{'requests.declineButton'|translate}}
+                                            </app-buttons>
+                                            <app-buttons buttonType="fill" (buttonClicked)="verifyAttachRequest()">
+                                                <span *ngIf="requestDetails.claim_attached">
+                                                    {{'requests.climEvidence.updateEvidence'|translate}}
+                                                </span>
+                                                <span *ngIf="!requestDetails.claim_attached">
+                                                    {{'requests.climEvidence.attachEvidence'|translate}}
+                                                </span>
+                                            </app-buttons>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+
+                    <div class="col px-0">
+                        <div *ngIf="requestDetails.updated_on && requestDetails.status != 1">
+
+                            <div class="response-bg mt-3 pt-3 pb-4" *ngIf="requestDetails.request_type == 3">
+                                <div class="row mx-4 px-3 pt-3">
+                                    <div class="col-1 px-0 mw-35">
+                                        <img *ngIf="!requestDetails.requestee.image" class="img-contain"
+                                            src="../../.././../assets/images/user_avatar.png" alt="">
+                                        <img *ngIf="requestDetails.requestee.image" class="img-contain"
+                                            [src]="requestDetails.requestee.image" alt="">
+                                    </div>
+                                    <div class="col ff-flex-align-center">
+                                        <p class="text-xs text-blue font-1-normal mb-0">
+                                            {{'requests.responseFrom'|translate}} : {{requestDetails.requestee.name}}
+                                        </p>
+                                    </div>
+                                    <div class="col-2 pr-0 ff-flex-align-center">
+                                        <p class="text-xs text-off-blue font-1-normal mb-0">
+                                            {{requestDetails.updated_on * 1000 | date: 'dd MMMM y'}}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mx-86">
+                                    <p class="my-4 font-1-normal text-sm text-blue">
+                                        {{requestDetails.requestee.name}}
+                                        {{'requests.haveResClaim'|translate:{name:requestDetails.claim.name} }}
+                                    </p>
+                                </div>
+
+                                <div class="mx-86 border-grey p-20px">
+                                    <p class="text-xs text-blue font-1-bold">{{'companyProfile.tab.details'|translate}}
+                                    </p>
+
+                                    <p class="text-sm text-blue font-1-bold mb-1">{{'requests.companyClaim'|translate}}
+                                    </p>
+                                    <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
+
+                                    <div *ngIf="requestDetails.status == 3">
+                                        <p class="text-xs text-off-blue font-1-normal mb-1">
+                                            {{'requests.reasonForRejection'|translate}}
+                                        </p>
+                                        <p class="text-sm text-blue font-1-normal">{{requestDetails.response?
+                                            requestDetails.response : '-' }}
+                                    </div>
+
+                                    <div *ngIf="requestDetails.status == 2">
+                                        <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
+                                            {{'requests.evidenceText'|translate}}</h6>
+
+                                        <ng-container [ngTemplateOutlet]="claimDetailSection">
+                                        </ng-container>
+                                    </div>
+
+                                    <div *ngIf="requestDetails.status == 4 && memberType != 3">
+                                        <h6 class="heading text-sm text-blue font-1-bold criteria-heading">
+                                            {{'requests.evidenceText'|translate}}</h6>
+
+                                        <ng-container>
+                                            <div class="col-12 px-0 mat-expansion-panel-inner">
+
+                                                <!-- Not Inherited criterias -->
+                                                <div *ngIf="requestDetails.fields.length > 0" class="row m-0">
+
+                                                    <div class="col-12 px-0">
+                                                        <table class="table table-bordered" *ngIf="fileCount > 0"
+                                                            aria-label="evidence">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th class="text-xs text-blue font-1-normal"
+                                                                        scope="col">
+                                                                        {{'requests.climEvidence.file'|translate}}
+                                                                    </th>
+                                                                    <th class="text-xs text-blue font-1-normal"
+                                                                        scope="col">
+                                                                    </th>
+                                                                </tr>
+                                                            </tbody>
+                                                            <tbody>
+                                                                <ng-container
+                                                                    *ngFor="let field of requestDetails.fields">
+                                                                    <tr *ngIf="field.type == 3">
+                                                                        <td class="text-xs text-blue font-1-normal">{{
+                                                                            field.title }}&nbsp;
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            <button *ngIf="!field.file"
+                                                                                (click)="attachFile.click()"
+                                                                                class="tab-btn text-xs text-red">
+                                                                                {{'requests.climEvidence.attachFile'|translate}}
+                                                                            </button>
+                                                                            <button *ngIf="field.file"
+                                                                                (click)="attachFile.click()"
+                                                                                class="tab-btn text-xs text-red">
+                                                                                {{'requests.climEvidence.changeFile'|translate}}
+                                                                            </button>
+                                                                            <input type="file" #attachFile
+                                                                                (click)="attachFile.value = null"
+                                                                                value=""
+                                                                                (change)="claimsFile($event, field)"
+                                                                                class="input-file"
+                                                                                placeholder="{{'themeSettings.noFile'|translate}}"
+                                                                                hidden
+                                                                                accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+                                                                            <button *ngIf="field.file" class="h-100"
+                                                                                mat-button
+                                                                                [matMenuTriggerFor]="beforeMenu">
+                                                                                <mat-icon>more_vert</mat-icon>
+                                                                            </button>
+                                                                            <mat-menu class="mat-menu"
+                                                                                #beforeMenu="matMenu"
+                                                                                xPosition="before">
+                                                                                <button class="text-xs text-blue"
+                                                                                    (click)="viewFiles(field)"
+                                                                                    mat-menu-item>
+                                                                                    {{'requests.climEvidence.viewFile'|translate}}
+                                                                                </button>
+                                                                            </mat-menu>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!-- col-12 -->
+
+                                                    <div class="col-12 px-0">
+                                                        <div class="row">
+                                                            <ng-container *ngFor="let field of requestDetails.fields">
+
+                                                                <div *ngIf="field.type == 1"
+                                                                    class="col-6 form-element m-12">
+                                                                    <mat-form-field class="font-1-normal"
+                                                                        floatLabel='always'>
+                                                                        <h4
+                                                                            class="text-xs text-off-blue font-1-normal ff-flex-align-center mb-1">
+                                                                            {{ field.title }}*&nbsp;
+                                                                        </h4>
+                                                                        <input (change)="checkCompleted(field)"
+                                                                            class="filter-div" matInput
+                                                                            [(ngModel)]="field.response" placeholder="">
+                                                                    </mat-form-field>
+                                                                </div>
+
+                                                                <div *ngIf="field.type == 2"
+                                                                    class="col-6 form-element m-12">
+                                                                    <h5
+                                                                        class="text-xs text-off-blue mb-2 pt-1 font-1-normal">
+                                                                        {{ field.title }}*&nbsp;</h5>
+                                                                    <mat-select
+                                                                        (selectionChange)="checkCompleted(field)"
+                                                                        [(ngModel)]="field.response">
+                                                                        <mat-option *ngFor="let item of field.options"
+                                                                            [value]="item" required>
+                                                                            {{ item }}
+                                                                        </mat-option>
+                                                                    </mat-select>
+                                                                </div><!-- col-6 -->
+
+                                                            </ng-container>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </ng-container>
+
+                                        <p class="text-sm text-blue font-1-normal mt-3">
+                                            {{'requests.addInfoToClaimText'|translate}} {{requestDetails.claim.name}}?
+                                        </p>
+                                        <div class="d-flex justify-content-end mb-3 pt-3 w-100">
+                                            <app-buttons buttonType="stroked" (buttonClicked)="declineRequest()">
+                                                {{'requests.declineButton'|translate}}
+                                            </app-buttons>
+                                            <app-buttons buttonType="fill" (buttonClicked)="verifyAttachRequest()">
+                                                <span *ngIf="requestDetails?.claim_attached">
+                                                    {{'requests.climEvidence.updateEvidence'|translate}}
+                                                </span>
+                                                <span *ngIf="!requestDetails?.claim_attached">
+                                                    {{'requests.climEvidence.attachEvidence'|translate}}
+                                                </span>
+                                            </app-buttons>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<ng-template #reqTypeListing let-item="item" let-requester="requester">
+    <article class="in-left ff-flex-start">
+        <ng-container *ngIf="requester">
+            <span class="avatar-round" *ngIf="!item.requester.image">
+                {{item?.requester?.short_name|reqAvatarPipe}}
+            </span>
+            <img *ngIf="item.requester.image" class="img-contain" [src]="item.requester.image" alt="">
+        </ng-container>
+        <ng-container *ngIf="!requester">
+            <span class="avatar-round" *ngIf="!item.requestee.image">
+                {{item?.requestee?.short_name|reqAvatarPipe}}
+            </span>
+            <img *ngIf="item.requestee.image" class="img-contain" [src]="item.requestee.image" alt="">
+        </ng-container>
+        <article class="flex-column">
+            <span class="text-xxs text-blue font-1-normal mb-1">
+                <ng-container *ngIf="requester">
+                    {{item.requester.name}}
+                </ng-container>
+                <ng-container *ngIf="!requester">
+                    To: {{item.requestee.name}}
+                </ng-container>
+            </span>
+            <span class="text-sm text-blue font-1-bold mb-1">
+                <span *ngIf="item.request_type == 1">{{'requests.type1'|translate}}</span>
+                <span *ngIf="item.request_type == 2">{{'requests.type2'|translate}}</span>
+                <span *ngIf="item.request_type == 3">{{'requests.type3'|translate}}</span>
+                <span *ngIf="item.request_type == 4">{{'requests.type4'|translate}}</span>
+            </span>
+            <span class="text-xxxs text-off-blue font-1-normal">
+                <ng-container [ngTemplateOutlet]="statusText" [ngTemplateOutletContext]="{status:item.status}">
+                </ng-container>
+            </span>
+        </article>
+    </article>
+    <span class="text-xxxs text-off-blue font-1-normal">
+        {{item.created_on * 1000 | date: 'dd MMMM y'}}
+    </span>
+</ng-template>
+
+<ng-template let-status="status" #statusText>
+    {{'companyProfile.claim.th3'|translate}}:
+    <span *ngIf="status == 1">{{'companyProfile.claim.status1'|translate}}</span>
+    <span *ngIf="status == 2">{{'requests.status2'|translate}}</span>
+    <span *ngIf="status == 3">{{'requests.status3'|translate}}</span>
+    <span *ngIf="status == 4">{{'requests.status4'|translate}}</span>
+</ng-template>
+
+<ng-template #claimsAttached>
+    <p class="text-xs text-off-blue font-1-normal mb-1">{{'menu.claims'|translate}}</p>
+    <ul class="supplied-for mb-20" *ngIf="requestDetails?.claims?.length">
+        <ng-container *ngFor="let claim of requestDetails?.claims">
+            <li class="ff-flex-between">
+                <span>
+                    {{claim.name}}
+                </span>
+            </li>
+        </ng-container>
+    </ul>
+    <p *ngIf="requestDetails.claims.length == 0" class="font-1-normal text-xs text-blue">
+        {{'requests.noClaimAttached'|translate}}
+    </p>
+</ng-template>
+
+<ng-template #declineButton>
+    <app-buttons buttonType="stroked" (buttonClicked)="declineRequest()">
+        {{'requests.declineButton'|translate}}
+    </app-buttons>
+</ng-template>
+
+<ng-template #transactionDetails>
+
+    <div>
+        <p class="text-xs text-blue font-1-bold">
+            {{'requests.linkedDetails'|translate}}
+        </p>
+        <div class="row-md">
+            <div class="col-md-12">
+                <p class="text-xs text-off-blue font-1-normal mb-1">
+                    {{'requests.transactionId'|translate}}
+                </p>
+                <p class="text-sm text-blue font-1-normal">{{requestDetails.transaction.number}}</p>
+            </div>
+            <div class="col-md-12">
+                <p class="text-xs text-off-blue font-1-normal mb-1">
+                    {{'requests.transactionDate'|translate}}
+                </p>
+                <p class="text-sm text-blue font-1-normal">
+                    {{requestDetails.transaction.date * 1000 | date: 'dd MMMM y' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="ff-flex-end mb-3 pt-3 w-100">
+            <app-buttons buttonType="fill" (click)="viewTransactionDetails(requestDetails.transaction.id)">
+                {{'requests.viewTransaction'|translate}}
+            </app-buttons>
+        </div>
+    </div>
+
+</ng-template>
+
+<ng-template #claimDetailSection>
+    <div class="col-md-12 px-0 mat-expansion-panel-inner">
+        <!-- Not Inherited criterias -->
+        <div *ngIf="requestDetails.fields.length > 0" class="row-md m-0">
+            <div class="col-md-12 px-0">
+                <table class="table table-bordered" *ngIf="fileCount > 0" aria-describedby="claim evidence">
+                    <tbody>
+                        <tr>
+                            <th class="text-xs text-blue font-1-normal" scope="col">
+                                {{'requests.climEvidence.file'|translate}}
+                            </th>
+                            <th class="text-xs text-blue font-1-normal" scope="col"></th>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <ng-container *ngFor="let field of requestDetails.fields">
+                            <tr *ngIf="field.type == 3">
+                                <td class="text-xs text-blue font-1-normal">
+                                    {{ field.title }}&nbsp;
+                                </td>
+                                <td class="text-right">
+                                    <button *ngIf="field.file" (click)="viewFiles(field)"
+                                        class="tab-btn text-xs text-red">
+                                        {{'requests.climEvidence.viewFile'|translate}}
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- col-12 -->
+
+            <div class="col-md-12 px-0">
+                <div class="row">
+                    <ng-container *ngFor="let field of requestDetails.fields">
+                        <div *ngIf="field.type == 1 || field.type == 2" class="col-6 form-element m-12">
+                            <h4 class="text-xs text-off-blue font-1-normal ff-flex-align-center mb-1">
+                                {{ field.title }}&nbsp;
+                            </h4>
+                            <p class="text-sm text-blue font-1-normal">
+                                {{ field.response ? field.response : '-' }}&nbsp;
+                            </p>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</ng-template>
+
+<ng-template let-item="item" #commonListItem>
+    <article class="req-item pointer" [ngClass]="{'selected-request': selectedRequest == item.id}"
+        (click)="selectRequest(item)" attr.data-test.id="request-item-{{item.id}}">
+        <!-- common template defined for request types and status  -->
+        <ng-container [ngTemplateOutlet]="reqTypeListing" [ngTemplateOutletContext]="{item, requestor: true}">
+        </ng-container>
+    </article>
+</ng-template>
+
+<ng-template #firstHeadingOutgoing let-response="response">
+
+    <section class="ff-flex-between">
+        <article class="ff-flex-start">
+            <ng-container *ngIf="requestDetails.request_type === 1">
+                <span class="avatar-round" *ngIf="!requestDetails.node.image">
+                    {{requestDetails.node?.name|reqAvatarPipe}}
+                </span>
+                <img *ngIf="requestDetails.node.image" class="img-contain" [src]="requestDetails.node.image" alt="test">
+                <p class="text-xs text-blue font-1-normal mb-0">
+
+                    <ng-container *ngIf="response">{{'requests.toText'|translate}}</ng-container>
+                    <ng-container *ngIf="!response">{{'requests.responseFrom'|translate}}</ng-container>
+
+                    : {{requestDetails.node?.name}}
+                </p>
+            </ng-container>
+            <ng-container *ngIf="requestDetails.request_type !== 1">
+                <span class="avatar-round" *ngIf="!requestDetails.requestee.image">
+                    {{requestDetails?.requestee?.short_name|reqAvatarPipe}}
+                </span>
+                <img *ngIf="requestDetails.requestee.image" class="img-contain" [src]="requestDetails.requestee.image"
+                    alt="test">
+                <p class="text-xs text-blue font-1-normal mb-0">
+                    <ng-container *ngIf="response">{{'requests.toText'|translate}}</ng-container>
+                    <ng-container *ngIf="!response">{{'requests.responseFrom'|translate}}</ng-container>
+                    : {{requestDetails.requestee.name}}
+                </p>
+            </ng-container>
+        </article>
+        <article class="ff-flex-between">
+            <span class="text-xs text-off-blue font-1-normal">
+                {{requestDetails.created_on * 1000 | date: 'dd MMMM y'}}
+            </span>
+            <ng-container *ngIf="respondedRequest && response">
+                <mat-icon *ngIf="!showRequest" class="pointer text-blue text-lg" (click)="showRequest = ! showRequest">
+                    arrow_drop_down
+                </mat-icon>
+                <mat-icon *ngIf="showRequest" class="pointer text-blue text-lg" (click)="showRequest = ! showRequest">
+                    arrow_drop_up
+                </mat-icon>
+            </ng-container>
+        </article>
+    </section>
+</ng-template>

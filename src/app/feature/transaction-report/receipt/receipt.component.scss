@@ -1,0 +1,7 @@
+@import 'src/styles/responsive.scss';
+.container-attachment {
+  width: 100%;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}

@@ -1,0 +1,40 @@
+<aside class="pop-header ff-flex-between">
+    <h4>
+        {{data?.isEdit?'Update': 'Add'}} reference
+    </h4>
+    <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</aside>
+<section class="content flex-column">
+    <ng-container *ngIf="!data?.isEdit">
+        <article class="input-container-with-error">
+            <app-ff-dropdown label="Reference" [dropdownOptions]="refArray" inpuSize="profile"
+                [defaultValue]="refForm?.controls?.reference?.value" [hideSearch]="true"
+                [showRedBorder]="refForm?.controls?.reference?.errors && submitted"
+                (selectionChange)="dropdownChanged($event)" class="form-item"></app-ff-dropdown>
+            <span class="error-message"
+                *ngIf="refForm?.controls?.reference?.errors?.required && (submitted || refForm?.controls?.reference?.touched)">
+                This field shouldn't be empty *
+            </span>
+        </article>
+    </ng-container>
+    <ng-container *ngIf="data.isEdit">
+        <span class="value-tr font-1-bold w-100 ff-flex-align-center">
+            {{data?.reference_details?.name}}
+        </span>
+    </ng-container>
+    <article class="input-container-with-error w-100">
+        <app-ff-input label="ID Number" [parentFormGroup]="refForm" [controlName]="'idNumber'" inputType="text"
+            class="form-item" inputSize="profile">
+        </app-ff-input>
+    </article>
+</section>
+
+<section class="ff-flex-between action">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">
+        Cancel
+    </app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="createReference()"
+        [isDisabled]="!refForm.value.reference || loading">
+        {{buttonText}}
+    </app-buttons>
+</section>

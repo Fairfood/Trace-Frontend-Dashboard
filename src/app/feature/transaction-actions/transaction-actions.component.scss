@@ -1,0 +1,19 @@
+@import 'src/styles/utils';
+::ng-deep .mat-dialog-container {
+  padding: 0px !important;
+}
+
+.details {
+  padding: 20px;
+  span {
+    padding: 5px 0;
+  }
+
+  .input-container-with-error {
+    padding: 0;
+    margin-top: 15px;
+  }
+}
+.p-20-button {
+  padding: 20px;
+}

@@ -1,0 +1,60 @@
+<section class="pop-header ff-flex-between">
+    <h4 id="popupHeading">
+        <ng-container *ngIf="data?.type === 'make'">
+            Change member role to {{data?.text}}
+        </ng-container>
+        <ng-container *ngIf="data?.type === 'delete'">
+            Delete team member
+        </ng-container>
+        <ng-container *ngIf="data?.type === 'deleteDoc'">
+            Delete document
+        </ng-container>
+        <ng-container *ngIf="data?.type === 'deleteTemplate'">
+            Delete template
+        </ng-container>
+        <ng-container *ngIf="data?.type === 'removeLabel'">
+            Remove connection label
+        </ng-container>
+        <ng-container *ngIf="data?.type === 'removeClaim'">
+            Remove claim
+        </ng-container>
+    </h4>
+    <mat-icon class="pointer" (click)="closePopup()">close</mat-icon>
+</section>
+<section class="pop-content flex-column" id="popupContent">
+    <p *ngIf="data?.type === 'make'">Are you sure you want to change the member role to {{data?.text}}?</p>
+    <p *ngIf="data?.type === 'delete'">Are you sure you want to delete this team member?</p>
+    <p *ngIf="data?.type === 'deleteDoc'">Are you sure you want to delete this document?</p>
+    <p *ngIf="data?.type === 'deleteTemplate'">
+        Are you sure you want to delete this template?
+    </p>
+    <ng-container *ngIf="data?.type === 'removeLabel'">
+        <p>
+            Are you sure you want to remove connection label {{data?.label?.name}}?
+        </p>
+        <p>
+            This action will result in removal of this label from companies which is attached with
+        </p>
+    </ng-container>
+
+    <ng-container *ngIf="data?.type === 'removeClaim'">
+        <p>
+            Are you sure you want to remove this claim?
+        </p>
+    </ng-container>
+
+    <div class="ff-flex-end" id="popupAction">
+        <app-buttons buttonType="stroked" (buttonClicked)="closePopup()">Cancel</app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="actionButton()">
+            <ng-container *ngIf="data?.type === 'make'">
+                Make {{data?.text}}
+            </ng-container>
+            <ng-container *ngIf="data?.type === 'delete'|| data?.type === 'deleteDoc'||data?.type === 'deleteTemplate'">
+                Delete
+            </ng-container>
+            <ng-container *ngIf="data?.type === 'removeLabel' || data?.type === 'removeClaim'">
+                Remove
+            </ng-container>
+        </app-buttons>
+    </div>
+</section>

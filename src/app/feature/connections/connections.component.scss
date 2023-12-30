@@ -1,0 +1,26 @@
+
+@import 'src/styles/responsive';
+@import 'src/styles/toggle_switch';
+.need-help {
+  font-family: var(--font-bold);
+  color: var(--font-color);
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 10px;
+  @include devices(laptop) {
+    font-size: 14px;
+  }
+  @include devices(desktop) {
+    font-size: 16px;
+  }
+}
+
+.help-wrapper,
+.heading-section {
+  margin-bottom: 15px;
+}
+.slide-togle-btn {
+  margin-right: 8px;
+  margin-left: 8px;
+}
+

@@ -1,0 +1,129 @@
+<section class="wrapper d-flex new-wrapper">
+    <app-loader [loaderText]="loaderText" [loaderType]="'type1'" *ngIf="loading" class="w-50"></app-loader>
+    <section class="col px-0 left w-50" *ngIf="!loading">
+        <aside aria-label="" class="">
+            <h3 class="text-sm text-blue font-1-bold header-wrap">
+                Selected claim ({{selectedClaims.length}})
+            </h3>
+            <p class="text-off-blue" *ngIf="selectedClaims.length === 0">
+                <ng-container *ngIf="isReversal">
+                    You cannot add any claims to this reversed transacton.
+                </ng-container>
+                <ng-container *ngIf="!isReversal">
+                    You didn't add any claims yet, please add claims from below list!
+                </ng-container>
+            </p>
+
+            <ul class="claim-listing" *ngIf="selectedClaims.length > 0">
+                <li *ngFor="let claim of selectedClaims" class="pointer"
+                    [ngClass]="{'selected': currentClaim?.id === claim?.id }" (click)="showDetails(claim)">
+                    <aside class="left-side" aria-label="Claim details">
+                        <mat-icon>verified_user</mat-icon>
+                        <article class="content-claim">
+                            <article class="ff-flex-align-center">
+                                <span class="font-1-bold text-blue">{{claim?.name}}</span>
+                                <span *ngIf="claim.status === 2" class="inherited-label ff-flex-align-center">Inherited claim</span>
+                            </article>
+                            <span class="font-1-normal desc text-overflow">{{claim.description_basic}}</span>
+                        </article>
+                    </aside>
+                    <article class="ff-flex-align-center">
+                        <span class="label-tr">
+                            <ng-container *ngIf="claim.status == 1">
+                                Pending
+                            </ng-container>
+                            <ng-container *ngIf="claim.status == 2">
+                                {{ claim.verification_percentage }}% verified
+                            </ng-container>
+                            <ng-container *ngIf="claim.status == 3">Rejected</ng-container>
+                        </span>
+
+                        <mat-icon class="ff-flex-center arrow-icon">keyboard_arrow_right</mat-icon>
+                    </article>
+                </li>
+            </ul>
+            <p class="text-off-blue" *ngIf="selectedClaims.length && isReversal">
+                You cannot add any claims to this reversed transacton.
+            </p>
+        </aside>
+        <ng-container *ngIf="!isReversal">
+            <aside aria-label="" class="">
+                <h3 class="text-sm text-blue font-1-bold header-wrap" *ngIf="availableClaims?.length > 0">
+                    Add claims
+                </h3>
+            </aside>
+            <ul class="claim-listing" *ngIf="availableClaims?.length > 0">
+                <li *ngFor="let claim of availableClaims">
+                    <aside class="left-side" aria-label="claim details">
+                        <!-- default claim icon  -->
+                        <mat-icon>verified_user</mat-icon>
+                        <article class="content-claim">
+                            <span class="font-1-bold text-blue">{{claim?.name}}</span>
+                            <span class="font-1-normal desc text-overflow">{{claim.description_basic}}</span>
+                        </article>
+                    </aside>
+                    <!-- add plus custom icon  -->
+                    <svg class="pointer" (click)="addClaimToTransaction(claim, false)" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="addClaim">
+                        <path
+                            d="M23.499 11.731C23.499 17.7206 18.5677 22.5889 12.4688 22.5889C6.36977 22.5889 1.43848 17.7206 1.43848 11.731C1.43848 5.74138 6.36977 0.873047 12.4688 0.873047C18.5677 0.873047 23.499 5.74138 23.499 11.731Z"
+                            fill="white" stroke="#BAE3FA" />
+                        <path
+                            d="M16.7379 10.312H13.4439V7H12.0399V10.312H8.72786V11.608H12.0399V14.92H13.4439V11.608H16.7379V10.312Z"
+                            fill="#B6DDF3" />
+                    </svg>
+                </li>
+            </ul>
+        </ng-container>
+    </section>
+    <!-- selecting and showing claim details here  -->
+    <section class="w-50 details-container" *ngIf="currentClaim">
+        <aside aria-label="claim details" class="claim-detail">
+
+            <article class="ff-flex-between">
+                <span class="label-tr">
+                    Description
+                </span>
+                <span class="text-xs text-off-blue font-1-normal m-0 pt-1">
+                    <span *ngIf="currentClaim.status == 1">Pending</span>
+                    <span *ngIf="currentClaim.status == 2">{{ currentClaim.verification_percentage }}% verified</span>
+                    <span *ngIf="currentClaim.status == 3">Rejected</span>
+                </span>
+            </article>
+            <p class="value-tr m-t-10" [class.bb]="currentClaim.criteria[0].field_responses.length">
+                {{currentClaim?.description_full }}
+            </p>
+            <article class="d-flex evidence-section" *ngIf="currentClaim.criteria[0].field_responses.length">
+                <span class="label-tr">
+                    Evidence
+                </span>
+                <ul>
+                    <ng-container *ngFor="let field of currentClaim.criteria[0].field_responses">
+                        <li>
+                            <ng-container *ngIf="field.type === 3">
+                                <article class="ff-flex-between">
+                                    <span class="value-tr">{{field?.title}}</span>
+                                    <span class="value-tr pointer" (click)="downloadFile(field.file)" id="downloadFile">
+                                        <svg width="13" height="10" viewBox="0 0 13 10" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M6.10979 6.71212L6.10962 6.71195L3.4844 3.96172L3.48428 3.96159C3.40864 3.88246 3.4653 3.75029 3.57459 3.75029H4.9497H5.1997V3.50029V0.625051C5.1997 0.418594 5.3683 0.25 5.57475 0.25H6.82485C7.03131 0.25 7.19991 0.418594 7.19991 0.625051V3.50029V3.75029H7.44991H8.82502C8.93431 3.75029 8.99096 3.88246 8.91532 3.96159L8.9152 3.96172L6.28999 6.71195L6.28982 6.71212C6.26656 6.73654 6.23399 6.75058 6.1998 6.75058C6.16561 6.75058 6.13305 6.73654 6.10979 6.71212Z"
+                                                fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+                                            <path
+                                                d="M11.3233 9.74984H1.07415C0.729759 9.74984 0.449219 9.4693 0.449219 9.12491V8.87493C0.449219 8.53054 0.729759 8.25 1.07415 8.25H11.3233C11.6677 8.25 11.9483 8.53054 11.9483 8.87493V9.12491C11.9483 9.4693 11.6677 9.74984 11.3233 9.74984Z"
+                                                fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+                                        </svg>Download
+                                    </span>
+                                </article>
+                            </ng-container>
+                            <ng-container *ngIf="field.type === 2 || field.type === 1">
+                                <span class="value-tr">{{field?.title}}: {{ field.response }}</span>
+                            </ng-container>
+                        </li>
+                    </ng-container>
+                </ul>
+            </article>
+        </aside>
+    </section>
+
+</section>

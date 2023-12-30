@@ -1,0 +1,201 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Add connection
+        </h1>
+    </section>
+
+    <section class="tabs">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="currentStep" (tabChanged)="changeTab($event)"
+            [withDescription]="true"></app-ff-custom-tab>
+    </section>
+
+    <section class="content" *ngIf="!loading">
+        <ng-container *ngIf="currentStep === tabGroup[0].id">
+            <p class="info font-1-normal" *ngIf="incomingData?.stock">
+                You are adding this farmer as your <span class="font-1-bold">Tier 1</span> supplier
+            </p>
+            <p class="info font-1-normal" *ngIf="incomingData?.isSupplier">
+                You are adding connection to <span class="font-1-bold">{{incomingData?.connectionName}}</span>
+            </p>
+        </ng-container>
+
+        <div class="row-md" *ngIf="currentStep === tabGroup[0].id">
+            <h3 class="text-blue font-1-bold col-md-12">Farmer details</h3>
+            <section [formGroup]="detailsForm" class="col-md-6">
+                <aside class="d-flex w-100" aria-label="">
+                    <article class="w-50-cc with-error m-r-12">
+                        <app-ff-input label="First name*" [parentFormGroup]="detailsForm" [controlName]="'firstName'"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'firstName', formgroup: detailsForm}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc with-error">
+                        <app-ff-input label="Last name*" [parentFormGroup]="detailsForm" [controlName]="'lastName'"
+                            inputSize="full" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'lastName', formgroup: detailsForm}">
+                        </ng-container>
+                    </article>
+
+                </aside>
+                <aside class="d-flex w-100" aria-label="second row">
+                    <article class="w-50-cc with-error m-r-12">
+                        <app-ff-dropdown label="Farmer type*" [dropdownOptions]="operationTypes" inputClass="profile"
+                            [hideSearch]="true" [defaultValue]="detailsForm.get('primaryOperation').value"
+                            [showRedBorder]="detailsForm | showRequiredError: 'primaryOperation'"
+                            (selectionChange)="dropdownChanged($event, 'primaryOperation', detailsForm)">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'primaryOperation', formgroup: detailsForm}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc with-error">
+                        <app-ff-input label="Identificaiton number" [parentFormGroup]="detailsForm"
+                            [controlName]="'identificationNo'" inputSize="full" inputType="text">
+                        </app-ff-input>
+                    </article>
+                </aside>
+            </section>
+            <aside aria-label="illustration" class="col-md-6 ff-flex-center">
+                <img src="../../../../assets/images/famer_bulk.svg" alt="">
+            </aside>
+        </div>
+
+        <section class="row-md" *ngIf="currentStep === tabGroup[1].id">
+
+            <section [formGroup]="addressForm" class="col-md-6">
+                <h3 class="text-blue font-1-bold col-md-12 with-error">Supplier address</h3>
+                <article class="with-error col-md-12">
+                    <app-ff-input label="Street name" [parentFormGroup]="addressForm" [controlName]="'street'"
+                        inputSize="profile" inputType="text">
+                    </app-ff-input>
+                </article>
+                <aside class="d-flex w-100" aria-label="second row">
+                    <article class="w-50-cc with-error m-r-12">
+                        <app-ff-dropdown label="Country*" [dropdownOptions]="countryList" inputClass="profile"
+                            [defaultValue]="addressForm.get('country').value"
+                            [showRedBorder]="addressForm | showRequiredError: 'country'"
+                            (selectionChange)="dropdownChanged($event, 'country', addressForm)">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'country', formgroup: addressForm}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc with-error">
+                        <app-ff-dropdown label="Province*" [dropdownOptions]="stateList" inputClass="profile"
+                            [defaultValue]="addressForm.get('province').value"
+                            [showRedBorder]="addressForm | showRequiredError: 'province'"
+                            (selectionChange)="dropdownChanged($event, 'province', addressForm)">
+                        </app-ff-dropdown>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'province', formgroup: addressForm}">
+                        </ng-container>
+                    </article>
+                </aside>
+                <aside class="d-flex w-100" aria-label="third row">
+                    <article class="w-50-cc with-error m-r-12">
+                        <app-ff-input label="City/Village*" [parentFormGroup]="addressForm" [controlName]="'city'"
+                            inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'city', formgroup: addressForm}">
+                        </ng-container>
+                    </article>
+                    <article class="w-50-cc with-error">
+                        <app-ff-input label="Postal code" [parentFormGroup]="addressForm" [controlName]="'zipcode'"
+                            inputSize="profile" inputType="text">
+                        </app-ff-input>
+                    </article>
+                </aside>
+                <h3 class="text-blue font-1-bold with-error">Contact information</h3>
+                <article class="w-100 with-error">
+                    <app-ff-input label="Email" [parentFormGroup]="addressForm" [controlName]="'email'"
+                        inputSize="profile" inputType="text">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'email', formgroup: addressForm}">
+                    </ng-container>
+                </article>
+                <aside class="d-flex w-100" aria-label="fourth row">
+                    <article class="w-50-cc with-error m-r-12">
+                        <app-ff-dropdown label="Country code" [dropdownOptions]="countryCodeList" inputClass="profile"
+                            [defaultValue]="addressForm.get('dialCode').value"
+                            (selectionChange)="dropdownChanged($event, 'dialCode', addressForm)">
+                        </app-ff-dropdown>
+                    </article>
+                    <article class="w-50-cc with-error">
+                        <app-ff-input label="Contact number" [parentFormGroup]="addressForm" [controlName]="'mobile'"
+                            inputSize="profile" inputType="text">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'mobile', formgroup: addressForm}">
+                        </ng-container>
+                    </article>
+                </aside>
+
+            </section>
+            <aside aria-label="illustration" class="col-md-6 ff-flex-center">
+                <img src="../../../../assets/images/famer_bulk.svg" alt="">
+            </aside>
+        </section>
+
+        <section class="row-md" *ngIf="currentStep === tabGroup[2].id">
+            <div class="col-md-6">
+                <p class="info font-1-normal text-blue with-error" *ngIf="incomingData?.stock">
+                    Your are about to invite
+                    <ng-container [ngTemplateOutlet]="farmerName"></ng-container> to your connections
+                </p>
+                <ng-container *ngIf="!incomingData?.stock && supplySelection?.length">
+                    <p class="info font-1-normal text-blue with-error">
+                        Products purchased from <ng-container [ngTemplateOutlet]="farmerName"></ng-container>
+                        are supplied to,
+                    </p>
+
+                    <app-connection-mapping [supplySelection]="supplySelection" [additionalLoader]="additionalLoader"
+                        [selectAll]="selectAll" [supplySelectionCount]="supplySelectionCount"
+                        (loadMoreData)="loadMoreBuyers()" (updateRadio)="updateSelectAll($event)"
+                        *ngIf="!viewingAsAdmin">
+                    </app-connection-mapping>
+                </ng-container>
+                <ng-container *ngIf="supplySelection?.length === 0">
+                    By clicking on add connection you are adding this farmer as a connection to the company
+                </ng-container>
+            </div>
+            <aside aria-label="illustration" class="col-md-6 ff-flex-center">
+                <img src="../../../../assets/images/famer_bulk.svg" alt="">
+            </aside>
+        </section>
+        <article class="w-100 row-md">
+            <app-action-buttons [buttonPrevText]="prevButton" [buttonNextState]="nextButtonState"
+                (buttonsClicked)="buttonAction($event)" aria-label="action section"
+                class="col-md-6"></app-action-buttons>
+        </article>
+    </section>
+    <section class="row-md">
+        <app-loader [loaderText]="loaderText" loaderType="type1" *ngIf="loading" class="col-md-6"></app-loader>
+    </section>
+</div>
+
+
+<!-- validation error section  -->
+<ng-template let-formcontrol="formcontrol" let-formgroup="formgroup" #formErrorMessages>
+    <span class="error-message" *ngIf="formgroup | showRequiredError: formcontrol">
+        This field shouldn't be empty *
+    </span>
+    <ng-container *ngIf="formcontrol === 'mobile' && addressForm.get(formcontrol)?.touched">
+        <span class="error-message" *ngIf="addressForm.get(formcontrol)?.errors?.pattern">
+            Invalid mobile number
+        </span>
+        <span class="error-message" *ngIf="formgroup.get(formcontrol)?.errors?.minlength">
+            Invalid mobile number
+        </span>
+    </ng-container>
+</ng-template>
+
+<ng-template #farmerName>
+    <span class="font-1-bold">{{detailsForm.get('firstName').value}} {{detailsForm.get('lastName').value}}</span>
+</ng-template>

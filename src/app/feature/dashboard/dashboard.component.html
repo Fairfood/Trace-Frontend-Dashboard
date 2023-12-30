@@ -1,0 +1,140 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Dashboard
+        </h1>
+    </section>
+    <section class="row-xl bg-primary-lighter" *ngIf="dataLoaded">
+        <div class="col-xl-5 row-md">
+            <app-chart-donut [chartData]="actorsData" [hideLegend]="true"
+                class="col-md-6 ff-flex-center"></app-chart-donut>
+            <aside aria-label="Donut legend" class="col-md-6 legend-wrapper">
+                <article class="legend-item" id="farmersCount">
+                    <span class="font-1-normal text-sm text-blue ff-flex-align-center">
+                        <span class="color-box bg-graph-1"></span>
+                        <span>Farmers</span>
+                    </span>
+                    {{statistics?.farmer_count}}
+                </article>
+                <article class="legend-item" id="companyCount">
+                    <span class="font-1-normal text-sm text-blue ff-flex-align-center">
+                        <span class="color-box bg-graph-1"></span>
+                        <span>Companies</span>
+                    </span>
+                    {{statistics?.company_count}}
+                </article>
+            </aside>
+        </div>
+        <div class="col-xl-7">
+            <div class="row-md">
+                <article class="col-md-4 item items">
+                    <span class="value">{{ statistics?.supply_chain_count }}</span>
+                    <span class="key">Active supply chains</span>
+                </article>
+                <article class="col-md-4 item items">
+                    <span class="value">{{statistics?.tier_count}}</span>
+                    <span class="key">Largest tier length</span>
+                </article>
+                <article class="col-md-4 item items">
+                    <span class="value">{{statistics?.chain_length}}</span>
+                    <span class="key">
+                        <span *ngIf="supplyChainSelected">Maximum</span>
+                        <span *ngIf="!supplyChainSelected">Average</span> chain length (in Km)
+                    </span>
+                </article>
+            </div>
+            <div class="col-md-12 flex-column progress" *ngIf="!supplyChainSelected">
+                <p class="mb-0 ff-flex-start">
+                    <span class="text-blue font-1-bold text-lg">{{statistics?.traceable_chain_percent}}</span><sup
+                        class="text-blue font-1-normal text-md">% </sup>
+                    <span class="font-1-normal text-xxxs text-off-blue pl-2"> Chains tracable to farmers</span>
+                </p>
+                <mat-progress-bar mode="determinate" value="{{statistics?.traceable_chain_percent}}">
+                </mat-progress-bar>
+            </div>
+            <span class="font-1-bold text-xs text-blue c-heading">Company details</span>
+            <div class="statistics-data">
+                <article class="col-md-3 item items">
+                    <span class="value" id="invitedActorCount">{{ statistics?.invited_actor_count }}</span>
+                    <span class="key">Invited</span>
+                </article>
+                <article class="col-md-3 item items">
+                    <span class="value" id="activeActorCount">{{ statistics?.active_actor_count }}</span>
+                    <span class="key">Active</span>
+                </article>
+                <article class="col-md-3 item items">
+                    <span class="value" id="pendingActorCount">{{ statistics?.pending_invite_count }}</span>
+                    <span class="key">Pending</span>
+                </article>
+                <article class="col-md-3 item items">
+                    <span class="value" id="mappedActorCount">{{ statistics?.mapped_actor_count }}</span>
+                    <span class="key">Mapped</span>
+                </article>
+            </div>
+        </div>
+    </section>
+    <app-dashboard-map-view *ngIf="dataLoaded"></app-dashboard-map-view>
+    <app-supply-chain-overview *ngIf="dataLoaded && allSupplychain"></app-supply-chain-overview>
+    <app-recent-transaction *ngIf="dataLoaded"></app-recent-transaction>
+
+    <!-- actions required and activity log boxes  -->
+
+    <div class="row-md mt-25" *ngIf="dataLoaded">
+        <div class="col-md-6 flex-column common-bg">
+            <section class="table-top-heading heading-bg">
+                <span class="text-md text-blue font-1-bold">
+                    Activity log
+                </span>
+            </section>
+            <section class="block-body flex-column">
+                <ul class="list-group">
+                    <li *ngFor="let log of activities; trackBy: trackByFn; let k=index" class="flex-column"
+                        id="activityItem-{{k}}">
+                        <span class="text-xs text-blue font-1-normal line-height">{{ log.text }}</span>
+                        <span class="text-xxxs text-off-blue font-1-normal">
+                            {{ (log.created_on * 1000) | date: 'dd MMMM y'}}
+                        </span>
+                    </li>
+                </ul>
+                <app-loader loaderText="Loading activities" [loaderType]="'type1'" class="min-h-300"
+                    *ngIf="activityLoading"></app-loader>
+                <aside class="no-data w-100" aria-label="no data" *ngIf="activities?.length == 0"
+                    [hidden]="activityLoading">
+                    No activities found
+                </aside>
+            </section>
+        </div>
+        <aside aria-label="actions required" class="col-md-6 flex-column common-bg">
+            <section class="table-top-heading heading-bg">
+                <span class="text-md text-blue font-1-bold">
+                    Actions required
+                </span>
+            </section>
+            <section class="block-body flex-column">
+                <ul class="list-group">
+                    <li *ngFor="let action of dashboardStatistics.actions;trackBy: trackByFn;"
+                        class="row-md ff-flex-between">
+                        <span class="text-xs text-blue font-1-normal col-md-8">{{ action.text }}</span>
+                        <aside class="col-md-4" aria-label="Action button section">
+                            <app-buttons buttonType="stroked" buttonSize="medium"
+                                (buttonClicked)="inviteConnection(action)"
+                                *ngIf="action.type === 2 && memberType !== 3">
+                                {{ action.action_text }}
+                            </app-buttons>
+                            <app-buttons buttonType="stroked" buttonSize="medium" (buttonClicked)="viewCompanyProfile()"
+                                *ngIf="action.type === 1">
+                                {{ action.action_text }}
+                            </app-buttons>
+                        </aside>
+                    </li>
+                </ul>
+                <aside class="no-data w-100" aria-label="no data" *ngIf="dashboardStatistics?.actions?.length == 0">
+                    No actions required
+                </aside>
+            </section>
+        </aside>
+    </div>
+
+    <app-loader loaderText="Loading dashboard data" [loaderType]="'type1'" class="min-h-300"
+        *ngIf="!dataLoaded"></app-loader>
+</div>

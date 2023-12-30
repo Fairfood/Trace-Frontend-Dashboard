@@ -1,0 +1,53 @@
+<!-- Connected farms & Tier statistics -->
+
+<div class="common-bg">
+    <div class="tab-container ff-flex-align-center">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="activeTabId" (tabChanged)="changeTab($event)"
+            class="w-100">
+        </app-ff-custom-tab>
+    </div>
+    <section class="tab-content row-md" *ngIf="dataLoaded">
+        <div class="col-md-6">
+            <div *ngIf="apiLoaded | async">
+                <google-map (mapInitialized)="mapReady($event)" height="400px" width="100%" [zoom]="2"
+                    [options]="mapDefaultOptions" id="googleMapDashboard"></google-map>
+            </div>
+        </div>
+        <aside class="col-md-6 row-md" aria-label="right side chart">
+            <app-chart-donut [chartData]="chartData" [hideLegend]="true" class="col-md-6 ff-flex-center"
+                *ngIf="activeTabId === 'farmer'" id="donutChart1"></app-chart-donut>
+            <app-chart-donut [chartData]="chartDataSupplier" [hideLegend]="true" class="col-md-6 ff-flex-center"
+                *ngIf="activeTabId === 'supplier'" id="chartDataSupplier"></app-chart-donut>
+            <aside aria-label="Donut legend" class="col-md-6 legend-wrapper">
+
+                <ng-container *ngIf="activeTabId === 'farmer'">
+                    <article class="legend-item" id="legendFarmer">
+                        <span class="font-1-normal text-sm text-blue ff-flex-align-center">
+                            <span class="color-box bg-graph-1"></span>
+                            <span>Farmers</span>
+                        </span>
+                        {{statistics?.farmer_count}}
+                    </article>
+                    <article class="legend-item" id="legendSupplier">
+                        <span class="font-1-normal text-sm text-blue ff-flex-align-center">
+                            <span class="color-box bg-graph-1"></span>
+                            <span>Collectors</span>
+                        </span>
+                        {{statistics?.collectorCount}}
+                    </article>
+                </ng-container>
+                <ng-container *ngIf="activeTabId === 'supplier'">
+                    <article class="legend-item"
+                        *ngFor="let item of statistics?.operation_stats?.supplier;let i = index; trackBy: trackByFnCommon">
+                        <span class="font-1-normal text-sm text-blue ff-flex-align-center">
+                            <span class="color-box bg-graph-1"
+                                [ngStyle]="{'background-color' : graphColors[i] }"></span>
+                            <span>{{item.name}}</span>
+                        </span>
+                        {{item.count}}
+                    </article>
+                </ng-container>
+            </aside>
+        </aside>
+    </section>
+</div>

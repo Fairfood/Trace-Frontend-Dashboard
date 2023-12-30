@@ -1,0 +1,220 @@
+<!-- File has data and no error  -->
+<section class="flex-column info" *ngIf="(errorRow$ | async).length === 0 && (successData$ | async).length > 0">
+    <article class="ff-flex-start">
+        <mat-icon>check_circle</mat-icon>
+        <span class="label-tr">
+            Excel file verified successfully ...!
+        </span>
+    </article>
+</section>
+
+<!-- File has errors  -->
+<section class="flex-column err" *ngIf="(errorRow$ | async).length > 0">
+    <article class="error-wrap">
+        <mat-icon>error_outline</mat-icon>
+        <span class="error-message">
+            Errors in the uploaded excel. Either complete the field here or reupload the excel file after corrections.
+            Issues found in {{(errorRow$ | async).length}} row
+        </span>
+    </article>
+    <article class="ff-flex-between second-row">
+        <span class="error-message">
+            {{(errorRow$ | async).length}} issues found
+        </span>
+        <span class="d-flex pointer">
+            <ng-container [ngTemplateOutlet]="deleteIcon" [ngTemplateOutletContext]="{i: -1}"></ng-container>
+            <span class="m-l-10 error-message" (click)="deleteRow(-1)">
+                Remove all
+            </span>
+        </span>
+    </article>
+</section>
+
+<!-- file is empty  -->
+<ng-container *ngIf="(successData$ | async).length === 0 && (errorRow$ | async).length === 0; else tableFormat">
+    <section class="file-empty w-100">
+        <article class="header-bar w-100"></article>
+        <article class="flex-column no-data">
+            <img src="../../../../assets/images/nodata.svg" alt="nothing">
+            <h3 class="value-tr">We couldn’t find any data in the uploaded sheet.</h3>
+            <span class="value-tr text-xxxs m-15">Fill data in and re-upload the sheet again to continue.</span>
+        </article>
+        <app-buttons buttonType="stroked" (buttonClicked)="removeUploadedFile()" class="m-15 ff-flex-center">
+            Upload excel again
+        </app-buttons>
+    </section>
+</ng-container>
+
+<ng-template #tableFormat>
+    <section class="ff-table-container w-100 pt-20 scroll" *ngIf="!loading">
+        <table aria-label="Verification of the excel data">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of displayedColumns" class="{{item.class}}">
+                        {{item.name}}
+                    </th>
+                    <th class="smaller-column last" *ngIf="(errorRow$ | async).length">
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let item of (errorRow$ | async); let i=index; trackBy: trackByFn">
+                    <tr>
+                        <td *ngFor="let column of displayedColumns" class="{{column.class}}">
+
+                            <!-- if column value has no errors  -->
+                            <ng-container [ngTemplateOutlet]="validColumnMapping"
+                                [ngTemplateOutletContext]="{item, column}"
+                                *ngIf="!(item | errorColumn: column?.sortKey)">
+                            </ng-container>
+                            <!-- if column value has no errors ends here -->
+                            <!-- if column value has errors -->
+                            <ng-container *ngIf="item | errorColumn: column.sortKey;">
+                                <ng-container *ngIf="inputFields.includes(column.type)">
+                                    <ng-container [ngTemplateOutlet]="invalidInput"
+                                        [ngTemplateOutletContext]="{item, column, i}">
+                                    </ng-container>
+                                </ng-container>
+
+
+                                <ng-container *ngIf="column.type === 'connection_type_drop_down'">
+                                    <app-ff-dropdown label="" [dropdownOptions]="connectionTypes" inputClass="profile"
+                                        [hideSearch]="true" [defaultValue]="item[column.sortKey]" [labelClass]="true"
+                                        [showRedBorder]="true"
+                                        (selectionChange)="dropdownChanged($event, item, column.sortKey)"></app-ff-dropdown>
+                                </ng-container>
+
+                                <ng-container *ngIf="column.type === 'country_drop_down'">
+                                    <app-ff-dropdown label="" [dropdownOptions]="countryList" inputClass="profile"
+                                        [defaultValue]="item[column.sortKey]" [labelClass]="true" [showRedBorder]="true"
+                                        (selectionChange)="dropdownChanged($event, item, column.sortKey)"></app-ff-dropdown>
+                                </ng-container>
+
+                                <ng-container *ngIf="column.type === 'province_drop_down'">
+                                    <app-ff-dropdown label=""
+                                        [dropdownOptions]="countryList | stateFilter: item.country" inputClass="profile"
+                                        [labelClass]="true" [showRedBorder]="true"
+                                        (selectionChange)="dropdownChanged($event, item, column.sortKey)"></app-ff-dropdown>
+                                </ng-container>
+
+                                <ng-container *ngIf="column.type === 'datetime'">
+                                    <app-ff-filter-box label="" [value]="item[column.sortKey] | date: 'dd MMMM y'"
+                                        [boxState]="'default'" [showRedBorder]="true"
+                                        [tooltipText]="item | errorColumnMessage: column.sortKey"
+                                        [matMenuTriggerFor]="datePickerFF"></app-ff-filter-box>
+                                    <mat-menu class="mat-menu date-picker" #datePickerFF="matMenu" xPosition="after">
+                                        <mat-card class="demo-inline-calendar-card" (click)="$event.stopPropagation();">
+                                            <mat-calendar [maxDate]="today"
+                                                (selectedChange)="dateFilter($event, item, column.sortKey)"></mat-calendar>
+                                        </mat-card>
+                                    </mat-menu>
+                                </ng-container>
+
+                            </ng-container>
+                            <!-- if column value has errors ends here-->
+                        </td>
+                        <td class="smaller-column action">
+                            <!-- action section  -->
+                            <aside class="ff-flex-end">
+                                <span *ngIf="validatingIndex === item.index">
+                                    <ng-container [ngTemplateOutlet]="roundLoader"></ng-container>
+                                </span>
+                                <ng-container [ngTemplateOutlet]="duplicateIcon"
+                                    *ngIf="item | errorColumn: 'duplicate'"></ng-container>
+                                <ng-container [ngTemplateOutlet]="deleteIcon"
+                                    [ngTemplateOutletContext]="{i}"></ng-container>
+                            </aside>
+                        </td>
+                    </tr>
+                </ng-container>
+                <tr *ngFor="let success of (successData$ | async)">
+                    <td *ngFor="let column of displayedColumns" class="{{column.class}}">
+                        <ng-container [ngTemplateOutlet]="validColumnMapping"
+                            [ngTemplateOutletContext]="{item: success, column}">
+                        </ng-container>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <section class="row-md" *ngIf="(dataCount$ | async) > 10">
+            <article class="col-md-12  additional-rows ff-flex-center value-tr">
+                + {{(dataCount$ | async) - 10}} more rows
+            </article>
+        </section>
+    </section>
+</ng-template>
+
+<app-loader [loaderText]="loaderText" [loaderType]="'type1'" *ngIf="loading" class="w-100 pt-20"></app-loader>
+
+<app-action-buttons [buttonNextState]="nextButton" (buttonsClicked)="buttonAction($event)"></app-action-buttons>
+
+<ng-template #roundLoader>
+    <svg width="40px" height="40px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid" class="rolling" style="background: none;">
+        <circle cx="50" cy="50" fill="none" stroke="#4dcaf4" stroke-width="8" r="30"
+            stroke-dasharray="141.37166941154067 49.12388980384689" transform="rotate(94.0408 50 50)">
+            <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50"
+                keyTimes="0;1" dur="0.9s" begin="0s" repeatCount="indefinite"></animateTransform>
+        </circle>
+    </svg>
+</ng-template>
+
+<ng-template #validColumnMapping let-item="item" let-column="column">
+    <span class="column-value ff-flex-align-center">
+
+        <ng-container *ngIf="column?.sortKey === 'date'">
+            {{item[column.sortKey] | date: 'dd MMMM y'}}
+        </ng-container>
+
+        <ng-container *ngIf="column?.sortKey !== 'date'">
+            {{item[column.sortKey]}}
+        </ng-container>
+
+    </span>
+</ng-template>
+
+<ng-template #invalidInput let-item="item" let-column="column" let-i="i">
+    <label class="has-float-label bulk" [ngClass]="{'has-error': item | errorColumn: column.sortKey }"
+        matTooltip="{{item | errorColumnMessage: column.sortKey}}">
+        <input placeholder=" " [(ngModel)]="item[column.sortKey]" [ngModelOptions]="{ updateOn: 'blur' }"
+            (ngModelChange)="validateColumns(item)" type="text" class="stock" />
+        <span class="label"></span>
+    </label>
+</ng-template>
+
+<ng-template #duplicateIcon>
+    <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0_821_5188)">
+            <path
+                d="M10.185 2.521H4.40155C4.07286 2.521 3.75764 2.65157 3.52522 2.88398C3.2928 3.1164 3.16223 3.43162 3.16223 3.76031V7.47826C3.16223 7.58782 3.20575 7.69289 3.28323 7.77037C3.3607 7.84784 3.46577 7.89136 3.57534 7.89136C3.6849 7.89136 3.78997 7.84784 3.86745 7.77037C3.94492 7.69289 3.98844 7.58782 3.98844 7.47826V3.76031C3.98844 3.65075 4.03196 3.54567 4.10944 3.4682C4.18691 3.39073 4.29198 3.34721 4.40155 3.34721H10.185C10.2946 3.34721 10.3997 3.39073 10.4771 3.4682C10.5546 3.54567 10.5981 3.65075 10.5981 3.76031V11.1962C10.5981 11.3058 10.5546 11.4108 10.4771 11.4883C10.3997 11.5658 10.2946 11.6093 10.185 11.6093H4.40155C4.29198 11.6093 4.18691 11.5658 4.10944 11.4883C4.03196 11.4108 3.98844 11.3058 3.98844 11.1962V9.95689C3.98844 9.84732 3.94492 9.74225 3.86745 9.66478C3.78997 9.5873 3.6849 9.54378 3.57534 9.54378C3.46577 9.54378 3.3607 9.5873 3.28323 9.66478C3.20575 9.74225 3.16223 9.84732 3.16223 9.95689V11.1962C3.16223 11.5249 3.2928 11.8401 3.52522 12.0725C3.75764 12.3049 4.07286 12.4355 4.40155 12.4355H10.185C10.5137 12.4355 10.8289 12.3049 11.0613 12.0725C11.2938 11.8401 11.4243 11.5249 11.4243 11.1962V3.76031C11.4243 3.43162 11.2938 3.1164 11.0613 2.88398C10.8289 2.65157 10.5137 2.521 10.185 2.521Z"
+                fill="#5691AE" />
+            <path
+                d="M4.81461 10.0883C4.81459 10.1183 4.82269 10.1476 4.83806 10.1733C4.85343 10.199 4.87548 10.22 4.90186 10.2341C4.92824 10.2482 4.95796 10.2549 4.98784 10.2535C5.01773 10.252 5.04667 10.2425 5.07156 10.2259L7.08668 8.88289C7.10926 8.86779 7.12777 8.84736 7.14057 8.8234C7.15337 8.79944 7.16007 8.7727 7.16007 8.74553C7.16007 8.71837 7.15337 8.69162 7.14057 8.66767C7.12777 8.64371 7.10926 8.62327 7.08668 8.60817L5.07156 7.26352C5.04667 7.24691 5.01773 7.23737 4.98784 7.23593C4.95796 7.23448 4.92824 7.24117 4.90186 7.2553C4.87548 7.26942 4.85343 7.29044 4.83806 7.31612C4.82269 7.34179 4.81459 7.37116 4.81461 7.40108V8.30454H2.74908C2.63952 8.30454 2.53444 8.26102 2.45697 8.18355C2.3795 8.10607 2.33598 8.001 2.33598 7.89144V2.10797C2.33598 1.99841 2.3795 1.89333 2.45697 1.81586C2.53444 1.73839 2.63952 1.69486 2.74908 1.69486H9.35876C9.46832 1.69486 9.5734 1.65134 9.65087 1.57387C9.72834 1.49639 9.77187 1.39132 9.77187 1.28176C9.77187 1.1722 9.72834 1.06712 9.65087 0.989648C9.5734 0.912176 9.46832 0.868652 9.35876 0.868652H2.74908C2.42039 0.868652 2.10517 0.999223 1.87275 1.23164C1.64034 1.46406 1.50977 1.77928 1.50977 2.10797V7.89144C1.50977 8.22012 1.64034 8.53535 1.87275 8.76777C2.10517 9.00018 2.42039 9.13075 2.74908 9.13075H4.81461V10.0883Z"
+                fill="#5691AE" />
+        </g>
+        <defs>
+            <clipPath id="clip0_821_5188">
+                <rect width="13.2194" height="13.2194" fill="white" transform="translate(0.683594 0.0424805)" />
+            </clipPath>
+        </defs>
+    </svg>
+</ng-template>
+
+<ng-template #deleteIcon let-i="i">
+    <svg width="20" height="20" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="pointer"
+        (click)="deleteRow(i)">
+        <path
+            d="M3.8737 8.42057V5.03109C3.8737 4.90267 3.82268 4.7795 3.73188 4.6887C3.64107 4.59789 3.51791 4.54688 3.38949 4.54688C3.26106 4.54688 3.1379 4.59789 3.0471 4.6887C2.95629 4.7795 2.90527 4.90267 2.90527 5.03109V8.42057C2.90527 8.54899 2.95629 8.67216 3.0471 8.76296C3.1379 8.85377 3.26106 8.90479 3.38949 8.90479C3.51791 8.90479 3.64107 8.85377 3.73188 8.76296C3.82268 8.67216 3.8737 8.54899 3.8737 8.42057Z"
+            fill="#EA2553" />
+        <path
+            d="M7.74756 3.57837C7.61914 3.57837 7.49598 3.62938 7.40517 3.72019C7.31436 3.811 7.26335 3.93416 7.26335 4.06258V9.4814C7.24946 9.72626 7.13938 9.95571 6.95708 10.1198C6.77479 10.2838 6.53505 10.3692 6.29008 10.3573H2.42607C2.1811 10.3692 1.94136 10.2838 1.75907 10.1198C1.57677 9.95571 1.46669 9.72626 1.4528 9.4814V4.06258C1.4528 3.93416 1.40178 3.811 1.31098 3.72019C1.22017 3.62938 1.09701 3.57837 0.968587 3.57837C0.840166 3.57837 0.717005 3.62938 0.626198 3.72019C0.53539 3.811 0.484375 3.93416 0.484375 4.06258V9.4814C0.498196 9.98316 0.7103 10.459 1.07423 10.8047C1.43817 11.1504 1.92426 11.3377 2.42607 11.3258H6.29008C6.79188 11.3377 7.27798 11.1504 7.64192 10.8047C8.00585 10.459 8.21795 9.98316 8.23177 9.4814V4.06258C8.23177 3.93416 8.18076 3.811 8.08995 3.72019C7.99914 3.62938 7.87598 3.57837 7.74756 3.57837Z"
+            fill="#EA2553" />
+        <path
+            d="M8.23161 2.12598H6.29476V1.15755C6.29476 1.02913 6.24374 0.90597 6.15294 0.815162C6.06213 0.724355 5.93897 0.67334 5.81055 0.67334H2.90527C2.77685 0.67334 2.65369 0.724355 2.56288 0.815162C2.47208 0.90597 2.42106 1.02913 2.42106 1.15755V2.12598H0.484212C0.355791 2.12598 0.23263 2.17699 0.141822 2.2678C0.0510151 2.35861 0 2.48177 0 2.61019C0 2.73861 0.0510151 2.86177 0.141822 2.95258C0.23263 3.04339 0.355791 3.0944 0.484212 3.0944H8.23161C8.36003 3.0944 8.48319 3.04339 8.574 2.95258C8.66481 2.86177 8.71582 2.73861 8.71582 2.61019C8.71582 2.48177 8.66481 2.35861 8.574 2.2678C8.48319 2.17699 8.36003 2.12598 8.23161 2.12598ZM3.38949 2.12598V1.64176H5.32633V2.12598H3.38949Z"
+            fill="#EA2553" />
+        <path
+            d="M5.81022 8.42057V5.03109C5.81022 4.90267 5.75921 4.7795 5.6684 4.6887C5.57759 4.59789 5.45443 4.54688 5.32601 4.54688C5.19759 4.54688 5.07443 4.59789 4.98362 4.6887C4.89281 4.7795 4.8418 4.90267 4.8418 5.03109V8.42057C4.8418 8.54899 4.89281 8.67216 4.98362 8.76296C5.07443 8.85377 5.19759 8.90479 5.32601 8.90479C5.45443 8.90479 5.57759 8.85377 5.6684 8.76296C5.75921 8.67216 5.81022 8.54899 5.81022 8.42057Z"
+            fill="#EA2553" />
+    </svg>
+</ng-template>

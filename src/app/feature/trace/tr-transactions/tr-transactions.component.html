@@ -1,0 +1,92 @@
+<section class="ff-flex-between">
+    <app-search-box [placeholder]="'Search here'" (searchText)="searchFilter($event)"
+        [hideOptions]="true"></app-search-box>
+    <article aria-label="filter and export section" class="ff-flex-center">
+        <app-buttons buttonType="secondary" (buttonClicked)="filterClicked()">
+            <ng-container *ngIf="toggleFilter">
+                <mat-icon>close</mat-icon>
+                <span class="button-text">Clear filters</span>
+            </ng-container>
+            <ng-container *ngIf="!toggleFilter">
+                <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+                <span class="button-text">Filters</span>
+            </ng-container>
+        </app-buttons>
+    </article>
+</section>
+<section class="ff-flex-start flex-wrap" *ngIf="toggleFilter">
+    <app-ff-filter-box-wrapper label="Actor" [filterMasterData]="actorData$ | async"
+        [defaultValue]="appliedFilterValues.selectedActor" (selectionChange)="filterData($event, 'actor')">
+    </app-ff-filter-box-wrapper>
+
+    <app-ff-filter-box-wrapper label="Product" [filterMasterData]="productData$ | async"
+        [defaultValue]="appliedFilterValues.selectedProduct" (selectionChange)="filterData($event, 'product')">
+    </app-ff-filter-box-wrapper>
+
+    <app-ff-filter-box-wrapper label="Transaction type" [defaultValue]="appliedFilterValues.selectedType"
+        [hideSearch]="true" [filterMasterData]="transactionTypes" (selectionChange)="filterData($event, 'type')">
+    </app-ff-filter-box-wrapper>
+
+    <app-ff-filter-box label="Date"
+        [value]="appliedFilterValues.selectedDate === ''? ('Select date'):  appliedFilterValues.selectedDate | date: 'dd MMMM y'"
+        [boxState]="appliedFilterValues.selectedDate !== ''?'selected':'default'"
+        [matMenuTriggerFor]="datePickerFF"></app-ff-filter-box>
+    <mat-menu class="mat-menu date-picker" #datePickerFF="matMenu" xPosition="after">
+        <mat-card class="demo-inline-calendar-card" (click)="$event.stopPropagation();">
+            <mat-calendar [(selected)]="appliedFilterValues.selectedDate"
+                (selectedChange)="dateFilter($event)"></mat-calendar>
+        </mat-card>
+    </mat-menu>
+
+</section>
+
+<section class="ff-table-container">
+    <table aria-label="Farmer transactions">
+        <thead>
+            <tr>
+                <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                    <article class="ff-flex-start pointer">
+                        {{item.name}}
+                    </article>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let element of dataSource" class="pointer">
+                <td class="mat-cell normal-column">
+                    {{ element.product_name }}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{ element.quantity.toFixed(2) }} kg
+                </td>
+                <td class="mat-cell normal-column">
+                    {{ element.date * 1000 | date: 'dd MMMM y' }}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{ element.tittle }}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{ element.destination_name }}
+                </td>
+                <td class="mat-cell normal-column">
+                    <app-common-wallet [type]="element?.wallet_type" [url]="element?.explorer_url"
+                        [wallet]="element?.blockchain_address">
+                    </app-common-wallet>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="col-12" *ngIf="tableLoading">
+        <app-loader [loaderText]="'Loading transactions'" loaderType="type1"></app-loader>
+    </div>
+
+    <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="tableCount === 0"
+        [hidden]="tableLoading">
+        No transactions found
+    </section>
+</section>
+<div class="col-12 mt-10">
+    <app-ff-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+</div>

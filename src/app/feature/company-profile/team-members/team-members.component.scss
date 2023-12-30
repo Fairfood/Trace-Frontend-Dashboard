@@ -1,0 +1,44 @@
+@import 'src/styles/utils';
+
+@include input-common-css;
+
+.team-members-table {
+  display: flex;
+  flex-direction: column;
+  .header {
+    width: 100%;
+    h3 {
+      color: var(--font-color);
+      font-family: var(--font-bold);
+      font-size: 18px;
+      padding-left: 20px;
+    }
+    .search {
+      width: 50%;
+    }
+  }
+}
+
+.mat-cell {
+  img {
+    margin-right: 12px;
+  }
+  .avatar-round {
+    @include set-avatar-props(18px, var(--color-white), var(--font-color));
+    font-size: 10px;
+    margin-right: 12px;
+  }
+}
+
+.add-member-form {
+  padding: 30px 20px;
+  padding-right: 0;
+}
+
+.has-error {
+  border: 1px solid var(--color-secondary) !important;
+  border-radius: 6px;
+}
+.mt-20 {
+  margin-top: 10px;
+}

@@ -1,0 +1,58 @@
+<span class="noti-icon" (click)="clearNewNotification()">
+    <svg width="28" height="28" viewBox="0 0 28 28" class="pointer" fill="none" xmlns="http://www.w3.org/2000/svg"
+        [matMenuTriggerFor]="notificationDropdownFF">
+        <circle cx="14" cy="14" r="14" fill="#003A60" />
+        <path
+            d="M9.1 17.4913L9.8835 16.3518C10.2823 15.7689 10.4985 15.0614 10.5 14.3341V12.3638C10.501 11.4464 10.8047 10.5601 11.3556 9.86691C11.9065 9.17377 12.6677 8.72017 13.5 8.58912V8.54548C13.5 8.40081 13.5527 8.26206 13.6464 8.15977C13.7402 8.05747 13.8674 8 14 8C14.1326 8 14.2598 8.05747 14.3536 8.15977C14.4473 8.26206 14.5 8.40081 14.5 8.54548V8.58912C15.3323 8.72017 16.0935 9.17377 16.6444 9.86691C17.1953 10.5601 17.499 11.4464 17.5 12.3638V14.3341C17.5014 15.0615 17.7174 15.7692 18.116 16.3524L18.9 17.4913C18.9557 17.5724 18.9896 17.6687 18.998 17.7696C19.0063 17.8705 18.9887 17.9719 18.9472 18.0625C18.9057 18.1532 18.8419 18.2294 18.7629 18.2826C18.6839 18.3359 18.5929 18.3641 18.5 18.3641H15.929C15.8199 18.8319 15.571 19.2467 15.2216 19.5429C14.8723 19.8392 14.4425 20 14 20C13.5575 20 13.1277 19.8392 12.7784 19.5429C12.429 19.2467 12.1801 18.8319 12.071 18.3641H9.5C9.40715 18.3641 9.31612 18.3359 9.23714 18.2826C9.15815 18.2294 9.09431 18.1532 9.05279 18.0625C9.01126 17.9719 8.99368 17.8705 9.00202 17.7696C9.01036 17.6687 9.04429 17.5724 9.1 17.4913ZM14 18.9096C14.1748 18.909 14.3463 18.8583 14.4974 18.7625C14.6485 18.6668 14.7739 18.5294 14.861 18.3641H13.139C13.2261 18.5294 13.3515 18.6668 13.5026 18.7625C13.6537 18.8583 13.8252 18.909 14 18.9096ZM17.5 17.2731L17.316 17.0058C16.7882 16.2339 16.5021 15.2971 16.5 14.3341V12.3638C16.5 11.6405 16.2366 10.9468 15.7678 10.4353C15.2989 9.92378 14.663 9.63643 14 9.63643C13.337 9.63643 12.7011 9.92378 12.2322 10.4353C11.7634 10.9468 11.5 11.6405 11.5 12.3638V14.3341C11.4982 15.2976 11.2119 16.2349 10.6835 17.0069L10.5 17.2731H17.5Z"
+            fill="white" />
+    </svg>
+    <span class="red-label"
+        [ngClass]="{'single': unreadNotification<10, 'two-digits': unreadNotification>=10 && unreadNotification<100,  'three-digits':unreadNotification>=100 }">
+        {{unreadNotification}}
+    </span>
+</span>
+
+<mat-menu class="notification-menu" #notificationDropdownFF="matMenu">
+    <section class="notification-header flex-column">
+        <h3>Notifications</h3>
+        <span class="text-xs mark ff-heading3 pointer">
+            New for you
+        </span>
+    </section>
+    <section class="notification-list">
+        <span class="no-notification ff-flex-align-center text-md" *ngIf="notificationList?.length == 0">
+            No notifications
+        </span>
+        <ng-container *ngIf="notificationList?.length != 0">
+            <article class="ff-flex-start not-item pointer"
+                *ngFor="let notification of notificationList; trackBy: trackByFn"
+                (click)="readSingleNotification(notification)">
+                <span *ngIf="!notification.is_read" class="unread-dot"></span>
+                <img class="not-img" [src]="notification?.actor_node?.image" *ngIf="notification.actor_node?.image"
+                    alt="Notification icon">
+                <span class="avatar-round" *ngIf="!notification.actor_node?.image">
+                    {{ notification?.actor_node?.name | notiAvatar}}
+                </span>
+
+                <aside aria-label="notification details" class="flex-column">
+                    <span class="not-title text-xs widget text-overflow"
+                        title="{{notification.title_en}}">{{notification.title_en}}</span>
+                    <span class="date-text text-xxxs">
+                        <ng-container *ngIf="notification.today">
+                            Today {{notification.created_on * 1000 | date: 'h:mm a'}}
+                        </ng-container>
+                        <ng-container *ngIf="!notification.today">
+                            {{notification.created_on * 1000 | date: 'dd MMMM y'}},
+                            {{notification.created_on * 1000 | date: 'h:mm a'}}
+                        </ng-container>
+                    </span>
+                </aside>
+            </article>
+        </ng-container>
+    </section>
+    <section class="notification-footer ff-flex-center">
+        <span class="text-xs value-tr pointer" (click)="viewAll()">
+            View all notifications
+        </span>
+    </section>
+</mat-menu>

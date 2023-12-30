@@ -1,0 +1,31 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        {{data?.invite?'Change Company': 'Notification'}}
+    </h4>
+    <mat-icon (click)="close()" class="pointer">clear</mat-icon>
+</section>
+<section class="pop-content flex-column">
+    <p>
+        <ng-container *ngIf="!data.invite">
+            The notification you are trying to view
+            doesn't belong to current entity. Do you want to switch company?
+        </ng-container>
+        <ng-container *ngIf="data.invite">
+            Your are currently switched on a diffrent
+            entity. Are you sure you want to switch to new entity?
+        </ng-container>
+    </p>
+    <article class="ff-flex-end">
+        <app-buttons buttonType="stroked" (buttonClicked)="close()">
+            Cancel
+        </app-buttons>
+
+        <app-buttons buttonType="fill" (buttonClicked)="switch()" *ngIf="!data.invite">
+            Switch to {{data?.name}}
+        </app-buttons>
+
+        <app-buttons buttonType="fill" (buttonClicked)="switch()" *ngIf="data.invite">
+            Continue
+        </app-buttons>
+    </article>
+</section>

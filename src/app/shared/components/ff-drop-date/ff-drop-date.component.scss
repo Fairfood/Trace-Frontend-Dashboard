@@ -1,0 +1,106 @@
+// color variables
+@import 'src/styles/utils';
+@import 'src/styles/flex';
+.ff-dropdown-container {
+  @include input-box-common-styles;
+  padding: 10px 20px;
+}
+.selected {
+  @extend %flex-common-center;
+  mat-icon {
+    padding-left: 5px;
+    @extend %flex-common-center;
+    font-size: 14px;
+  }
+}
+
+::ng-deep.date-picker {
+  .mat-form-field-infix {
+    border-top: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    height: 40px;
+  }
+  .mat-datepicker-input {
+    width: 70%;
+    padding: 0;
+    vertical-align: middle;
+  }
+  .mat-icon {
+    line-height: 1.125;
+    position: absolute;
+    bottom: 10px;
+  }
+}
+
+::ng-deep .radio-blue .mat-radio-inner-circle {
+  background-color: var(--color-primary-1) !important;
+}
+
+::ng-deep .radio-blue .mat-radio-checked .mat-radio-outer-circle {
+  border-color: var(--color-primary-1) !important;
+}
+
+::ng-deep .ff-date-menu {
+  min-width: 330px !important;
+  .mat-mdc-menu-content {
+    max-width: 400px;
+    padding: 0!important;
+  }
+}
+.dateform {
+  padding: 12px 10px 10px 10px;
+}
+.radio-container {
+  @extend %flex-common-center;
+  justify-content: space-between;
+  margin: 10px 0;
+  padding: 0 25px;
+}
+.date-picker-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.footer-action {
+  @extend %flex-common-center;
+  border-top: 1px solid var(--border-color);
+  justify-content: space-between;
+  padding: 8px 25px;
+}
+
+.range-input {
+  padding: 0 25px;
+  .mat-date-range-input {
+    display: flex;
+    font-size: 14px;
+    color: var(--font-color);
+  }
+}
+
+::ng-deep .mat-date-range-input-start-wrapper {
+  input {
+    &::placeholder {
+      color: var(--font-color) !important;
+      opacity: 0.6;
+    }
+  }
+}
+::ng-deep .mat-date-range-input-end-wrapper {
+  input {
+    &::placeholder {
+      color: var(--font-color) !important;
+      opacity: 0.6;
+    }
+  }
+}
+
+.custom-style-mat {
+  color: var(--font-color) !important;
+  border: 0;
+  outline: none;
+}

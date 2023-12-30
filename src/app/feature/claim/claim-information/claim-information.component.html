@@ -1,0 +1,134 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Claim details
+        </h1>
+    </section>
+    <app-loader loaderText="Loading claim details" [loaderType]="'type1'" *ngIf="loading"
+        class="min-h-300"></app-loader>
+
+    <section class="top-box ff-flex-align-center" *ngIf="!loading">
+        <article class="icon-wrapper ff-flex-center">
+            <img src="../../../../assets/images/claim_icon.svg" alt="claim">
+        </article>
+        <aside aria-label="info" class="flex-column info">
+            <span class="value-tr" id="claimeName">{{currentClaim?.claim?.name}}</span>
+            <span class="value-tr ff-flex-align-center font-1-normal" id="claimStatus">
+                <ng-container *ngIf="currentClaim.status === 1">Pending</ng-container>
+                <ng-container *ngIf="currentClaim.status === 2">
+                    <mat-icon>check_circle</mat-icon>
+                    Verified
+                </ng-container>
+                <ng-container *ngIf="currentClaim.status === 3">Rejected</ng-container>
+            </span>
+        </aside>
+    </section>
+
+    <section class="tabs" *ngIf="!loading">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [activeTabId]="currentTab"
+            (tabChanged)="changeTab($event)"></app-ff-custom-tab>
+    </section>
+
+
+    <!-- selecting and showing claim details here  -->
+    <section class="details-container" *ngIf="!loading">
+        <ng-container *ngIf="currentTab === 'basic'">
+            <article class="item w-100">
+                <span class="key">Claim description</span>
+                <span class="value" id="claimDescription">
+                    {{currentClaim?.claim?.description_full}}
+                </span>
+            </article>
+            <span class="w-100 value-tr"
+                *ngIf="currentClaim.criteria[0] && currentClaim.criteria[0]?.field_responses.length > 0">
+                Evidences
+            </span>
+            <section class="ff-flex-align-center flex-wrap">
+                <ng-container
+                    *ngFor="let field of currentClaim.criteria[0]?.field_responses;trackBy: trackByFn;let j=index ">
+                    <article class="item" *ngIf="field.type !==3">
+                        <span class="key" id="evidence{{j}}">{{ field.title }}</span>
+                        <span class="value" id="evidenceValue{{j}}">
+                            {{ field.response }}
+                        </span>
+                    </article>
+                    <article class="item" *ngIf="field.type === 3">
+                        <span class="key">File</span>
+                        <span class="value" (click)="downloadFile(field?.file)" [ngClass]="{'pointer': field.file}">
+                            {{ field.title }}
+                        </span>
+                    </article>
+                </ng-container>
+            </section>
+
+            <section class="flex-column">
+                <span class="value-tr">Transaction details</span>
+                <section class="box row-md ff-flex-align-center">
+                    <article class="col-md-3 flex-column">
+                        <span class="label-tr">Transaction ID</span>
+                        <span class="value-tr">{{currentClaim.transaction?.number}}</span>
+                    </article>
+                    <article class="col-md-3 flex-column">
+                        <span class="label-tr">Transaction date</span>
+                        <span class="value-tr">{{currentClaim.transaction.date * 1000 | date: 'dd MMMM y' }}</span>
+                    </article>
+                    <article class="col-md-3 flex-column">
+                        <span class="label-tr">Product</span>
+                        <span class="value-tr">{{currentClaim.product?.name}}</span>
+                    </article>
+                    <article class="col-md-3">
+                        <app-buttons buttonType="stroked" buttonSize="medium" (buttonClicked)="viewTransaction()"
+                            buttonSize="medium">
+                            View transaction
+                        </app-buttons>
+                    </article>
+
+                </section>
+            </section>
+        </ng-container>
+
+        <ng-container *ngIf="currentTab === 'comment'">
+            <article class="comment-section">
+                <span class="w-100 value-tr ">
+                    Add new comment
+                </span>
+                <article class="flex-column">
+                    <app-ff-input label="New comment" [parentFormGroup]="detailsForm" controlName="comments"
+                        inputSize="full" [isTextarea]="true" class="w-100">
+                    </app-ff-input>
+                    <span class="error-message"
+                        *ngIf="detailsForm.get('comments')?.errors?.required && (detailsForm.get('comments')?.touched)">
+                        This field is required *
+                    </span>
+                    <app-buttons buttonType="stroked" buttonSize="medium"
+                        [isDisabled]="detailsForm.get('comments').invalid || updatingComment"
+                        (buttonClicked)="addComments()" class="w-100 ff-flex-end">
+                        <span *ngIf="!updatingComment">Comment</span>
+                        <span *ngIf="updatingComment">Adding comment</span>
+                    </app-buttons>
+                </article>
+
+            </article>
+            <section class="comment-list">
+                <ul class="flex-column">
+                    <li *ngFor="let item of currentClaim.comments" class="ff-flex-start">
+                        <span class="avatar-round">
+                            {{item?.sender?.name.split('')[0]}}
+                        </span>
+                        <article class="flex-column">
+                            <span class="value-tr">
+                                {{item?.sender?.name}}
+                                <span class="label-tr">
+                                    {{item.created_on * 1000 | date: 'dd MMMM y' }}
+                                </span>
+                            </span>
+                            <span class="value-tr">
+                                {{item?.message}}
+                            </span>
+                        </article>
+                    </li>
+                </ul>
+            </section>
+        </ng-container>
+    </section>
+</div>

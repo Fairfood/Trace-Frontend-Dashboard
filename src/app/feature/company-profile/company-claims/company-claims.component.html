@@ -1,0 +1,39 @@
+<div class="header mb-10">
+    <h3>Company claims</h3>
+</div>
+
+<section class="ff-table-container w-100" id="companyClaimTable">
+    <table aria-label="companyClaimTable">
+        <thead>
+            <tr>
+                <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                    <article class="ff-flex-start pointer">
+                        {{item.name}}
+                    </article>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let element of dataSource" class="pointer">
+                <td class="mat-cell large-column">
+                    {{element.name}}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{element.verifier ? element.verifier?.name : 'Self verified'}}
+                </td>
+                <td class="mat-cell normal-column">
+                    <span *ngIf="element.status == 1">Pending</span>
+                    <span *ngIf="element.status == 2">Verified</span>
+                    <span *ngIf="element.status == 3">Rejected</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="no-data w-100" aria-label="" *ngIf="companyClaimsCount === 0" [hidden]="loader">
+        No company claims found
+    </div>
+
+    <app-loader [loaderText]="'Loading company claims'" [loaderType]="'type1'" *ngIf="loader"
+        class="min-h-300"></app-loader>
+</section>
+<app-ff-pagination [totalCount]="companyClaimsCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>

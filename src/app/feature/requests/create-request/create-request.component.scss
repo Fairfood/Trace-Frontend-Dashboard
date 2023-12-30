@@ -1,0 +1,49 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include autocomplete-common;
+@include input-common-css;
+@include custom-input;
+@include reset-ul;
+@include company-selection;
+
+
+.quantity-row {
+  display: flex;
+  width: 100%;
+}
+
+.receive-row-item {
+  width: 100%;
+  @include devices(tablet) {
+    width: 50%;
+  }
+  &.margin-rig {
+    margin-right: 0;
+    @include devices(tablet) {
+      margin-right: 10px;
+      width: 48%;
+    }
+  }
+}
+
+.claim-wrap {
+  flex-wrap: wrap;
+  .claim-list {
+    background-color: var(--border-color);
+    padding: 12px;
+    margin: 8px;    
+    margin-left: 0;
+    mat-icon {
+      margin-left: 5px;
+    }
+  }
+}
+
+.button-wrapper {
+  margin-right: 24px;
+  margin-bottom: 20px;
+}
+
+.main-div {
+  padding: 20px;
+}

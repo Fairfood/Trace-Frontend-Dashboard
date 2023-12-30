@@ -1,0 +1,72 @@
+@import 'src/styles/utils';
+@import 'src/styles/flex';
+@include common-farmer-profile;
+
+.head-section {
+  padding: 10px 0;
+}
+
+.top-box {
+  border-radius: 3px;
+  margin-top: 15px;
+  background-color: var(--color-table-row-active);
+  display: flex;
+  padding: 30px;
+}
+
+.widget {
+  background-color: var(--color-white);
+  box-shadow: 0px 4px 23px 5px rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+  padding: 15px 20px;
+  width: 100%;
+  display: flex;
+  padding: 25px 20px;
+  min-width: 100%;
+  @include devices(tablet-md) {
+    min-width: auto;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+.widget-item {
+  display: flex;
+  flex-direction: row;
+
+  .svg-wrap {
+    background-color: var(--color-table-row-active);
+    height: 50px;
+    width: 50px;
+    border-radius: 6px;
+    @extend %flex-common-center;
+    @include justify-content(center);
+  }
+  .info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 15px;
+    .key {
+      font-size: 14px;
+      color: var(--font-color-2);
+    }
+
+    .value {
+      font-size: 20px;
+      color: var(--font-color);
+    }
+  }
+}
+.ml-20 {
+  margin-left: 20px;
+}
+
+.utils {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.filename {
+  max-width: 25vw;
+  display: block;
+}

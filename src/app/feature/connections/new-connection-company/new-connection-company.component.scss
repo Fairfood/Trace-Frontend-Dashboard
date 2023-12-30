@@ -1,0 +1,46 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include reset-ul;
+@include company-selection;
+.tabs {
+  margin-bottom: 40px;
+}
+.content {
+  padding: 0 40px 10px 0;
+  margin-bottom: 20px;
+  .info {
+    font-size: 14px;
+    color: var(--font-color-2);
+    margin-top: 20px;
+  }
+}
+
+.w-50-cc {
+  width: 50%;
+}
+.m-r-12 {
+  margin-right: 12px;
+}
+
+.with-error {
+  margin-bottom: 20px;
+}
+
+h3 {
+  font-size: 16px;
+  color: var(--font-color);
+  padding: 0 10px;
+  margin: 10px 0 0;
+}
+
+.load-more {
+  font-size: 14px;
+  text-decoration: underline;
+  margin: 10px 0;
+  padding-bottom: 10px;
+}
+.mt-20 {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}

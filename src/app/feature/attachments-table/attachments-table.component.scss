@@ -1,0 +1,24 @@
+@import 'src/styles/responsive';
+.head {
+  padding-left: 10px;
+  color: var(--font-color);
+  margin: 0;
+}
+
+.container-main {
+  padding: 10px;
+  @include devices(desktop) {
+    padding-right: 10px;
+  }
+}
+.rolling {
+  margin: 0 10px;
+}
+.top-section {
+  width: 100%;
+}
+.filename {
+  max-width: 25vw;
+  display: block;
+}
+

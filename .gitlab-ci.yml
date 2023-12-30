@@ -1,0 +1,186 @@
+variables:
+  SLACK_CHANNEL: "logs-fairtrace-v2"
+
+  DEV_BUCKET: "trace-dev.fairfood.nl"
+  DEV_CLOUDFRONT_ID: "EQCFXHXFFC20N"
+
+  STAGING_BUCKET: "trace-stage.fairfood.nl"
+  STAGING_CLOUDFRONT_ID: "E2ONM10FH7H5GV"
+
+  PROD_BUCKET: "trace.fairfood.org"
+  PROD_CLOUDFRONT_ID: "EDV0HECYUR91K"
+
+  DEMO_BUCKET: "trace-demo.fairfood.nl"
+  DEMO_CLOUDFRONT_ID: "E32KZALMBAJKG3"
+
+# Node Image for docker on which code will execute
+image: node:16.16.0
+
+# This is the stages / task to perfom in jobs
+stages:
+  - build
+  - deploy
+
+# caching for reuse
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - dist/
+
+# DEVELOPMENT
+# Job One for making build in development
+build_dev:
+  stage: build
+  script:
+    - npm install
+    - node --max_old_space_size=5048 ./node_modules/@angular/cli/bin/ng build --configuration=dev
+  variables:
+    ENVIRONMENT: "Development"
+    EXIT_STATUS: $?
+  after_script:
+    - . .slacknotifier.sh
+    # Send failed slack notification (if success continue to next job)
+    - |
+      if [ $? == 1 ]; then
+        share_slack_update
+      fi
+  only: ["development"]
+
+# Job Two for deploy build to S3 in development
+deploy_dev:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: deploy
+  script:
+    - aws s3 sync ./dist s3://${DEV_BUCKET}/ --acl=public-read
+    - |
+      if [ "$DEV_CLOUDFRONT_ID" != "" ]; then
+        aws cloudfront create-invalidation --distribution-id ${DEV_CLOUDFRONT_ID} --paths "/*"
+      fi
+  variables:
+    ENVIRONMENT: "Development"
+    EXIT_STATUS: $?
+  after_script:
+    # Send slack notification
+    - . .slacknotifier.sh
+    - share_slack_update
+  only: ["development"]
+#######################
+
+#STAGING
+# Job One for making build in staging
+build_staging:
+  stage: build
+  script:
+    - npm install
+    - node --max_old_space_size=5048 ./node_modules/@angular/cli/bin/ng build --configuration=staging
+  variables:
+    ENVIRONMENT: "Staging"
+    EXIT_STATUS: $?
+  after_script:
+    # Send failed slack notification (if success continue to next job)
+    - . .slacknotifier.sh
+    - |
+      if [ $? == 1 ]; then
+        share_slack_update
+      fi
+  only: ["staging"]
+
+# Job Two for deploy build to S3 in staging
+deploy_staging:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: deploy
+  script:
+    - aws s3 sync ./dist s3://${STAGING_BUCKET}/ --acl=public-read
+    - |
+      if [ "$STAGING_CLOUDFRONT_ID" != "" ]; then
+        aws cloudfront create-invalidation --distribution-id ${STAGING_CLOUDFRONT_ID} --paths "/*"
+      fi
+  variables:
+    ENVIRONMENT: "Staging"
+    EXIT_STATUS: $?
+  after_script:
+    # Send slack notification
+    - . .slacknotifier.sh
+    - share_slack_update
+  only: ["staging"]
+########
+
+#DEMO
+# Job One for making build in demo
+build_demo:
+  stage: build
+  script:
+    - npm install
+    - node --max_old_space_size=5048 ./node_modules/@angular/cli/bin/ng build --configuration=demo
+  variables:
+    ENVIRONMENT: "Demo"
+    EXIT_STATUS: $?
+  after_script:
+    # Send failed slack notification (if success continue to next job)
+    - . .slacknotifier.sh
+    - |
+      if [ $? == 1 ]; then
+        share_slack_update
+      fi
+  only: ["demo"]
+
+# Job Two for deploy build to S3 in demo
+deploy_demo:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: deploy
+  script:
+    - aws s3 sync ./dist s3://${DEMO_BUCKET}/ --acl=public-read
+    - |
+      if [ "$DEMO_CLOUDFRONT_ID" != "" ]; then
+        aws cloudfront create-invalidation --distribution-id ${DEMO_CLOUDFRONT_ID} --paths "/*"
+      fi
+  variables:
+    ENVIRONMENT: "DEMO"
+    EXIT_STATUS: $?
+  after_script:
+    # Send slack notification
+    - . .slacknotifier.sh
+    - share_slack_update
+  only: ["demo"]
+########
+
+#PRODUCTION
+# Job One for making build in production
+build_prod:
+  stage: build
+  script:
+    - npm install
+    - node --max_old_space_size=5048 ./node_modules/@angular/cli/bin/ng build --configuration=production
+  variables:
+    ENVIRONMENT: "Production"
+    EXIT_STATUS: $?
+  after_script:
+    # Send failed slack notification (if success continue to next job)
+    - . .slacknotifier.sh
+    - |
+      if [ $? == 1 ]; then
+        share_slack_update
+      fi
+  only: ["production"]
+
+# Job Two for deploy build to S3 in production
+deploy_prod:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: deploy
+  script:
+    - ls
+    - aws s3 sync ./dist s3://${PROD_BUCKET}/ --acl=public-read
+    - |
+      if [ "$PROD_CLOUDFRONT_ID" != "" ]; then
+        aws cloudfront create-invalidation --distribution-id ${PROD_CLOUDFRONT_ID} --paths "/*"
+      fi
+  variables:
+    ENVIRONMENT: "Production"
+    EXIT_STATUS: $?
+  after_script:
+    # Send slack notification
+    - . .slacknotifier.sh
+    - share_slack_update
+  only: ["production"]
+########

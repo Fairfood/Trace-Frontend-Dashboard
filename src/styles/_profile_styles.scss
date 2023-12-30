@@ -1,0 +1,42 @@
+@import './responsive';
+
+.top-box {
+  border-radius: 3px;
+  background-color: var(--color-table-row-active);
+  padding: 20px 30px;
+  position: relative;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+
+  .value-tr,
+  .label-tr {
+    margin-bottom: 5px;
+  }
+
+  .data {
+    margin-left: 30px;
+  }
+}
+
+.tab-container {
+  border-bottom: 1px solid var(--border-color);
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+.tab-content {
+  padding: 24px 0;
+  height: auto;
+  transition: height 0.25s ease-in;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+
+.loader-wrapper {
+    min-height: 70vh;
+  }
+  

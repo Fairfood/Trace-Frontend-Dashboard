@@ -1,0 +1,58 @@
+@import 'src/styles/utils';
+@include input-common-css;
+// top section of the page
+// including filter and search
+// action button styles
+.stock-listing-table thead th:first-child {
+  border-radius: 6px 0 0 0;
+  border-left: 0;
+}
+
+.no-border-left {
+  border-left: 0;
+}
+
+.radio-items {
+  padding: 10px 0;
+}
+
+.footer-selection {
+  border-top: 1px solid var(--border-color);
+  padding: 10px 0 10px 20px;
+  color: var(--color-secondary);
+  font-size: 13px;
+}
+
+::ng-deep .more-filters {
+  width: 250px;
+  ul {
+    font-family: var(--font-medium);
+  }
+}
+
+::ng-deep .more-options {
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+  }
+  ul {
+    font-family: var(--font-medium);
+  }
+}
+
+.custom-checkbox {
+  position: relative;
+  .overlay {
+    height: 50px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    background: transparent;
+  }
+}
+
+.m-0 {
+  margin: 0;
+}
+.one-margin {
+  margin-top: 1px !important;
+}

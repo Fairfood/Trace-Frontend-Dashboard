@@ -1,0 +1,34 @@
+<aside class="pop-header ff-flex-between"aria-label="Declin request header">
+  <h4>
+    Decline request
+  </h4>
+  <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</aside>
+<section class="pop-content">
+  <p>
+    Are you sure you want to decline this request
+    <span *ngIf="data.request_type == 3">for information</span>
+    <span *ngIf="data.request_type == 2">for company claim</span>
+    <span *ngIf="data.request_type == 4">to map suppliers</span>?
+  </p>
+  <article class="flex-column">
+    <app-ff-input label="Reason for rejecting request" [parentFormGroup]="detailsForm" [controlName]="'reason'"
+      inputSize="profile" [isTextarea]="true" class="w-100">
+    </app-ff-input>
+    <ng-container *ngIf="detailsForm.controls.reason.touched">
+      <span class="error-message" *ngIf="detailsForm.controls.reason.errors?.required">
+        Please enter a valid reason
+      </span>
+      <span class="error-message" *ngIf="detailsForm.controls.reason.invalid && detailsForm.controls.reason.value">
+        Maximum length is 50
+      </span>
+    </ng-container>
+  </article>
+</section>
+
+<article class="ff-flex-between p-20-button">
+  <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+  <app-buttons buttonType="fill" (buttonClicked)="declineRequest()" [isDisabled]="detailsForm.invalid">
+    Reject request
+  </app-buttons>
+</article>

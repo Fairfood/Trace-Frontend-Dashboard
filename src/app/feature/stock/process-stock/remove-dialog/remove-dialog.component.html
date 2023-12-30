@@ -1,0 +1,15 @@
+<article class="pop-header ff-flex-between">
+    <h4>
+        Remove claim
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</article>
+<article class="pop-content">
+    <p>
+        Are you sure you want to Remove <span class="font-1-bold">{{data?.name}}</span> claim ?
+    </p>
+</article>
+<article class="ff-flex-between p-20-button">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="remove()">Remove</app-buttons>
+</article>

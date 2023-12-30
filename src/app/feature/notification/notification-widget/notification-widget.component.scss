@@ -1,0 +1,53 @@
+@import 'src/styles/utils';
+
+@include notification-list-common;
+
+.noti-icon {
+  display: flex;
+  position: relative;
+  margin-right: 25px;
+}
+
+.red-label {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border-radius: 50%;
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+  font-size: 10px;
+  padding: 4px 9px;
+
+  &.single {
+    padding: 4px 9px;
+  }
+
+  &.two-digits {
+    padding: 4px 6px;
+  }
+
+  &.three-digits {
+    padding: 5px 6px;
+  }
+}
+::ng-deep .notification-menu {
+  min-width: 350px !important;
+  @include scrollbar;
+  .mat-mdc-menu-content {
+    max-height: 400px !important;
+    padding: 0;
+  }
+}
+
+.notification-header,
+.notification-footer {
+  padding: 0 10px;
+  min-height: 30px;
+  .mark {
+    font-family: var(--font-regular);
+  }
+}
+
+.ff-heading3 {
+  color: var(--color-primary-1);
+}

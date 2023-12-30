@@ -1,0 +1,73 @@
+<section class="utils" *ngIf="stagesLoaded">
+    <app-wizard-step [list]="wizardData" [activeIndex]="activeStage"
+        (itemClicked)="stageSelection($event)"></app-wizard-step>
+</section>
+<section class="utils">
+    <app-tr-mapview *ngIf="stagesLoaded"></app-tr-mapview>
+</section>
+<app-loader loaderText="Fetching data" loaderType="type1" *ngIf="!stagesLoaded"></app-loader>
+<section class="farmer-box d-flex" *ngIf="actorLoaded">
+    <div class="left ff-flex-center">
+        <app-ff-image-slider [imageArray]="imageUrl"
+            (currentActiveIndex)="changeStageActor($event)"></app-ff-image-slider>
+    </div>
+    <aside aria-label="farmer related information" class="right" *ngIf="currentActiveActor">
+        <h4 class="text-blue font-1-bold">{{currentActiveActor?.name || '-'}}</h4>
+        <article class="ff-flex-start items">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle class="fill-text-color" cx="8" cy="8" r="8" fill="#334739" />
+                <path
+                    d="M11 7.15C11 6.73634 10.9224 6.32672 10.7716 5.94455C10.6209 5.56237 10.3999 5.21512 10.1213 4.92261C9.84274 4.63011 9.51203 4.39808 9.14805 4.23978C8.78407 4.08148 8.39397 4 8 4C7.60603 4 7.21593 4.08148 6.85195 4.23978C6.48797 4.39808 6.15726 4.63011 5.87868 4.92261C5.6001 5.21512 5.37913 5.56237 5.22836 5.94455C5.0776 6.32672 5 6.73634 5 7.15C5 7.77415 5.17571 8.35465 5.47357 8.84425H5.47014C6.48157 10.507 8 13 8 13L10.5299 8.84425H10.5269C10.8356 8.33862 10.9998 7.75063 11 7.15ZM8 8.5C7.65901 8.5 7.33198 8.35777 7.09086 8.10459C6.84974 7.85142 6.71429 7.50804 6.71429 7.15C6.71429 6.79196 6.84974 6.44858 7.09086 6.19541C7.33198 5.94223 7.65901 5.8 8 5.8C8.34099 5.8 8.66802 5.94223 8.90914 6.19541C9.15026 6.44858 9.28571 6.79196 9.28571 7.15C9.28571 7.50804 9.15026 7.85142 8.90914 8.10459C8.66802 8.35777 8.34099 8.5 8 8.5Z"
+                    fill="white" />
+            </svg>
+            <span class="text-xs text-blue font-1-medium">
+                {{currentActiveActor?.province || ''}}, {{currentActiveActor?.country || '-' }}
+            </span>
+        </article>
+        <article class="ff-flex-start items">
+            <span class="ff-flex-center items">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="fill-text-color" cx="8" cy="8" r="8" fill="#334739" />
+                    <path
+                        d="M12.9744 10.414L11.406 6.23168C11.3366 6.04678 11.137 5.92152 10.9118 5.92152H9.25659C9.39076 5.73032 9.46947 5.50709 9.46947 5.26774C9.46947 4.56875 8.81022 4 7.99998 4C7.18975 4 6.53049 4.56874 6.53049 5.26774C6.53049 5.50708 6.6092 5.73031 6.74338 5.92152H5.08823C4.86297 5.92152 4.66338 6.04678 4.59403 6.23168L3.0256 10.414C2.91706 10.7034 3.16721 11 3.5198 11H12.4802C12.8328 11 13.0829 10.7034 12.9744 10.414ZM7.22307 5.26774C7.22307 4.89811 7.57155 4.59748 7.99999 4.59748C8.42844 4.59748 8.77692 4.89811 8.77692 5.26774C8.77692 5.5878 8.51524 5.8553 8.167 5.92152H7.833C7.48475 5.85532 7.22307 5.5878 7.22307 5.26774ZM7.3131 9.54444L6.86416 8.80077H6.65024V9.54444H6.13014V7.71114H6.65024V8.4189H6.86416L7.30415 7.71114H7.86294L7.28913 8.58801V8.59323L7.8956 9.54444H7.3131ZM10.0485 9.54444H9.61457V9.49308C9.61457 9.45465 9.61748 9.41625 9.61748 9.41625H9.61168C9.61168 9.41625 9.40645 9.57513 9.05289 9.57513C8.50887 9.57513 8.00959 9.22396 8.00959 8.62392C8.00959 8.09069 8.47617 7.68043 9.12427 7.68043C9.66807 7.68043 9.94155 7.92389 9.94155 7.92389L9.69179 8.25982C9.69179 8.25982 9.47494 8.0907 9.17463 8.0907C8.72885 8.0907 8.54759 8.33686 8.54759 8.60847C8.54759 8.95735 8.82687 9.16488 9.15697 9.16488C9.40648 9.16488 9.58772 9.03168 9.58772 9.03168V8.89054H9.28764V8.50847H10.0485V9.54444Z"
+                        fill="white" />
+                </svg>
+                <span class="text-xs text-blue font-1-medium">
+                    {{currentActiveActor?.transaction_quantity || 0}} kg
+                </span>
+            </span>
+            <span class="ff-flex-center items trans" *ngIf="transactionLoaded">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="fill-text-color" cx="8" cy="8" r="8" fill="#334739" />
+                    <path
+                        d="M4.82188 6.33754L4.82188 6.43754L4.92188 6.43754L10.0036 6.43754L9.01623 7.48508C8.88379 7.62558 8.88379 7.85107 9.01623 7.99158C9.15183 8.13544 9.37428 8.13544 9.50988 7.99158L11.0764 6.32965C11.2088 6.18914 11.2088 5.96365 11.0764 5.82315L9.50988 4.16122C9.37428 4.01735 9.15183 4.01735 9.01623 4.16122C8.88379 4.30172 8.88379 4.52721 9.01623 4.66772L10.0036 5.71525L4.92188 5.71525L4.82188 5.71525L4.82188 5.81525L4.82188 6.33754Z"
+                        fill="white" stroke="white" stroke-width="0.2" />
+                    <path
+                        d="M11.1742 9.66148L11.1742 9.56148L11.0742 9.56148L5.99247 9.56148L6.97987 8.51395C7.1123 8.37344 7.1123 8.14795 6.97987 8.00745C6.84426 7.86358 6.62182 7.86358 6.48621 8.00745L4.9197 9.66938C4.78726 9.80988 4.78726 10.0354 4.9197 10.1759L6.48621 11.8378C6.62182 11.9817 6.84426 11.9817 6.97987 11.8378C7.1123 11.6973 7.1123 11.4718 6.97987 11.3313L5.99247 10.2838L11.0742 10.2838L11.1742 10.2838L11.1742 10.1838L11.1742 9.66148Z"
+                        fill="white" stroke="white" stroke-width="0.2" />
+                </svg>
+                <span class="text-xs text-blue font-1-medium">
+                    {{currentActiveActor?.count}} Transaction
+                </span>
+            </span>
+        </article>
+        <p class="text-xs text-blue font-1-medium desc">
+            {{ currentActiveActor?.description_basic.length > 250?
+            currentActiveActor?.description_basic.substring(0, 250)+'...':
+            currentActiveActor?.description_basic}}
+        </p>
+    </aside>
+</section>
+<section class="utils" *ngIf="actorLoaded">
+    <app-ff-custom-tab [tabGroupItems]="tabItems" [activeTabId]="activeTab"
+        (tabChanged)="changeTab($event)"></app-ff-custom-tab>
+</section>
+<app-loader loaderText="Fetching data" loaderType="type1" *ngIf="stagesLoaded && !actorLoaded"></app-loader>
+<section class="main-wrapper" *ngIf="actorLoaded">
+    <ng-container *ngIf="activeTab === 'actors' && actorLoaded">
+        <app-tr-actors></app-tr-actors>
+    </ng-container>
+    <ng-container *ngIf="activeTab === 'transaction'">
+        <app-tr-transactions></app-tr-transactions>
+    </ng-container>
+</section>

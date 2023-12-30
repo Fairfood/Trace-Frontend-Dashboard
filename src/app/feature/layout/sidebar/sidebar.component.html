@@ -1,0 +1,78 @@
+<nav class="sidebar">
+    <section class="slanted-bg">
+        <div class="slanted-div"></div>
+    </section>
+    <section class="nav-list flex-column">
+        <ng-container [ngTemplateOutlet]="navItem"
+            [ngTemplateOutletContext]="{url:'/dashboard', label: 'Dashboard'}"></ng-container>
+        <ng-container [ngTemplateOutlet]="navItem"
+            [ngTemplateOutletContext]="{url:'/company-profile', label: 'Profile'}"></ng-container>
+        <ng-container *ngIf="adminUser" [ngTemplateOutlet]="navItem"
+            [ngTemplateOutletContext]="{url:'/connections', label: 'Connections'}"></ng-container>
+        <ng-container [ngTemplateOutlet]="navItem"
+            [ngTemplateOutletContext]="{url:'/requests', label: 'Requests'}"></ng-container>
+
+        <div *ngIf="adminUser" class="nested-menu">
+            <a class="list-group-item" (click)="addExpandClass('assets')" id="assetManagement">
+                Asset management
+                <mat-icon style="position: absolute;">arrow_drop_down</mat-icon>
+            </a>
+            <section class="nested" [class.expand]="showMenu === 'assets'">
+                <ul class="submenu">
+                    <li (click)="resetStock()">
+                        <a routerLink="/transactions" [routerLinkActive]="['router-link-active']"
+                            class="list-group-item font-1-medium " id="transactions">
+                            Transactions
+                        </a>
+                    </li>
+                    <li (click)="resetStock(true)">
+                        <a routerLink="/stock/listing" [routerLinkActive]="['router-link-active']"
+                            class="list-group-item font-1-medium " id="stock">
+                            Stock
+                        </a>
+                    </li>
+                    <li (click)="resetStock()">
+                        <a routerLink="/claims" [routerLinkActive]="['router-link-active']"
+                            class="list-group-item font-1-medium  pb-0" id="claim">
+                            Claims
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+        <a routerLink="/company-profile" routerLinkActive="router-link-active" class="list-group-item company-bottom">
+            <span class="text-xxs  company-title" id="myCompany">My company</span> <br>
+            <span class="company-name" id="companyName">{{ companyDetails?.name || '' }}</span>
+        </a>
+
+        <div class="header-fields" *ngIf="!viewAsAdmin">
+            <ul class="nested-menu">
+                <a class="list-group-item font-1-medium" (click)="addExpandClass('profile')">
+                    <span id="accountMenu"> Account</span>
+                </a>
+                <li class="nested" [class.expand]="showMenu === 'profile'">
+                    <ul class="submenu">
+                        <li>
+                            <a [routerLink]="['/user-profile']" id="profile">
+                                Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a (click)="logout()" class="pointer" id="logout">
+                                Log Out
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+    </section>
+</nav>
+
+<ng-template #navItem let-url="url" let-label="label">
+    <a [routerLink]="url" (click)="resetStock()" routerLinkActive="router-link-active" class="list-group-item"
+        [id]="label">
+        {{label}}
+    </a>
+</ng-template>

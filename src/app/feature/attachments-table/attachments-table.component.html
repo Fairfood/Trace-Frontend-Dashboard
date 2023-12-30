@@ -1,0 +1,75 @@
+<article class="ff-flex-between top-section" *ngIf="!loading">
+    <h3 class="text-md font-1-bold head">{{tableHeading}} ({{tableLength}})</h3>
+    <app-buttons buttonType="stroked" (buttonClicked)="openDialog()" *ngIf="showAction">
+        {{buttonText}}
+    </app-buttons>
+</article>
+<div class="container-main">
+
+    <section class="ff-table-container w-100">
+        <table *ngIf="!loading" aria-label="attachment table">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                        {{item.name}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of dataSource" class="pointer">
+                    <td class="mat-cell normal-column">
+                        {{element.addedBy}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.addedOn * 1000 | date: 'dd MMMM y' }}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.name}}
+                    </td>
+                    <td class="mat-cell normal-column" *ngIf="element.uploader">
+                        {{element.uploader}}
+                    </td>
+
+                    <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+
+                        <span class="pointer text-overflow filename" (click)="downloadFile(element)"
+                            *ngIf="downloadingId !== element.id">
+                            <svg width="13" height="10" viewBox="0 0 13 10" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.10979 6.71212L6.10962 6.71195L3.4844 3.96172L3.48428 3.96159C3.40864 3.88246 3.4653 3.75029 3.57459 3.75029H4.9497H5.1997V3.50029V0.625051C5.1997 0.418594 5.3683 0.25 5.57475 0.25H6.82485C7.03131 0.25 7.19991 0.418594 7.19991 0.625051V3.50029V3.75029H7.44991H8.82502C8.93431 3.75029 8.99096 3.88246 8.91532 3.96159L8.9152 3.96172L6.28999 6.71195L6.28982 6.71212C6.26656 6.73654 6.23399 6.75058 6.1998 6.75058C6.16561 6.75058 6.13305 6.73654 6.10979 6.71212Z"
+                                    fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+                                <path
+                                    d="M11.3233 9.74984H1.07415C0.729759 9.74984 0.449219 9.4693 0.449219 9.12491V8.87493C0.449219 8.53054 0.729759 8.25 1.07415 8.25H11.3233C11.6677 8.25 11.9483 8.53054 11.9483 8.87493V9.12491C11.9483 9.4693 11.6677 9.74984 11.3233 9.74984Z"
+                                    fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+                            </svg>
+                            {{element.file?.split('/').pop()}}
+                        </span>
+                        <span *ngIf="downloadingId === element.id">
+                            <ng-container [ngTemplateOutlet]="roundLoader"></ng-container>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <app-loader loaderText="Loading attachments" loaderType="type1" class="no-data" *ngIf="loading">
+        </app-loader>
+        <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="!loading && tableLength === 0">
+            No attachments found
+        </section>
+    </section>
+    <div class="col-12 mt-10">
+        <app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+    </div>
+</div>
+
+<ng-template #roundLoader>
+    <svg width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid" class="rolling" style="background: none;">
+        <circle cx="50" cy="50" fill="none" stroke="#4dcaf4" stroke-width="8" r="30"
+            stroke-dasharray="141.37166941154067 49.12388980384689" transform="rotate(94.0408 50 50)">
+            <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50"
+                keyTimes="0;1" dur="0.9s" begin="0s" repeatCount="indefinite"></animateTransform>
+        </circle>
+    </svg>
+</ng-template>

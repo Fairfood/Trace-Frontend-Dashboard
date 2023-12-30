@@ -1,0 +1,8 @@
+<section class="action-section ff-flex-between">
+    <app-buttons buttonType="stroked" (buttonClicked)="buttonNavigation('prev')">
+        Back
+    </app-buttons>
+    <app-buttons buttonType="fill" [isDisabled]="buttonNextState?.disabled" (buttonClicked)="buttonNavigation('next')">
+        {{buttonNextState?.buttonText}}
+    </app-buttons>
+</section>

@@ -1,0 +1,102 @@
+<section class="row-md">
+    <div class="col-md-4">
+        <section class="header ff-flex-between">
+            <h3>In stock</h3>
+
+            <app-buttons buttonType="fill" (buttonClicked)="viewStockClicked()" id="viewStockButton">
+                View stock
+            </app-buttons>
+        </section>
+
+        <section class="ff-table-container w-100">
+            <table aria-label="Most recent stocks">
+                <thead>
+                    <tr>
+                        <th class="normal-column pointer">
+                            Product
+                        </th>
+                        <th class="normal-column pointer">
+                            Quantity (kg)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of stockData; trackBy: trackByFnStock" class="pointer">
+                        <td class="mat-cell normal-column text-overflow">
+                            {{item?.name}}
+                        </td>
+                        <td class="mat-cell normal-column">
+                            {{item?.quantity}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <aside class="no-data w-100" aria-label="no data" *ngIf="stockData?.length === 0" [hidden]="stockLoading">
+                No stock found
+            </aside>
+
+            <app-loader loaderType="type1" loaderText="Loading recent stocks" *ngIf="stockLoading"
+                class="min-h-300"></app-loader>
+
+        </section>
+    </div>
+    <div class="col-md-8">
+        <section class="header ff-flex-between">
+            <h3>Recent transactions</h3>
+
+            <app-buttons buttonType="fill" (buttonClicked)="viewTransactionClicked()">
+                View transactions
+            </app-buttons>
+        </section>
+
+        <section class="ff-table-container w-100">
+            <table aria-label="Most recent transaction list">
+                <thead>
+                    <tr>
+                        <th class="large-column pointer">
+                            Product
+                        </th>
+                        <th class="normal-column pointer">
+                            Transaction type
+                        </th>
+                        <th class="normal-column pointer">
+                            Connection
+                        </th>
+                        <th class="normal-column pointer">
+                            Date
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let transaction of transactionData; trackBy: trackByFnTransaction; let j=index"
+                        class="pointer" id="rowTr-{{j}}">
+                        <td class="mat-cell normal-column">
+                            {{ transaction?.products[0]?.name }}
+                        </td>
+                        <td class="mat-cell normal-column">
+                            <span *ngIf="transaction?.type == 1">Sent stock</span>
+                            <span *ngIf="transaction?.type == 2">Received stock</span>
+                            <span *ngIf="transaction?.type == 3">Reversal</span>
+                        </td>
+                        <td class="mat-cell normal-column">
+                            {{ transaction?.connection?.name }}
+                        </td>
+                        <td class="mat-cell normal-column">
+                            {{ transaction?.date * 1000 | date: 'dd MMMM y' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <aside class="no-data w-100" aria-label="no data" *ngIf="transactionData?.length === 0"
+                [hidden]="transactionLoading">
+                No recent transaction found
+            </aside>
+
+            <app-loader loaderType="type1" loaderText="Loading recent transactions" *ngIf="transactionLoading"
+                class="min-h-300"></app-loader>
+
+        </section>
+    </div>
+</section>

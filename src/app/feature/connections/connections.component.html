@@ -1,0 +1,37 @@
+<div class="page-container">
+  <section class="heading-section">
+    <h1 class="page-heading">
+      {{'connections.heading'|translate}}
+    </h1>
+    <aside class="right-section" aria-label="Misc items">
+      <article class="ff-flex-align-center">
+        <span class="text-xs text-blue font-1-normal slide-togle-btn">
+          {{'connections.view2'|translate}}
+        </span>
+        <label class="switch">
+          <input type="checkbox" id="connectionViewSwitch" name="view" (change)="onToggleConnectionView($event)"
+            [checked]="listView">
+          <span class="slider round"></span>
+        </label>
+        <span class="text-xs text-blue font-1-normal slide-togle-btn">
+          {{'connections.view1'|translate}}
+        </span>
+      </article>
+      <span *ngIf="!listView">|</span>
+      <ng-container *ngIf="!listView">
+        <app-export-icon></app-export-icon>
+      </ng-container>
+    </aside>
+  </section>
+  <section class="help-wrapper" *ngIf="toggleHelp">
+    <aside class="help-box" aria-label="Help box">
+      <img src="../../../assets/images/help.png" alt="it is a help illustration">
+      <span>
+        {{'connections.subtext'|translate}}
+      </span>
+      <mat-icon (click)="showHideHelp()" id="closeIcon">close</mat-icon>
+    </aside>
+  </section>
+  <app-map-view *ngIf="listView"></app-map-view>
+  <app-list-view *ngIf="!listView"></app-list-view>
+</div>

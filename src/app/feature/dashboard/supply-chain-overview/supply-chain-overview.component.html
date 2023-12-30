@@ -1,0 +1,46 @@
+<section class="header flex-column">
+    <h3>Supply chain overview</h3>
+    <span class="label-tr" id="supplyChainLength">
+        {{ dashboardData?.supplier_chains.length }} active supply chains
+    </span>
+</section>
+
+<section class="ff-table-container w-100" *ngIf="!dataLoading">
+    <table aria-label="Supply chain data">
+        <thead>
+            <tr>
+                <th *ngFor="let item of displayedColumns;trackBy: trackByFnCommon" class="{{item?.class}}">
+                    <article class="ff-flex-start pointer">
+                        {{item.name}}
+                    </article>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of displayedData;trackBy: trackByFnCommon">
+                <td class="mat-cell normal-column">
+                    {{item.name}}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{item.tier_count}}
+                </td>
+                <td class="mat-cell large-column">
+                    {{item.chain_length}}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{item.company_count}}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{item.farmer_count}}
+                </td>
+                <td class="mat-cell normal-column">
+                    {{item.complexity}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <app-loader loaderType="type1" loaderText="Loading supply chain" *ngIf="dataLoading" class="min-h-300"></app-loader>
+</section>
+<app-ff-pagination [totalCount]="supplyChainData.length"
+    (paginationAction)="paginatorEvent($event)"></app-ff-pagination>

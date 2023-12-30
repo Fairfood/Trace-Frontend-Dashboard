@@ -1,0 +1,37 @@
+<section class="active-filter ff-flex-start" *ngIf="!filterDataLoading">
+    <app-ff-filter-box-wrapper label="Product" [defaultValue]="appliedFilterValues.selectedProduct"
+        [filterMasterData]="stocklistFilter?.productData" (selectionChange)="filterStocklist($event, 'product')">
+    </app-ff-filter-box-wrapper>
+    <app-ff-filter-box-wrapper label="Supplier" [defaultValue]="appliedFilterValues.selectedSupplier"
+        [filterMasterData]="stocklistFilter?.supplierData" (selectionChange)="filterStocklist($event, 'supplier')">
+    </app-ff-filter-box-wrapper>
+    <app-ff-filter-box-wrapper label="Claim" [defaultValue]="appliedFilterValues.selectedClaim"
+        [filterMasterData]="stocklistFilter?.claimsData" (selectionChange)="filterStocklist($event, 'claim')">
+    </app-ff-filter-box-wrapper>
+
+    <app-ff-drop-date label="Created date" (appliedFilter)="filterByAdditional($event)"
+        *ngIf="availableFilters[0].visible"></app-ff-drop-date>
+
+    <app-ff-drop-quantity *ngIf="availableFilters[1].visible" [defaultValues]="appliedFilterValues"
+        (appliedFilter)="filterByAdditional($event)">
+    </app-ff-drop-quantity>
+
+    <ng-container *ngIf="availableFilters[2].visible">
+        <app-ff-filter-box-wrapper label="Created from" [defaultValue]="appliedFilterValues.createdFrom"
+            [filterMasterData]="createdFromList" [hideSearch]="true"
+            (selectionChange)="filterStocklist($event, 'createdFrom')">
+        </app-ff-filter-box-wrapper>
+    </ng-container>
+
+    <app-buttons buttonType="secondary" buttonSize="medium" [matMenuTriggerFor]="moreFilters">
+        + More filters
+    </app-buttons>
+    <mat-menu class="mat-menu more-filters" #moreFilters="matMenu" xPosition="before">
+        <ul>
+            <li *ngFor="let item of availableFilters">
+                <mat-checkbox class="w-100" [checked]="item.visible" (change)="showFilter(item)">{{item.name}}</mat-checkbox>
+            </li>
+        </ul>
+    </mat-menu>
+</section>
+<app-loader [loaderText]="'Loading filters. Please wait'" [loaderType]="'type1'" *ngIf="filterDataLoading"></app-loader>

@@ -1,0 +1,17 @@
+<div class="ff-wizard">
+    <ul [ngClass]="{'overflow-flex': list.length > 5}">
+        <ng-container *ngFor="let item of list;let i=index">
+            <li class="pointer" [ngClass]="{'active': i=== activeIndex, 'max-width-li': list | shrink: i: activeIndex }"
+                (click)="stepClicked(i)">
+                <aside aria-label="" class="ff-flex-center list-content-area">
+                    <span class="badge-label" *ngIf="!hideBadge" [ngClass]="{'two-digits': (i+1)>10 && (i+1)<100, 'three-digits':(i+1)>99,
+                             'margin-left-30': list | shrink: i: activeIndex}">{{i+1}}</span>
+                    <article class="flex-column" [ngClass]="{'hide-details': list | shrink: i: activeIndex }">
+                        <span class="text-blue text-xs font-1-bold">{{item?.title}}</span>
+                        <span class="text-off-blue text-xs font-1-normal">{{item?.subTitle}}</span>
+                    </article>
+                </aside>
+            </li>
+        </ng-container>
+    </ul>
+</div>

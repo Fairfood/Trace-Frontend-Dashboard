@@ -1,0 +1,26 @@
+@import 'src/styles/utils.scss';
+@import '../process-stock.common.scss';
+@include input-common-css;
+@include key-value-pair;
+
+.section-divider {
+  margin-bottom: 10px;
+
+  hr {
+    border-top: 1px solid var(--border-color);
+  }
+}
+.loader-wrap {
+  min-height: 350px;
+}
+
+.stock-convert-item {
+  width: 100%;
+  @include devices(tablet) {
+    width: 33%;
+  }
+
+  &.mr-10 {
+    margin-right: 10px;
+  }
+}

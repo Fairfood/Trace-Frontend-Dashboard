@@ -1,0 +1,18 @@
+<section class="pop-header ff-flex-between">
+  <h4>
+    User signed in
+  </h4>
+</section>
+<section class="pop-content flex-column">
+  <p>
+    You appear to be signed in to another account already. Please sign out to proceed.
+  </p>
+  <article class="ff-flex-end">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">
+      Cancel
+    </app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="logout()">
+      Logout
+    </app-buttons>
+  </article>
+</section>

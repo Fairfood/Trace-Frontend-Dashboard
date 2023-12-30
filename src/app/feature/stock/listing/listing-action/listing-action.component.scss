@@ -1,0 +1,39 @@
+@import 'src/styles/responsive';
+@import 'src/styles/flex';
+
+.show-desktop-filter-icon {
+  display: none;
+  @include devices(tablet-md) {
+    display: block;
+    mat-icon {
+      height: 15px;
+      width: 15px;
+      font-size: 16px;
+    }
+  }
+}
+
+.show-mobile-filter {
+  @extend %flex-common-center;
+  @include justify-content(space-between);
+  @include devices(tablet-md) {
+    display: none;
+  }
+}
+
+.button-text {
+  display: none;
+  @include devices(laptop) {
+    display: block;
+    margin-left: 10px;
+  }
+}
+
+
+
+
+::ng-deep .more-button-receive {
+  ul {
+    font-family: var(--font-medium);
+  }
+}

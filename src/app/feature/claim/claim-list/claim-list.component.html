@@ -1,0 +1,114 @@
+<div class="page-container">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Claims
+        </h1>
+    </section>
+    <section class="utils ff-flex-between flex-column" *ngIf="!dataLoading">
+        <app-search-box [placeholder]="'Search here'" [hideOptions]="true" (searchText)="searchFilter($event)"
+            class="search-item"></app-search-box>
+
+        <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
+            <ng-container *ngIf="toggleFilter">
+                <mat-icon class="clear-icon">close</mat-icon>
+                <span class="button-text">Clear filters</span>
+            </ng-container>
+            <ng-container *ngIf="!toggleFilter">
+                <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+                <span class="button-text">Filters</span>
+            </ng-container>
+        </app-buttons>
+    </section>
+
+    <section *ngIf="toggleFilter" class="active-filter ff-flex-start">
+        <app-ff-filter-box-wrapper label="Claims" [defaultValue]="appliedFilterValues.selectedClaim"
+            [filterMasterData]="claimListOptions?.claimsData" (selectionChange)="filterClaims($event, 'claim')">
+        </app-ff-filter-box-wrapper>
+
+        <app-ff-filter-box-wrapper label="Status" [defaultValue]="appliedFilterValues.status"
+            [filterMasterData]="statusFilter" [hideSearch]="true" (selectionChange)="filterClaims($event, 'status')">
+        </app-ff-filter-box-wrapper>
+
+        <app-ff-filter-box-wrapper label="Product" [defaultValue]="appliedFilterValues.selectedProduct"
+            [filterMasterData]="claimListOptions?.productData" (selectionChange)="filterClaims($event, 'product')">
+        </app-ff-filter-box-wrapper>
+
+        <ng-container *ngIf="claimListOptions?.assignorData.length > 0">
+            <app-ff-filter-box-wrapper label="Assigned to" [defaultValue]="appliedFilterValues.selectedAssignor"
+                [filterMasterData]="claimListOptions?.assignorData"
+                (selectionChange)="filterClaims($event, 'assignor')">
+            </app-ff-filter-box-wrapper>
+        </ng-container>
+    </section>
+
+
+    <section class="ff-table-container w-100">
+        <table aria-label="Claim section listing">
+            <thead>
+                <tr>
+                    <th class="large-column">
+                        Claim
+                    </th>
+                    <th class="normal-column">
+                        Assigned to
+                    </th>
+                    <th class="normal-column">
+                        Stock ID
+                    </th>
+                    <th class="large-column">
+                        Product
+                    </th>
+                    <th class="smaller-column">
+                        Status
+                    </th>
+                    <th class="options-column">
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of dataSource" class="pointer" (click)="viewDetails(element.id)">
+                    <td class="mat-cell large-column">
+                        {{element.claim.name}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.verifier ? element.verifier?.name : '-'}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element.batch_number}}
+                    </td>
+                    <td class="mat-cell large-column">
+                        {{element.product.name}}
+                    </td>
+                    <td class="mat-cell smaller-column">
+                        <ng-container [ngSwitch]="element.status">
+                            <span *ngSwitchCase="1">Pending</span>
+                            <span *ngSwitchCase="2">Verified</span>
+                            <span *ngSwitchCase="3">Rejected</span>
+                            <span *ngSwitchDefault>Pending</span>
+                        </ng-container>
+                    </td>
+                    <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+                        <span class="pointer" [matMenuTriggerFor]="moreOptionsClaimList">
+                            <mat-icon>more_vert</mat-icon>
+                        </span>
+                        <mat-menu class="mat-menu more-options" #moreOptionsClaimList="matMenu" xPosition="before">
+                            <button class="text-xs text-blue" (click)="viewDetails(element.id)" mat-menu-item id="viewDetails">
+                                View details
+                            </button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="tableLength === 0" [hidden]="dataLoading">
+            No records found
+        </div>
+
+        <app-loader [loaderText]="'Loading claim data'" [loaderType]="'type1'" *ngIf="dataLoading"
+            class="min-h-300"></app-loader>
+    </section>
+
+    <app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+</div>

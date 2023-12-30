@@ -1,0 +1,87 @@
+<span class="value-tr p20" *ngIf="linkFields">
+    Uploaded excel file details. You can remove and upload again if required.
+</span>
+
+<ng-container [formGroup]="templateSelectionForm">
+    <section class="row-md">
+        <article class="col-md-12 ff-flex-between p20" *ngIf="linkFields">
+            <app-ff-input label="File name" [parentFormGroup]="templateSelectionForm" [controlName]="'fileName'"
+                inputSize="profile" inputType="text" class="w-100">
+            </app-ff-input>
+            <app-buttons buttonType="stroked" (buttonClicked)="removeUploadedFile()">
+                Remove
+            </app-buttons>
+        </article>
+
+        <!-- For connection template form details are not needed  -->
+        <ng-container *ngIf="!isConnection">
+            <span class="value-tr p20 col-md-12">
+                Fill details
+            </span>
+            <!-- product selection autocomplete  -->
+            <div class="col-md-12 flex-column">
+                <app-template-product [productControl]="ccontrol['productName']"
+                    (productSelected)="selectProduct($event)"></app-template-product>
+                <ng-container [ngTemplateOutlet]="formErrorMessages"
+                    [ngTemplateOutletContext]="{formcontrol:'productName'}">
+                </ng-container>
+            </div>
+            <div class="col-md-6">
+                <app-ff-dropdown label="Currency*" [defaultValue]="ccontrol.currency.value"
+                    [dropdownOptions]="currencies" inputClass="profile"
+                    (selectionChange)="dropdownSelection($event, 'currency')">
+                </app-ff-dropdown>
+                <ng-container [ngTemplateOutlet]="formErrorMessages"
+                    [ngTemplateOutletContext]="{formcontrol:'currency'}">
+                </ng-container>
+            </div>
+            <div class="col-md-6">
+                <app-ff-dropdown label="Unit" [defaultValue]="ccontrol.unit.value" [dropdownOptions]="units"
+                    inputClass="profile" [hideSearch]="true" (selectionChange)="dropdownSelection($event, 'unit')">
+                </app-ff-dropdown>
+                <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'unit'}">
+                </ng-container>
+            </div>
+        </ng-container>
+    </section>
+</ng-container>
+
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message" *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched)">
+        {{'commonValidationError'|translate}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'productName'">
+        <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched)">
+            <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
+                {{'productMaxLength'|translate}}
+            </span>
+            <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
+                {{'productMinLength'|translate}}
+            </span>
+        </article>
+    </ng-container>
+</ng-template>
+
+<ng-template #traceTemplate>
+    <div class="flex-column additional-item">
+        <span class="label-tr">Do you wish to select additional fields?*</span>
+        <mat-radio-group class="additional-item" id="additional-fields" aria-label="Select an option"
+            formControlName="additionalFields">
+            <mat-radio-button value="true" class="font-1-normal text-xs">Yes</mat-radio-button>
+            <mat-radio-button value="false" class="font-1-normal text-xs">No</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div class="flex-column additional-item">
+        <span class="label-tr">Select additional fields which are required*</span>
+        <aside aria-label="" class="additional-item">
+            <span class="col-6 pl-0" *ngFor="let item of additionalFields; let i = index;">
+                <mat-checkbox class="font-1-normal text-xs" [checked]="item?.checked"
+                    (change)="additionalFieldsSelected($event, i)">
+                    {{item?.name}}
+                </mat-checkbox>
+            </span>
+        </aside>
+    </div>
+</ng-template>

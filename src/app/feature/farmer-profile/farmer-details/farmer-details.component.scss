@@ -1,0 +1,42 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+@include input-common-css;
+@include common-farmer-profile;
+.edit {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  padding-top: 3px;
+  margin-right: 5px;
+}
+@include key-value-pair;
+
+.form-items {
+  min-width: 250px;
+  max-width: 250px;
+  padding: 15px 10px;
+  padding-bottom: 0;
+}
+.action {
+  margin-bottom: 25px;
+  width: 500px;
+  justify-content: space-between;
+}
+.error-message {
+  padding-left: 10px;
+}
+
+.custom-input {
+  position: relative;
+  mat-icon {
+    position: absolute;
+    right: 15px;
+    top: 36%;
+  }
+}
+
+.avatar-box {
+  height: 120px;
+  width: 120px;
+  margin-left: 20px;
+}

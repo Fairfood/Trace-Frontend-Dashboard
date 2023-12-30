@@ -1,0 +1,66 @@
+@import 'src/styles/utils';
+@include key-value-pair;
+
+.summary-bg {
+  background-color: var(--color-table-row-active);
+  padding: 25px;
+  border-radius: 6px;
+
+  h3 {
+    font-size: 18px;
+  }
+
+  .sub-heading {
+    color: var(--font-color-2);
+  }
+
+  .summary {
+    margin-bottom: 10px;
+  }
+
+  .batches {
+    background-color: var(--color-white);
+    padding: 20px;
+    margin-top: 15px;
+
+    .product-list {
+      max-width: 250px;
+      font-family: var(--font-regular);
+    }
+  }
+}
+
+.second-row {
+  border-top: 1px dashed var(--color-dotted-border);
+  flex-wrap: wrap;
+  margin-top: 20px;
+  .item {
+    min-width: auto;
+    padding: 20px;
+    padding-left: 0;
+  }
+}
+
+.margin-top-1 {
+  margin-top: 1px;
+}
+
+::ng-deep .mat-menu-panel.more-products {
+  min-width: 200px;
+  padding: 15px;
+  background-color: var(--font-color-2) !important;
+  color: var(--color-white);
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      max-width: 180px;
+    }
+  }
+}
+.p-l-0 {
+  padding-left: 0;
+}

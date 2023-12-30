@@ -1,0 +1,79 @@
+<aside class="pop-header ff-flex-between">
+  <h4>
+    Reject request
+  </h4>
+  <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</aside>
+<section class="pop-content">
+  <p>
+    Are you sure you want to reject this request?
+  </p>
+  <article class="flex-column">
+    <app-ff-input label="Reason for rejecting request" [parentFormGroup]="detailsForm" [controlName]="'reason'"
+      inputSize="profile" [isTextarea]="true" class="w-100">
+    </app-ff-input>
+    <ng-container *ngIf="detailsForm.controls.reason.touched">
+      <span class="error-message" *ngIf="detailsForm.controls.reason.errors?.required">
+        Please enter a valid reason
+      </span>
+      <span class="error-message" *ngIf="detailsForm.controls.reason.invalid && detailsForm.controls.reason.value">
+        Maximum length is 50
+      </span>
+    </ng-container>
+  </article>
+</section>
+<div id="transparency-request-details">
+  <div class="px-3">
+    <div *ngIf="data.type == 'table'">
+      <p class="font-1-bold text-sm text-blue mx-3 mt-4 mb-0">Request details</p>
+      <div class="row mx-0 mt-4">
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Request ID</p>
+          <p class="font-1-normal text-sm text-blue">{{data.number}}</p>
+        </div>
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Request type</p>
+          <p class="font-1-normal text-sm text-blue"><span *ngIf="data.requestType == 1">Recieved request</span>
+            <span *ngIf="data.requestType == 2">Sent request</span>
+          </p>
+        </div>
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Request received date</p>
+          <p class="font-1-normal text-sm text-blue">{{data.created_on * 1000 | date: 'dd MMMM y'}}</p>
+        </div>
+      </div>
+      <div class="row mx-0">
+        <div class="col-12">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Request recieved from</p>
+          <p class="font-1-normal text-sm text-blue">{{data.node.name}}</p>
+        </div>
+      </div>
+      <div class="row mx-0">
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Product</p>
+          <p *ngIf="!editOrder" class="font-1-normal text-sm text-blue">{{data.product.name}}</p>
+        </div>
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Quantity</p>
+          <p *ngIf="!editOrder" class="font-1-normal text-sm text-blue">{{data.quantity}} Kg</p>
+        </div>
+        <div class="col-4">
+          <p class="font-1-normal text-xs text-off-blue mb-1">Price</p>
+          <p *ngIf="!editOrder" class="font-1-normal text-sm text-blue">{{data.price}} {{data.currency}}</p>
+        </div>
+      </div>
+      <p class="font-1-bold text-sm text-blue mx-3 mb-0">Claims</p>
+      <div *ngIf="!editOrder">
+        <button class="claim-list text-blue bg-white mx-2 p-2 btn d-inline mt-3 text-xs" *ngFor="let claim of claims">
+          {{ claim.name }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<article class="ff-flex-between p-20-button">
+  <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+  <app-buttons buttonType="fill" (buttonClicked)="deleteRequest()" [isDisabled]="detailsForm.invalid">
+    Decline request
+  </app-buttons>
+</article>

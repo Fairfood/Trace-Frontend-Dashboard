@@ -1,0 +1,5 @@
+<section class="container-attachment">
+    <app-attachments-table [loading]="loading" [displayedColumns]="displayedColumns" [tableLength]="tableLength"
+        [dataSource]="dataSource" tableHeading="Transaction attachments" buttonText="Add attachments" [showAction]="true"
+        (filterApplied)="filterApplied($event)" (fileUploaded)="fileUploadStarted($event)"></app-attachments-table>
+</section>

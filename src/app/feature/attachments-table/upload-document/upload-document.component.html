@@ -1,0 +1,43 @@
+<aside class="pop-header ff-flex-between">
+    <h4>
+        {{ data?.heading }}
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</aside>
+
+<section class="content flex-column" [formGroup]="receiptForm">
+    <article class="input-container-with-error">
+        <span class="label-tr">Upload document *</span>
+
+        <app-buttons buttonType="stroked" (buttonClicked)="receiptFile.click()" buttonSize="medium"
+            *ngIf="!receiptForm.value.file">
+            Upload file
+        </app-buttons>
+        <article class="ff-flex-align-center" *ngIf="receiptForm.value.file">
+            <p class="value-tr flex-center file-name">{{receiptForm.value.file.name}} </p>
+            <app-buttons buttonType="stroked" (buttonClicked)="removeFile()" buttonSize="medium">
+                Remove
+            </app-buttons>
+        </article>
+        <input type="file" #receiptFile (click)="receiptFile.value = null" value="" class="input-file"
+            placeholder="No file chosen" (change)="uploadReceipt($event)" hidden
+            accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+    </article>
+    <article class="input-container-with-error">
+        <app-ff-input label="File name *" [parentFormGroup]="receiptForm" [controlName]="'fileName'" inputSize="profile"
+            inputType="text">
+        </app-ff-input>
+        <span class="error-message"
+            *ngIf="receiptForm?.controls?.fileName?.errors?.required && receiptForm?.controls?.fileName?.touched">
+            This field shouldn't be empty *
+        </span>
+    </article>
+</section>
+<section class="ff-flex-between action">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">
+        Cancel
+    </app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="uploadFile()" [isDisabled]="!receiptForm.value.file">
+        Upload
+    </app-buttons>
+</section>

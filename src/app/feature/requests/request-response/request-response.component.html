@@ -1,0 +1,104 @@
+<section class="pop-header ff-flex-between">
+  <h4>
+    {{'requests.type3' | translate}}
+  </h4>
+  <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+<section *ngIf="requestData?.fields.length > 0" class="details">
+  <h6 class="text-sm text-blue m-0 pt-2 font-1-medium">Add document</h6>
+</section>
+
+
+<div class="row mx-0 px-2 mt-3 details">
+  <div class="col-12 mat-expansion-panel-inner">
+    <!-- Not Inherited criterias -->
+    <div *ngIf="requestData.fields.length > 0" class="row m-0">
+
+
+      <div class="col-12 px-0">
+
+        <table class="table table-bordered" *ngIf="filescount > 0" aria-label="">
+          <thead>
+            <tr>
+              <th class="text-xs text-blue font-1-normal" scope="col">File name</th>
+              <th class="text-xs text-blue font-1-normal" scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let field of requestData.fields">
+              <tr *ngIf="field.type == 3">
+                <td class="text-xs text-blue font-1-normal">
+                  {{ field.title }}&nbsp;
+                </td>
+                <td class="text-right">
+                  <button *ngIf="!field.file" (click)="attachFile.click()" class="tab-btn text-xs text-red">
+                    Attach file
+                  </button>
+                  <input type="file" #attachFile (click)="attachFile.value = null" value=""
+                    (change)="claimsFile($event, field)" class="input-file" placeholder="No file chosen" hidden
+                    accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+                  <button *ngIf="field.file" class="h-100" mat-button [matMenuTriggerFor]="beforeMenu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu class="mat-menu" #beforeMenu="matMenu" xPosition="before">
+                    <button class="text-xs text-blue" (click)="removeClaimFile(field)" mat-menu-item>Remove</button>
+                  </mat-menu>
+                </td>
+              </tr>
+            </ng-container>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- col-12 -->
+
+      <div class="col-12 px-0">
+        <div class="row">
+          <ng-container *ngFor="let field of requestData.fields">
+
+            <div *ngIf="field.type == 1" class="col-6 form-element m-12">
+              <mat-form-field class="font-1-normal" floatLabel='always'>
+                <h4 class="text-xs text-off-blue font-1-normal ff-flex-align-center">
+                  {{ field.title }}&nbsp;
+                </h4>
+                <input (change)="checkCompleted()" matInput [(ngModel)]="field.value" placeholder="">
+              </mat-form-field>
+            </div>
+
+            <div *ngIf="field.type == 2" class="col-6 form-element m-12">
+              <h5 class="text-xs text-off-blue mb-2 pt-1 font-1-normal">{{ field.title }}&nbsp;</h5>
+              <mat-select (onSelectionChange)="checkCompleted()" [(ngModel)]="field.value">
+                <mat-option *ngFor="let item of field.options" [value]="item" required>
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+            </div><!-- col-6 -->
+
+          </ng-container>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<section class="ff-flex-column details">
+  <app-ff-input [label]="'Note'" [parentFormGroup]="detailsForm" [controlName]="'comment'" inputSize="profile"
+    [isTextarea]="true" class="w-100">
+  </app-ff-input>
+  <ng-container *ngIf="detailsForm.controls.comment.touched">
+    <span class="error-message" *ngIf="detailsForm.controls.comment.invalid && detailsForm.controls.comment.value">
+      Maximum length is 50
+    </span>
+  </ng-container>
+</section>
+
+<section class="ff-flex-end details">
+  <app-buttons buttonType="stroked" (buttonClicked)="close()">
+    Cancel
+  </app-buttons>
+  <app-buttons buttonType="fill" (buttonClicked)="respond()">
+    Respond
+  </app-buttons>
+</section>

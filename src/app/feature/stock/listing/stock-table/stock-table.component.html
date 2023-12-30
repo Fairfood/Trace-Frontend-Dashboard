@@ -1,0 +1,113 @@
+<app-listing-info></app-listing-info>
+
+<section class="ff-table-container w-100" [ngClass]="selectedStocks?.length?'one-margin m-0': ''">
+    <table class="stock-listing-table" aria-label="stock listing table">
+        <thead>
+            <tr>
+                <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                    <ng-container *ngIf="item.name === 'selection'">
+                        <span class="custom-checkbox" *ngIf="!selectedBatchesOnly">
+                            <mat-checkbox [checked]="selectAll$ | async"></mat-checkbox>
+                            <span class="overlay pointer" [matMenuTriggerFor]="selectList"></span>
+                        </span>
+
+                        <!-- new feature  -->
+                        <mat-menu class="mat-menu more-filters" #selectList="matMenu" xPosition="after">
+                            <mat-radio-group id="selectAllOptions" aria-label="Select an option">
+                                <mat-radio-button value="page" class="font-1-normal text-xs text-blue radio-items"
+                                    (change)="radioButtonChanged($event)" [checked]="(selectingOptions$ | async)==='page'"
+                                    *ngIf="(selectingOptions$ | async)!=='all'">
+                                    Select current list ({{stocks?.length}})
+                                </mat-radio-button>
+                                <mat-radio-button value="all" class="font-1-normal text-xs text-blue radio-items"
+                                    [checked]="(selectingOptions$ | async)==='all'" (change)="radioButtonChanged($event)">
+                                    Select entire list ({{tableLength}})
+                                </mat-radio-button>
+                            </mat-radio-group>
+                            <article *ngIf="(selectingOptions$ | async)" class="footer-selection font-1-medium pointer"
+                                (click)="clearPageSelection()">
+                                Clear selection
+                            </article>
+                        </mat-menu>
+                    </ng-container>
+                    <ng-container *ngIf="item.name !== 'selection'">
+                        <article class="ff-flex-start pointer" (click)="sortData(item.sortKey)">
+                            {{item.name}}
+                            <ng-container *ngIf="!item?.hideSort && !selectedBatchesOnly">
+                                <app-sort-custom [filterValues]="appliedFilterValues"
+                                    [columnName]="item.sortKey"></app-sort-custom>
+                            </ng-container>
+                        </article>
+                    </ng-container>
+
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let item of stocks; trackBy: trackByFn" class="pointer"
+                [ngClass]="{'selected': selectedStocks | listingRowSelection: item }">
+                <td class="mat-cell selection-column">
+                    <mat-checkbox [ngModel]="item.select" (change)="changeSelect($event, item)"></mat-checkbox>
+                </td>
+                <td class="mat-cell stock-id-column" (click)="viewDetails(item)">
+                    {{item?.stockId}}
+                </td>
+                <td class="mat-cell large-column text-overflow" (click)="viewDetails(item)">
+                    {{item?.product}}
+                </td>
+                <td class="mat-cell normal-column" (click)="viewDetails(item)">
+                    {{item?.created * 1000 | date: 'dd MMMM y'}}
+                </td>
+                <td class="mat-cell normal-column" (click)="viewDetails(item)">
+                    {{item?.from}}
+                </td>
+                <td class="mat-cell normal-column" (click)="viewDetails(item)">
+                    {{item?.batch}}
+                </td>
+                <td class="mat-cell large-column">
+                    <div [ngClass]="item?.select?'ff-flex-between':'ff-flex-start'">
+                        <span>
+                            {{item?.quantityAvailable.toFixed(2)}}
+                        </span>
+                        <ng-container *ngIf="item.select">
+                            <article class="input-container-with-error">
+                                <label class="has-float-label">
+                                    <input type="number" min="1" [(ngModel)]="item.quantityNeeded"
+                                        (keyup)="updateQuantityValue(item)" />
+                                    <span class="label">Quantity needed(kg)</span>
+                                </label>
+                                <span class="error-message"
+                                    *ngIf="item.quantityNeeded > item.quantityAvailable || item.quantityNeeded <= 0">
+                                    Invalid quantity
+                                </span>
+                            </article>
+                        </ng-container>
+                    </div>
+                </td>
+                <td class="mat-cell normal-column text-overflow">
+                    {{item?.referenceNo || '-'}}
+                </td>
+                <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+                    <span class="pointer" [matMenuTriggerFor]="rowMenu">
+                        <mat-icon>more_vert</mat-icon>
+                    </span>
+                    <mat-menu class="mat-menu more-options" #rowMenu="matMenu" xPosition="before">
+                        <button class="text-xs text-blue" mat-menu-item (click)="viewDetails(item)">
+                            View details
+                        </button>
+                    </mat-menu>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="no-data w-100" aria-label="" *ngIf="tableLength === 0 && !dataLoading">
+        No stock found
+    </div>
+
+    <app-loader loaderText="Loading stock list" loaderType="type1" *ngIf="dataLoading" class="min-h-300"></app-loader>
+</section>
+
+<app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"
+    [ngClass]="(hidePagination$ | async)?'hide': 'show'"></app-ff-pagination>

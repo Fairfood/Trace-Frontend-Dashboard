@@ -1,0 +1,80 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include claim-detail-common;
+@include reset-ul;
+@include key-value-pair;
+.details-container {
+  width: 100%;
+  margin-top: 0;
+  @include devices(desktop) {
+    width: 70%;
+  }
+  .details {
+    margin-left: 0;
+  }
+}
+
+.top-box {
+  border-radius: 3px;
+  background-color: var(--color-table-row-active);
+  padding: 20px 30px;
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+
+  .icon-wrapper {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    background-color: var(--color-primary-2);
+    margin-right: 20px;
+  }
+  .info {
+    .value-tr {
+      margin-top: 10px;
+    }
+    mat-icon {
+      color: var(--font-color-2);
+      margin-right: 10px;
+      height: 18px;
+      width: 18px;
+      font-size: 18px;
+    }
+  }
+}
+.box {
+  padding: 20px;
+  background-color: #e2f5ff;
+  margin-top: 10px;
+
+  span {
+    padding: 2px 0;
+    font-size: 14px;
+  }
+}
+.comment-section {
+  margin: 20px 0;
+  .flex-column {
+    margin: 20px 0;
+  }
+}
+
+.comment-list {
+  .avatar-round {
+    @include set-avatar-props(14px, var(--color-white), var(--font-color));
+    font-size: 12px;
+    margin-right: 15px;
+  }
+  .value-tr {
+    margin: 5px 0;
+  }
+  .label-tr {
+    font-size: 10px;
+  }
+  ul {
+    padding: 0;
+    li {
+      padding: 10px;
+    }
+  }
+}

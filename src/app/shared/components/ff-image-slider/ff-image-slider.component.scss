@@ -1,0 +1,126 @@
+// color variables
+@import 'src/styles/utils.scss';
+@import 'src/styles/responsive.scss';
+
+@mixin set-width-height($width, $height) {
+  height: $height;
+  width: $width;
+  min-width: $width;
+}
+
+%active-image {
+  @include set-width-height(115px, 115px);
+  @include devices(desktop) {
+    @include set-width-height(125px, 125px);
+  }
+}
+
+%two-image {
+  @include set-width-height(100px, 100px);
+  border-radius: 50%;
+  background-color: var(--color-white);
+  @include devices(desktop) {
+    @include set-width-height(125px, 125px);
+  }
+}
+
+.slider-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .ff-image-gallery {
+    height: 135px;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    @include devices(desktop) {
+      @include set-width-height(200px, 145px);
+    }
+
+    li {
+      &.image-right,
+      &.image-left {
+        z-index: 2;
+        position: absolute;
+        top: 40px;
+        img, .avatar-round {
+          border-radius: 50%;
+          @include set-width-height(50px, 50px);
+          opacity: 0.5;
+          @include devices(desktop) {
+            @include set-width-height(65px, 65px);
+          }
+        }
+      }
+      &.image-right {
+        right: 15px;
+      }
+      &.image-left {
+        left: 15px;
+      }
+
+      // center image
+      &.active {
+        z-index: 8;
+        border-radius: 50%;
+        position: relative;
+        @extend %active-image;
+        background-color: var(--color-white);
+        img {
+          border-radius: 50%;
+          border: 2px solid var(--color-white);
+          object-fit: cover;
+          @extend %active-image;
+        }
+      }
+
+      &.two-items-active {
+        @extend %two-image;
+        position: absolute;
+        left: 15px;
+        z-index: 8;
+        img, .avatar-round {
+          @extend %two-image;
+        }
+      }
+      &.two-items-inactive {
+        border-radius: 50%;
+        background-color: var(--color-white);
+        position: absolute;
+        right: 0;
+        z-index: 2;
+        img, .avatar-round {
+          @include set-width-height(80px, 80px);
+          border-radius: 50%;
+          @include devices(desktop) {
+            @include set-width-height(100px, 100px);
+          }
+        }
+      }
+    }
+  }
+
+  .navigation-slider {
+    width: 180px;
+
+    mat-icon {
+      font-size: 32px;
+      height: 32px;
+      width: 32px;
+    }
+  }
+}
+
+.image-data {
+  margin-top: 10px;
+  .title {
+    max-width: 120px;
+    padding-bottom: 4px;
+  }
+}
+.avatar-round {
+  @extend %active-image;
+  background-color: var(--font-color)!important;
+  font-size: 30px;
+  color: var(--color-white);
+}

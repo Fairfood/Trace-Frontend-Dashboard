@@ -1,0 +1,4 @@
+<app-attachments-table [loading]="loading" [displayedColumns]="displayedColumns" [tableLength]="tableLength"
+    [dataSource]="dataSource" tableHeading="General attachments" buttonText="Upload document" [showAction]="isEditable"
+    (filterApplied)="filterApplied($event)" (fileUploaded)="fileUploadStarted($event)"></app-attachments-table>
+    

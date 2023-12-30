@@ -1,0 +1,63 @@
+<div class="page-container" *ngIf="dataLoaded">
+    <section class="heading-section">
+        <h1 class="page-heading">
+            Company profile
+        </h1>
+    </section>
+
+    <section class="top-box ff-flex-align-center">
+        <app-profile-avatar [imageUrl]="companyPic" [avatar]="companyProfileData?.icon" [isEditing]="isEdit"
+            (itemClicked)="openImageUpload($event)"></app-profile-avatar>
+        <aside aria-label="important information" class="flex-column data">
+            <span class="value-tr text-capitalize text-md font-1-bold" id="companyName">{{companyProfileData?.name}}</span>
+            <article class="d-flex location" id="locationData">
+                <img [src]="companyProfileData?.countryFlag" alt="flag" *ngIf="companyProfileData?.countryFlag">
+                <span class="label-tr text-sm">{{companyProfileData?.province}}, {{companyProfileData?.country}}</span>
+            </article>
+            <article *ngIf="companyProfileData?.identification_no" class="ff-flex-start" id="regNo">
+                <span class="label-tr text-sm">
+                    Registration number:
+                </span>
+                <span class="value-tr text-sm" id="identificationNumber">&nbsp;{{companyProfileData?.identification_no}}</span>
+            </article>
+        </aside>
+    </section>
+
+    <div class="tab-container ff-flex-align-center">
+        <app-ff-custom-tab [tabGroupItems]="tabGroup" [moreTabs]="moreTabs" [activeTabId]="activeTabId"
+            (tabChanged)="changeTab($event)" class="w-100">
+        </app-ff-custom-tab>
+    </div>
+    <section class="tab-content">
+        <ng-container *ngIf="activeTabId === 'basic'">
+            <app-basic-details [isConnection]="isConnection" (editingStarted)="toggleEdit($event)"></app-basic-details>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'team'">
+            <app-team-members></app-team-members>
+        </ng-container>
+        <ng-container *ngIf="activeTabId ==='document'">
+            <app-documents-tab></app-documents-tab>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'supplyChain'">
+            <app-supply-chains [companyId]="companyProfileData?.id"></app-supply-chains>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'wallet'">
+            <app-wallet-tab></app-wallet-tab>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'connectionLabel'">
+            <app-connection-label></app-connection-label>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'logs'">
+            <app-activities [companyId]="companyProfileData?.id"></app-activities>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'claims'">
+            <app-company-claims [companyId]="companyProfileData?.id"></app-company-claims>
+        </ng-container>
+    </section>
+
+</div>
+
+<!-- loader section -->
+<section class="loader-wrapper ff-flex-center" *ngIf="!dataLoaded">
+    <app-loader loaderText="Loading profile data" [loaderType]="'type1'"></app-loader>
+</section>

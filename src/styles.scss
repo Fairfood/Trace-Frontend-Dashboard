@@ -1,0 +1,126 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$trace-dashboard-v3-primary: mat.define-palette(mat.$indigo-palette);
+$trace-dashboard-v3-accent: mat.define-palette(
+  mat.$pink-palette,
+  A200,
+  A100,
+  A400
+);
+
+$trace-dashboard-v3-warn: mat.define-palette(mat.$red-palette);
+
+$trace-dashboard-v3-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $trace-dashboard-v3-primary,
+      accent: $trace-dashboard-v3-accent,
+      warn: $trace-dashboard-v3-warn,
+    ),
+  )
+);
+
+@include mat.all-component-themes($trace-dashboard-v3-theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+  min-height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  padding: 0;
+}
+
+:root {
+  // color configurations
+  --color-white: #fff;
+  --color-black: #000;
+
+  --color-primary-1: #4dcaf4;
+  --color-primary-2: #92ddf6;
+  --color-primary-3: #ddf3ff;
+  --color-primary-4: #ddf3ff;
+  --color-secondary: #ea2553;
+
+  --color-disabled: #b2b5b7;
+
+  --font-color: #003a60;
+  --font-color-2: #5691ae;
+
+  --border-color: #e5ebef;
+  --border-color2: #e5ebef;
+
+  --color-sidebar-secondary: var(--font-color);
+  --color-sidebar-light: white;
+  --map-bg-color: #c5edfa;
+  --map-clustor-color: var(--font-color-2);
+  --map-marker: var(--font-color);
+  --map-selected: var(--color-secondary);
+  --marker-text: var(--color-white);
+
+  --ts-primary: var(--color-primary-1);
+  --ts-primary-2: #92ddf6;
+  --ts-primary-3: #ddf3ff;
+  --ts-primary-4: #ddf3ff;
+  --ts-secondary: var(--color-secondary);
+  --ts-font-1: var(--font-color);
+  --ts-font-2: var(--font-color-2);
+  --ts-font-3: var(--font-color);
+  --ts-border: var(--border-color);
+  --ts-map-bg: #c5edfa;
+  --ts-map-marker: var(--font-color);
+  --ts-map-clustor: var(--font-color-2);
+  --ts-map-selected: var(--color-secondary);
+  --ts-map-font: var(--color-white);
+
+  --ci-primary: var(--color-primary-1);
+  --ci-primary-2: #92ddf6;
+  --ci-secondary: var(--color-secondary);
+  --ci-font: var(--font-color);
+  --ci-map-marker: var(--font-color);
+  --ci-banner-text: var(--color-white);
+
+  // new colors added by Dev (Midhun)
+  --color-filter-active: #eef9ff;
+  --color-dropdown-arrow: #7091a6;
+  --color-table-row-active: var(--color-filter-active);
+  --color-scrollbar: #d3e2e8;
+  --color-green: #4caf50;
+  --color-sort-inactive: #678aa0;
+  --color-loss: #ffcc80;
+  --color-dotted-border: #d9d9d9;
+  --color-tr-claims: #bae3fa;
+  --color-light-grey5: #f3f3f3;
+  --color-yellow: #f2c94c;
+  --color-brown: #5b3c3c;
+  --color-green: #3f903f;
+  --color-pink: #d9534f;
+  --color-grey-dark1: #999999;
+  --color-light-grey10: #d4d4d4;
+  --color-light-grey11: #ccc;
+  --color-chip-inactive: #bbc0c3;
+  --color-error-bg: #fef6f8;
+  --color-mapping-bg: #ccedff;
+  // font settings newly added
+  --font-regular: 'Moderat Regular';
+  --font-medium: 'Moderat Medium';
+  --font-bold: 'Moderat Bold';
+  --font-size-heading1: 34px;
+  --font-size-heading2: 18px;
+  --font-size-heading3: 16px;
+  --font-size-paragraph1: 16px;
+  --font-size-paragraph2: 14px;
+  --font-size-paragraph3: 12px;
+  --font-size-label: 12px;
+  --font-size-button1: 14px;
+  --font-size-button2: 16px;
+  --font-weight-bold: bold;
+  --font-weight-normal: normal;
+  --font-weight-medium: medium;
+}

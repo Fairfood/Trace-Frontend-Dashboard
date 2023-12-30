@@ -1,0 +1,35 @@
+@import 'src/styles/utils';
+
+.ff-dropdown-container {
+  @include input-box-common-styles;
+  padding: 10px 20px;
+  padding-right: 30px;
+  width: 150px !important;
+  &.active {
+    background-color: var(--color-mapping-bg);
+    .box-value {
+      color: var(--font-color);
+    }
+  }
+  &.default {
+    background-color: var(--color-white);
+    .box-value {
+      opacity: 0.7;
+      color: var(--font-color);
+    }
+  }
+
+  .arrow {
+    color: var(--color-dropdown-arrow);
+    right: 8px;
+    top: 6px;
+  }
+  .check {
+    margin-right: 5px;
+    position: relative;
+    color: var(--color-primary-2);
+    height: 18px;
+    width: 18px;
+    font-size: 18px;
+  }
+}

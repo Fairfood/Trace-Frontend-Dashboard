@@ -1,0 +1,93 @@
+<div class="row-md m50">
+    <ng-container *ngIf="!loading">
+        <section class="col-md-6">
+            <app-template-form [templateSelectionForm]="templateSelectionForm" [linkFields]="true"
+                [isConnection]="templateType === dynamicTemplateType.CONNECTION"></app-template-form>
+        </section>
+        <section class="col-md-6"></section>
+        <section class="col-md-12 bg-light">
+            <span class="value-tr d-flex">Map template</span>
+
+            <div class="row-md border-bottom p10" [formGroup]="templateSelectionForm">
+                <article class="col-md-6 label-tr ff-flex-align-center">
+                    Link the row in the sheet with the fields given below
+                </article>
+                <aside aria-label="save this template" class="col-md-6 ff-flex-start">
+                    <mat-checkbox formControlName="saveTemplate"></mat-checkbox>
+                    <span class="value-tr">Check if you want to save this template</span>
+                </aside>
+                <div class="col-md-3">
+                    <article class="flex-column">
+                        <app-ff-input label="Title of the table*" [parentFormGroup]="templateSelectionForm"
+                            [controlName]="'title'" inputSize="profile" inputType="text" class="form-items">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'title'}">
+                        </ng-container>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="flex-column">
+                        <app-ff-input label="Data starts at*" [parentFormGroup]="templateSelectionForm"
+                            [controlName]="'dataRow'" inputSize="profile" inputType="text" class="form-items">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'dataRow'}">
+                        </ng-container>
+                    </article>
+                </div>
+                <div class="col-md-6">
+                    <article class="flex-column">
+                        <app-ff-input label="Name*" [parentFormGroup]="templateSelectionForm"
+                            [controlName]="'templateName'" inputSize="profile" inputType="text" class="form-items">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'templateName'}">
+                        </ng-container>
+                    </article>
+                </div>
+            </div>
+            <span class="value-tr d-flex p10">Mapped columns</span>
+            <div class="flex-wrap">
+                <ng-container *ngFor="let item of (schemaFields$ | async)">
+                    <span class="new-chip-template" *ngIf="item.required"
+                        [ngClass]="item.selected?'active-required':'inactive'">
+                        {{item.label}}* <mat-icon class="check" *ngIf="item.selected">check_circle</mat-icon>
+                    </span>
+                    <span class="new-chip-template" *ngIf="!item.required"
+                        [ngClass]="item.selected?'active-optional':'inactive'">
+                        {{item.label}}
+                    </span>
+                </ng-container>
+            </div>
+        </section>
+        <app-mapping-table class="col-md-12" [titleRow]="templateSelectionForm.value.title"></app-mapping-table>
+        <app-action-buttons class="col-md-12" [buttonNextState]="nextButton"
+            (buttonsClicked)="buttonAction($event)"></app-action-buttons>
+    </ng-container>
+    <app-loader [loaderText]="loaderText" [loaderType]="'type1'" *ngIf="loading" class="col-md-6"></app-loader>
+</div>
+
+
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+
+
+    <span class="error-message" *ngIf="templateSelectionForm | showRequiredError: formcontrol">
+        {{'commonValidationError'|translate}}
+    </span>
+    <ng-container *ngIf="formcontrol === 'title'">
+        <span class="error-message" *ngIf="templateSelectionForm.get(formcontrol)?.hasError('min')">
+            Minimum number is {{templateSelectionForm.get(formcontrol).errors?.min?.min}}
+        </span>
+        <span class="error-message" *ngIf="templateSelectionForm.get(formcontrol)?.hasError('pattern')">
+            Please enter a number
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'dataRow'">
+        <span class="error-message" *ngIf="templateSelectionForm.get(formcontrol)?.hasError('pattern')">
+            Please enter a number
+        </span>
+    </ng-container>
+</ng-template>

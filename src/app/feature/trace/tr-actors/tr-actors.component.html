@@ -1,0 +1,65 @@
+<section class="ff-flex-between">
+    <app-search-box [placeholder]="'Search here'" [hideOptions]="true"
+        (searchText)="searchFilter($event)"></app-search-box>
+    <article aria-label="filter and export section" class="ff-flex-center">
+        <app-ff-filter-box-wrapper label="Product" [filterMasterData]="productData$ | async" [hideSearch]="true"
+            [defaultValue]="selectedProduct" (selectionChange)="filterData($event)">
+        </app-ff-filter-box-wrapper>
+    </article>
+</section>
+
+<section class="ff-table-container">
+    <table mat-table [dataSource]="dataSource" class="col-12 tr-listing-table" aria-label="Actors table">
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell class="normal-column" *matHeaderCellDef>
+                Actor name
+            </th>
+            <td mat-cell *matCellDef="let element" class="normal-column">
+                {{ element.name }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="location">
+            <th mat-header-cell class="large-column" *matHeaderCellDef>
+                Location
+            </th>
+            <td mat-cell *matCellDef="let element" class="large-column">
+                {{ element.location }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <th mat-header-cell class="normal-column" *matHeaderCellDef>
+                Actor type
+            </th>
+            <td mat-cell *matCellDef="let element" class="normal-column">
+                {{ element.primary_operation }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="product">
+            <th mat-header-cell class="normal-column" *matHeaderCellDef>
+                Product
+            </th>
+            <td mat-cell *matCellDef="let element" class="normal-column">
+                {{ element.productName }}
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row class="table-row" *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div class="col-12" *ngIf="tableLoading">
+        <app-loader [loaderText]="'Loading transactions'" loaderType="type1"></app-loader>
+    </div>
+
+    <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="tableCount === 0"
+        [hidden]="tableLoading">
+        No actors found
+    </section>
+</section>
+<section class="col-12 mt-10">
+    <app-ff-pagination [totalCount]="tableCount" (paginationAction)="pageEventChanged($event)"></app-ff-pagination>
+</section>

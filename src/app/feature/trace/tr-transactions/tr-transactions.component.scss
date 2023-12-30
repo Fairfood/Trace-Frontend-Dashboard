@@ -1,0 +1,23 @@
+// color variables
+@import 'src/styles/utils.scss';
+
+.button-text {
+  margin-left: 10px;
+}
+
+.ff-table-container {
+  min-height: auto;
+}
+
+.demo-inline-calendar-card {
+  width: 250px;
+}
+::ng-deep .ff-dropdown-container {
+  margin-right: 10px;
+}
+
+::ng-deep .date-picker {
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+  }
+}

@@ -1,0 +1,38 @@
+<section class="pop-header ff-flex-between">
+  <h4>
+    Add document
+  </h4>
+  <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+
+<section class="w-100">
+  <div class="uploadfile-container ff-flex-center flex-column">
+    <input hidden type="file" #fileInput (change)="uploadFile($event)"
+      accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+    <img class="uploadimage" src="../../../../../assets/images/fileupload.svg" alt="" (click)="fileInput.click()"
+      appDragDrop (fileDropped)="uploadFile($event)">
+    <div class="mt-20">
+      <h5 *ngIf="filename" class="m-0 text-xs text-blue font-1-normal">{{filename}}</h5>
+    </div>
+  </div>
+  <div class="mb-20 wrap" [ngClass]="filename?'between': 'center'">
+    <form *ngIf="filename" id="comapny" class="row px-0 comapny input-box" [formGroup]="uploadForm">
+      <article class="input-container-with-error">
+        <app-ff-input label="File Name" [parentFormGroup]="uploadForm" controlName="name" inputSize="full"
+          inputType="text" class="item">
+        </app-ff-input>
+        <span class="error-message"
+          *ngIf="uploadForm.controls.name?.errors?.required && (uploadForm.controls.name?.touched)">
+          This field is required *
+        </span>
+      </article>
+    </form>
+    <aside class="ff-flex-center">
+      <app-buttons buttonType="fill" (buttonClicked)="uploadForm.invalid ? fileInput.click() : uploadDocument()">
+        <img [hidden]="!loader" src="../../../../../assets/images/loading-white.svg" width="20" alt="">
+        Upload
+      </app-buttons>
+    </aside>
+
+  </div>
+</section><!-- col-12 -->

@@ -1,0 +1,22 @@
+@import 'src/styles/utils';
+@import 'src/styles/flex';
+::ng-deep .mat-dialog-container {
+  padding: 0px !important;
+}
+
+.uploadfile-container {
+  margin-bottom: 20px;
+}
+.wrap {
+  @extend %flex-common-center;
+  &.center {
+    justify-content: center;
+  }
+  &.between {
+    justify-content: space-between;
+    padding-left: 20px;
+  }
+}
+.mb-20 {
+  margin-bottom: 20px;
+}

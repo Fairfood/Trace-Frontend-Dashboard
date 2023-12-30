@@ -1,0 +1,13 @@
+@import 'src/styles/utils';
+@include reset-ul;
+
+::ng-deep .more-filters {
+  .mat-mdc-menu-content {
+    ul {
+      padding: 0;
+    }
+  }
+}
+::ng-deep .ff-dropdown-container {
+  margin-right: 10px;
+}

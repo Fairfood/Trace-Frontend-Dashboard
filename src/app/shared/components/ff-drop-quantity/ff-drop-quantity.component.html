@@ -1,0 +1,35 @@
+<ng-container *ngIf="isMobile;then qtyForm else desktop">
+
+</ng-container>
+<ng-template #desktop>
+    <app-ff-filter-box label="Quantity available" [value]="quantityFilterApplied?quantityFilterText: 'Select quantity'"
+        [boxState]="quantityFilterApplied?'selected':'default'" [matMenuTriggerFor]="qtyMenu"></app-ff-filter-box>
+</ng-template>
+<mat-menu #qtyMenu="matMenu" class="ff-qty-menu">
+    <ng-container [ngTemplateOutlet]="qtyForm">
+    </ng-container>
+    <div class="footer-action ff-flex-center">
+        <app-buttons buttonType="stroked" (buttonClicked)="resetFilter()">
+            Reset filter
+        </app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="applyQuantityFilter()">
+            Apply filter
+        </app-buttons>
+    </div>
+</mat-menu>
+
+<ng-template #qtyForm>
+    <form [formGroup]="quantityForm">
+        <section class="form-wrap flex-column" (click)="$event.stopPropagation();">
+            <aside class="ff-flex-between">
+                <app-ff-input label="Min" [parentFormGroup]="quantityForm" controlName="smaller" inputSize="filter"
+                    inputType="number">
+                </app-ff-input>
+                <span>-</span>
+                <app-ff-input label="Max" [parentFormGroup]="quantityForm" controlName="larger" inputSize="filter"
+                    inputType="number">
+                </app-ff-input>
+            </aside>
+        </section>
+    </form>
+</ng-template>

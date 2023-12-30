@@ -1,0 +1,31 @@
+@import 'src/styles/responsive';
+
+
+
+.help-box {
+  margin-top: 10px;
+  background-color: rgb(238, 249, 255, 0.7);
+  padding: 10px;
+  @include devices(laptop-xlg) {
+    justify-content: flex-end;
+    width: 90%;
+  }
+  @include devices(desktop) {
+    width: 60%;
+  }
+  span {
+    font-size: 14px;
+    font-family: var(--font-regular);
+    line-height: 24px;
+    color: var(--font-color);
+    padding-left: 50px;
+    padding-right: 20px;
+    @include devices(laptop) {
+      font-size: 16px;
+    }
+  }
+  mat-icon {
+    align-self: baseline;
+    cursor: pointer;
+  }
+}

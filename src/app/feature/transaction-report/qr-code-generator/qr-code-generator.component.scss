@@ -1,0 +1,49 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+
+.qr-wrapper {
+  padding: 15px 35px;
+  background-color: var(--color-white);
+  @include devices(tablet-md) {
+    padding: 15px;
+  }
+  @include devices(laptop) {
+    padding: 15px 35px;
+  }
+  .url {
+    max-width: 100px;
+    color: var(--font-color);
+    cursor: pointer;
+    margin-right: 10px;
+    color: var(--color-primary-1);
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .download {
+    font-family: var(--font-medium);
+    color: var(--font-color);
+    svg {
+      margin-right: 8px;
+    }
+  }
+}
+
+.center-logo {
+  position: absolute;
+  top: 50%;
+  height: 30px;
+  background: var(--color-white);
+  padding: 4px;
+}
+#qrcode {
+  position: relative;
+  padding-top: 10px;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+}

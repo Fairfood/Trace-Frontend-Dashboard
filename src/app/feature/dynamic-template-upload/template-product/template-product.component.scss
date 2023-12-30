@@ -1,0 +1,9 @@
+@import 'src/styles/utils';
+@include autocomplete-common;
+@include input-common-css;
+@include custom-input;
+.autocomplete-heading {
+  color: var(--font-color-2);
+  font-size: 13px;
+  padding: 10px 18px;
+}

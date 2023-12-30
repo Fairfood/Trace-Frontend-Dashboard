@@ -1,0 +1,82 @@
+<section>
+    <!-- Loader  -->
+    <div class="col-12 pb-3 text-center" *ngIf="loaderConnection">
+        <app-loader [loaderText]="'connections.loaderText'|translate" [loaderType]="'type1'"></app-loader>
+    </div>
+    <!-- Loader end -->
+    <div class="map-container" id="agmmap">
+        <div *ngIf="apiLoaded | async">
+            <google-map id="map" class="map-view" (mapInitialized)="mapReady($event)" height="100%" width="100%"
+                [zoom]="2" [options]="mapDefaultOptions"></google-map>
+        </div>
+
+        <div class="select-stream ff-flex-center" *ngIf="selectedMarkerInCluster">
+            <span class="avatar-round">
+                T{{selectedMarkerInCluster?.customInfo.tier}}
+            </span>
+            <div class="h-1 ff-flex-center m-0">
+                {{selectedMarkerInCluster?.customInfo.name.length > 48 ?
+                selectedMarkerInCluster?.customInfo.name.slice(0, 49) + '...' :
+                selectedMarkerInCluster?.customInfo.name}}
+                <mat-icon (click)="resetConnectionMap()" class="text-blue pointer close" id="resetConnection">clear</mat-icon>
+            </div>
+        </div>
+        <div class="map-legend-box">
+            <div class="legend-item" *ngIf="legendOpen">
+                <div class="legend-icon ff-flex-center" matTooltip="{{'menu.mine'|translate}}" matTooltipClass="map-tooltip"
+                    matTooltipPosition="left">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="my-company" cx="10" cy="10" r="10" />
+                        <circle cx="10" cy="10" r="7" fill="white" />
+                    </svg>
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.connection'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="10" class="actor" />
+                    </svg>
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.selectedActor'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="10" class="active-actor" />
+                    </svg>
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.multipleConnections'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="10" class="clustered-img" />
+                    </svg>'
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.verifiedConnection'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="25" height="2" viewBox="0 0 25 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 1L25 1" class="verified-connection" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.claimedConnection'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="25" height="2" viewBox="0 0 25 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 1L25 1" class="verified-connection" stroke-width="2" stroke-dasharray="5 5" />
+                    </svg>
+                </div>
+                <div class="legend-icon ff-flex-center" matTooltip="{{'connections.tooltip.activeConnection'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <svg width="25" height="2" viewBox="0 0 25 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 1L25 1" class="active-connection" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+            <div class="legend-item-info legend-icon ff-flex-center" (click)="legendOpen=!legendOpen" id="legendIcon">
+                <span *ngIf="!legendOpen" matTooltip="{{'connections.tooltip.showLegend'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <mat-icon class="text-blue">error_outline</mat-icon>
+                </span>
+                <span *ngIf="legendOpen" matTooltip="{{'connections.tooltip.closeLegend'|translate}}"
+                    matTooltipClass="map-tooltip" matTooltipPosition="left">
+                    <mat-icon class="text-blue">clear</mat-icon>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>

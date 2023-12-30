@@ -1,0 +1,88 @@
+<section class="wrapper d-flex">
+    <section class="col px-0 left">
+        <aside aria-label="" class="">
+            <h3 class="text-sm text-blue font-1-bold header-wrap">
+                Selected claim ({{selectedClaims.length}})
+            </h3>
+            <p class="text-off-blue" *ngIf="selectedClaims.length === 0">
+                You didn't add any claims yet, please add claims from below list !
+            </p>
+            <ul class="claim-listing" *ngIf="selectedClaims.length > 0">
+                <li *ngFor="let claim of selectedClaims" class="pointer selected ff-flex-between"
+                    (click)="addClaimToTransaction(claim, true)">
+                    <aside class="left-side ff-flex-align-center" aria-label="Claim details">
+                        <mat-icon>verified_user</mat-icon>
+                        <article class="content-claim">
+                            <article class="ff-flex-align-center">
+                                <span class="font-1-bold text-blue">{{claim?.name}}</span>
+                                <span *ngIf="claim.inherited" class="inherited-label ff-flex-align-center">
+                                    Inherited claim
+                                </span>
+                            </article>
+                            <span class="font-1-normal desc text-overflow">{{claim.description_basic}}</span>
+                        </article>
+                    </aside>
+                    <ng-container *ngIf="!claim.disabled && (claim.inherited || claim.selected)">
+
+                        <span class="cursor-pointer ff-flex-align-center text-xs font-1-normal"
+                            (click)="removeClaimFromTransaction($event, claim)">
+                            <svg width="20" height="20" viewBox="0 0 9 12" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.8737 8.42057V5.03109C3.8737 4.90267 3.82268 4.7795 3.73188 4.6887C3.64107 4.59789 3.51791 4.54688 3.38949 4.54688C3.26106 4.54688 3.1379 4.59789 3.0471 4.6887C2.95629 4.7795 2.90527 4.90267 2.90527 5.03109V8.42057C2.90527 8.54899 2.95629 8.67216 3.0471 8.76296C3.1379 8.85377 3.26106 8.90479 3.38949 8.90479C3.51791 8.90479 3.64107 8.85377 3.73188 8.76296C3.82268 8.67216 3.8737 8.54899 3.8737 8.42057Z"
+                                    fill="#EA2553" />
+                                <path
+                                    d="M7.74756 3.57837C7.61914 3.57837 7.49598 3.62938 7.40517 3.72019C7.31436 3.811 7.26335 3.93416 7.26335 4.06258V9.4814C7.24946 9.72626 7.13938 9.95571 6.95708 10.1198C6.77479 10.2838 6.53505 10.3692 6.29008 10.3573H2.42607C2.1811 10.3692 1.94136 10.2838 1.75907 10.1198C1.57677 9.95571 1.46669 9.72626 1.4528 9.4814V4.06258C1.4528 3.93416 1.40178 3.811 1.31098 3.72019C1.22017 3.62938 1.09701 3.57837 0.968587 3.57837C0.840166 3.57837 0.717005 3.62938 0.626198 3.72019C0.53539 3.811 0.484375 3.93416 0.484375 4.06258V9.4814C0.498196 9.98316 0.7103 10.459 1.07423 10.8047C1.43817 11.1504 1.92426 11.3377 2.42607 11.3258H6.29008C6.79188 11.3377 7.27798 11.1504 7.64192 10.8047C8.00585 10.459 8.21795 9.98316 8.23177 9.4814V4.06258C8.23177 3.93416 8.18076 3.811 8.08995 3.72019C7.99914 3.62938 7.87598 3.57837 7.74756 3.57837Z"
+                                    fill="#EA2553" />
+                                <path
+                                    d="M8.23161 2.12598H6.29476V1.15755C6.29476 1.02913 6.24374 0.90597 6.15294 0.815162C6.06213 0.724355 5.93897 0.67334 5.81055 0.67334H2.90527C2.77685 0.67334 2.65369 0.724355 2.56288 0.815162C2.47208 0.90597 2.42106 1.02913 2.42106 1.15755V2.12598H0.484212C0.355791 2.12598 0.23263 2.17699 0.141822 2.2678C0.0510151 2.35861 0 2.48177 0 2.61019C0 2.73861 0.0510151 2.86177 0.141822 2.95258C0.23263 3.04339 0.355791 3.0944 0.484212 3.0944H8.23161C8.36003 3.0944 8.48319 3.04339 8.574 2.95258C8.66481 2.86177 8.71582 2.73861 8.71582 2.61019C8.71582 2.48177 8.66481 2.35861 8.574 2.2678C8.48319 2.17699 8.36003 2.12598 8.23161 2.12598ZM3.38949 2.12598V1.64176H5.32633V2.12598H3.38949Z"
+                                    fill="#EA2553" />
+                                <path
+                                    d="M5.81022 8.42057V5.03109C5.81022 4.90267 5.75921 4.7795 5.6684 4.6887C5.57759 4.59789 5.45443 4.54688 5.32601 4.54688C5.19759 4.54688 5.07443 4.59789 4.98362 4.6887C4.89281 4.7795 4.8418 4.90267 4.8418 5.03109V8.42057C4.8418 8.54899 4.89281 8.67216 4.98362 8.76296C5.07443 8.85377 5.19759 8.90479 5.32601 8.90479C5.45443 8.90479 5.57759 8.85377 5.6684 8.76296C5.75921 8.67216 5.81022 8.54899 5.81022 8.42057Z"
+                                    fill="#EA2553" />
+                            </svg>
+                            Remove
+                        </span>
+                    </ng-container>
+                </li>
+            </ul>
+        </aside>
+        <aside aria-label="" class="">
+            <h3 class="text-sm text-blue font-1-bold header-wrap">
+                Add claims
+            </h3>
+            <p class="text-off-blue" *ngIf="availableClaims?.length === 0">
+                There are no claims available
+            </p>
+        </aside>
+        <ul class="claim-listing" *ngIf="availableClaims?.length > 0">
+            <li class="ff-flex-between" *ngFor="let claim of availableClaims">
+                <aside class="left-side ff-flex-align-center" aria-label="Available claim details">
+                    <!-- default claim icon  -->
+                    <mat-icon>verified_user</mat-icon>
+                    <article class="content-claim flex-column">
+                        <span class="font-1-bold text-blue">{{claim?.name}}</span>
+                        <span class="font-1-normal desc text-overflow">{{claim.description_basic}}</span>
+                    </article>
+                </aside>
+                <!-- add plus custom icon  -->
+                <svg class="pointer" (click)="addClaimToTransaction(claim, false)" width="32" height="32"
+                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M23.499 11.731C23.499 17.7206 18.5677 22.5889 12.4688 22.5889C6.36977 22.5889 1.43848 17.7206 1.43848 11.731C1.43848 5.74138 6.36977 0.873047 12.4688 0.873047C18.5677 0.873047 23.499 5.74138 23.499 11.731Z"
+                        fill="white" stroke="#BAE3FA" />
+                    <path
+                        d="M16.7379 10.312H13.4439V7H12.0399V10.312H8.72786V11.608H12.0399V14.92H13.4439V11.608H16.7379V10.312Z"
+                        fill="#B6DDF3" />
+                </svg>
+
+            </li>
+        </ul>
+    </section>
+
+    <app-summary-card class="right"></app-summary-card>
+
+</section>
+
+<app-stock-action-button [buttonNextState]="nextButtonState"
+    (buttonsClicked)="navigationOutOfComponent($event)"></app-stock-action-button>

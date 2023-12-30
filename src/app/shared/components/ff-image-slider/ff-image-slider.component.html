@@ -1,0 +1,65 @@
+<section class="slider-wrapper" *ngIf="imageArray.length">
+    <ul class="ff-image-gallery ff-flex-center" [ngStyle]="{width:imageArray?.length === 2?'160px': '180px' }">
+        <ng-container *ngIf="imageArray?.length === 2;then twoImages; else normalSlider"></ng-container>
+    </ul>
+    <aside class="ff-flex-between navigation-slider">
+        <mat-icon (click)="changeImage('previous')" class="pointer">
+            <ng-container *ngIf="imageArray.length > 1">
+                chevron_left
+            </ng-container>
+        </mat-icon>
+        <article class="flex-column image-data ff-flex-center">
+            <span class="text-md text-overflow font-1-bold text-blue title">
+                {{imageArray[active]?.title}}
+            </span>
+            <span class="text-xs text-off-blue text-overflow title" title="{{imageArray[active]?.subTitle}}">
+                {{imageArray[active]?.subTitle}}
+            </span>
+            <p class="text-xs text-blue">
+                {{active+1}} out of {{imageArray.length}}
+            </p>
+        </article>
+        <mat-icon (click)="changeImage('next')" class="pointer">
+            <ng-container *ngIf="imageArray.length > 1">
+                chevron_right
+            </ng-container>
+        </mat-icon>
+    </aside>
+</section>
+
+<ng-template #twoImages>
+    <li class="ff-flex-center two-items-active">
+        <ng-container [ngTemplateOutlet]="showImage"
+            [ngTemplateOutletContext]="{imageUrl:imageArray[active]?.imageUrl,avatar: imageArray[active]?.defaultImage }">
+        </ng-container>
+    </li>
+    <li class="ff-flex-center two-items-inactive">
+        <ng-container [ngTemplateOutlet]="showImage"
+            [ngTemplateOutletContext]="{imageUrl:imageArray[activeRight]?.imageUrl,avatar: imageArray[activeRight]?.defaultImage }">
+        </ng-container>
+    </li>
+</ng-template>
+
+<ng-template #normalSlider>
+    <li class="ff-flex-center image-left">
+        <ng-container *ngIf="activeLeft!==-1" [ngTemplateOutlet]="showImage"
+            [ngTemplateOutletContext]="{imageUrl:imageArray[activeLeft]?.imageUrl,avatar: imageArray[activeLeft]?.defaultImage }">
+        </ng-container>
+    </li>
+    <li class="ff-flex-center active">
+        <ng-container [ngTemplateOutlet]="showImage"
+            [ngTemplateOutletContext]="{imageUrl:imageArray[active]?.imageUrl,avatar: imageArray[active]?.defaultImage }">
+        </ng-container>
+    </li>
+    <li class="ff-flex-center image-right">
+        <ng-container *ngIf="activeRight!==-1" [ngTemplateOutlet]="showImage"
+            [ngTemplateOutletContext]="{imageUrl:imageArray[activeRight]?.imageUrl,avatar: imageArray[activeRight]?.defaultImage }">
+        </ng-container>
+    </li>
+</ng-template>
+
+
+<ng-template #showImage let-imageUrl="imageUrl" let-avatar="avatar">
+    <img [src]="imageUrl" alt="slider-image" *ngIf="imageUrl">
+    <span class="avatar-round" *ngIf="!imageUrl">{{avatar}}</span>
+</ng-template>

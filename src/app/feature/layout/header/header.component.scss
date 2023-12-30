@@ -1,0 +1,120 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+
+header {
+  background-color: var(--color-white);
+  padding: 14px 30px;
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 500;
+
+  .brand-img {
+    max-width: 200px;
+    max-height: 65px;
+    -o-object-fit: contain;
+    object-fit: contain;
+  }
+}
+
+// new style integration
+.user-details-new {
+  position: relative;
+  .avatar-round {
+    @include set-avatar-props(19px, var(--color-white), var(--font-color));
+    font-size: 10px;
+  }
+  .down-arrow {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  .user-pic {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-medium);
+    margin-left: 15px;
+
+    .name {
+      color: var(--font-color);
+    }
+
+    .c-name {
+      color: var(--font-color-2);
+      max-width: 250px;
+      font-size: 14px;
+      line-height: 1;
+    }
+  }
+}
+
+::ng-deep .profile-dropdown {
+  .mat-mdc-menu-content {
+    border: 0;
+    background: var(--color-white);
+    border-radius: 0;
+    width: auto;
+    margin-top: -1px;
+    max-height: 250px;
+    overflow-y: auto;
+    min-width: 230px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    @include scrollbar;
+
+    a {
+      color: var(--font-color);
+      font-family: var(--font-regular);
+      &:hover {
+        background-color: var(--color-white);
+        color: var(--color-primary-1);
+      }
+    }
+
+    .dropdown-item {
+      padding: 8px 26px !important;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  }
+}
+
+.c-circle {
+  background-color: var(--border-color);
+  margin-right: 5px;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  display: flex;
+  &.active {
+    background-color: var(--color-primary-1);
+  }
+}
+.downloads {
+  margin-right: 25px;
+}
+.supply {
+  margin-left: 20px;
+  width: 260px;
+}
+
+.navbar-menu {
+  display: block;
+  @include devices(tablet-md) {
+    display: none;
+  }
+}
+.navbar-collapse {
+  display: none;
+  @include devices(tablet-md) {
+    display: flex;
+  }
+}

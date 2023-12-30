@@ -1,0 +1,58 @@
+<header *ngIf="dataLoaded" class="ff-flex-between" [ngStyle]="{top: viewingAsAdmin?'30px': '0'}">
+
+    <div class="ff-flex-start">
+        <img class="brand-img pointer" [src]="nodeDetails?.brandLogo || '../../../../assets/images/Logo.svg'"
+            alt="Fairfood Brand" (click)="gotoHome()">
+        <app-ff-dropdown [dropdownOptions]="filteredSupplyChain" [defaultValue]="selectedSupplyChain.id"
+            label="Supply chain" [hideSearch]="filteredSupplyChain?.length>5?false: true" [hideFooter]="true"
+            (selectionChange)="changeSupplychain($event)" class="supply navbar-collapse"
+            *ngIf="!hideDropdown && selectedSupplyChain"></app-ff-dropdown>
+    </div>
+
+    <aside class="ff-flex-start navbar-collapse" aria-label="right side of the header">
+        <app-notification-widget (supplyChainUpdate)="notificationChange($event)"
+            (switchCompany)="notificationSwitchCompany($event)"></app-notification-widget>
+        <app-downloads class="downloads"></app-downloads>
+        <aside class="user-details-new ff-flex-align-center" aria-label="user avatar and details section"
+            *ngIf="userData" [matMenuTriggerFor]="menuProfile">
+            <img class="user-pic" [src]="userData?.image" alt="" *ngIf="userData?.image">
+            <span class="avatar-round" *ngIf="!userData?.image">
+                {{userData|avatarPipe}}
+            </span>
+            <article class="user-info pointer">
+                <span *ngIf="userData" class="name text-capitalize text-md">
+                    {{ userData?.first_name }} {{ userData?.last_name }}
+                </span>
+                <span class="c-name text-overflow" #elTitle
+                    title="{{(elTitle.scrollWidth > elTitle.clientWidth) ? nodeDetails?.name : ''}}">
+                    {{nodeDetails?.name}}
+                </span>
+            </article>
+            <mat-icon class="down-arrow">keyboard_arrow_down</mat-icon>
+        </aside>
+        <mat-menu class="profile-dropdown" #menuProfile="matMenu" xPosition="before">
+            <ng-container *ngIf="!viewingAsAdmin">
+                <a *ngFor="let item of userData.nodes; trackBy: trackById; let i=index" class="pl-0 pr-0"
+                    (click)="changeCompany(item.id, i)" class="dropdown-item ff-flex-align-center companies">
+                    <span class="c-circle" [ngClass]="nodeDetails?.id == item.id ? 'active' : ''"></span>
+                    <span>
+                        {{ (item.name.length> 20)? (item.name | slice:0:21) + '..' : (item.name) }}
+                    </span>
+                </a>
+            </ng-container>
+
+            <a [routerLink]="['/user-profile']" class="dropdown-item" *ngIf="!viewingAsAdmin">
+                My profile
+            </a>
+            <a class="dropdown-item" (click)="backtoAdmin()" *ngIf="viewingAsAdmin">
+                Go back to admin
+            </a>
+            <a class="dropdown-item" (click)="onLoggedout()" *ngIf="!viewingAsAdmin">
+                Log Out
+            </a>
+        </mat-menu>
+    </aside>
+
+    <mat-icon class="navbar-menu" (click)="toggleSidebar()">menu</mat-icon>
+
+</header>

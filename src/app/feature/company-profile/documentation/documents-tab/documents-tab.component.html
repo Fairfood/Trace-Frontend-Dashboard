@@ -1,0 +1,52 @@
+<section class="documents-table">
+    <aside class="header ff-flex-between" aria-label="">
+        <h3>{{documentList?.length}} company documents</h3>
+        <app-buttons buttonType="stroked" (buttonClicked)="openDocumentDialog()" *ngIf="memberType!==3">
+            Add document
+        </app-buttons>
+    </aside>
+
+    <section class="ff-table-container w-100">
+        <table>
+            <thead>
+                <tr>
+                    <th class="large-column pointer">
+                        Document name
+                    </th>
+                    <th class="options-column">
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="pointer" *ngFor="let element of documentList">
+                    <td class="mat-cell large-column">
+                        <span class="ff-flex-align-center">
+                            <mat-icon>attach_file</mat-icon>{{element?.name}}
+                        </span>
+                    </td>
+                    <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+                        <span class="pointer" [matMenuTriggerFor]="beforeMenu">
+                            <mat-icon>more_vert</mat-icon>
+                        </span>
+                        <mat-menu class="mat-menu" #beforeMenu="matMenu" xPosition="before">
+                            <button class="text-xs text-blue" mat-menu-item (click)="downloadDoc(element)">
+                                Download
+                            </button>
+                            <button class="text-xs text-blue" mat-menu-item
+                                (click)="openDocDeleteDialog(element)">Remove</button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="documentCount === 0" [hidden]="loader">
+            No documents found
+        </div>
+
+        <app-loader [loaderText]="'Loading documents'" [loaderType]="'type1'" *ngIf="loader"
+            class="min-h-300"></app-loader>
+    </section>
+    <app-ff-pagination [totalCount]="documentCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+</section>

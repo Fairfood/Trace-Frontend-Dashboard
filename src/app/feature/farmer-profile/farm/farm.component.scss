@@ -1,0 +1,29 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+@include common-farmer-profile;
+@include key-value-pair;
+@include common-list-styles;
+
+.editing {
+  align-self: flex-start;
+  padding: 20px 10px;
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    margin-right: 6px;
+    padding-top: 3px;
+  }
+}
+.delete {
+  margin-left: 5px;
+  display: flex;
+}
+.no-ref {
+  padding: 0;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.map-height {
+  height: 350px;
+}

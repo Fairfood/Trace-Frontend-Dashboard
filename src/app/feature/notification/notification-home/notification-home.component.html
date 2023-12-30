@@ -1,0 +1,62 @@
+<section class="mark-wrapper row-md">
+    <app-search-box [placeholder]="'Search here'" [hideOptions]="true" (searchText)="searchFilter($event)"
+        class="col-md-6"></app-search-box>
+    <section class="col-md-6">
+
+        <article class="ff-flex-start">
+            <app-ff-filter-box-wrapper label="Company" [defaultValue]="params.selectedNode" [filterMasterData]="nodes"
+                (selectionChange)="changePreference($event)">
+            </app-ff-filter-box-wrapper>
+            <span class="value-tr text-xs pointer col-md-2" (click)="markRead()">
+                {{'header.markAll'|translate}}
+            </span>
+        </article>
+    </section>
+</section>
+<section class="noti-wrapper row-md" *ngIf="!loading">
+    <section class="notification-list col-md-6">
+        <span class="no-notification ff-flex-align-center text-xs" *ngIf="notificationList?.length == 0">
+            No notifications
+        </span>
+        <ng-container *ngIf="notificationList?.length != 0">
+            <ng-container *ngIf="todayNotification">
+                <span class="ff-heading3 text-xs">Today</span>
+                <ng-container *ngFor="let notification of notificationList | filterToday:true"
+                    [ngTemplateOutlet]="listBody"
+                    [ngTemplateOutletContext]="{notification:notification}"></ng-container>
+
+            </ng-container>
+            <ng-container *ngIf="earlierNotification">
+                <span class="ff-heading3 text-xs">Earlier</span>
+                <ng-container *ngFor="let notification of notificationList | filterToday:false"
+                    [ngTemplateOutlet]="listBody"
+                    [ngTemplateOutletContext]="{notification:notification}"></ng-container>
+
+            </ng-container>
+        </ng-container>
+    </section>
+</section>
+<app-loader loaderText="Loading notifications" [loaderType]="'type1'" *ngIf="loading"></app-loader>
+
+<ng-template #listBody let-notification="notification">
+    <section class="ff-flex-start not-item pointer" (click)="read(notification)">
+        <img class="not-img" [src]="notification?.actor_node?.image" *ngIf="notification.actor_node?.image" alt="notification icon">
+        <span *ngIf="!notification.is_read" class="unread-dot"></span>
+        <span class="avatar-round" *ngIf="!notification.actor_node?.image">
+            {{ notification?.actor_node?.name | notiAvatar}}
+        </span>
+
+        <aside aria-label="notification details" class="flex-column">
+            <span class="not-title text-xs">{{notification.title_en}}</span>
+            <span class="date-text text-xxxs">
+                <ng-container *ngIf="notification.today">
+                    Today {{notification.created_on * 1000 | date: 'h:mm a'}}
+                </ng-container>
+                <ng-container *ngIf="!notification.today">
+                    {{notification.created_on * 1000 | date: 'dd MMMM y'}},
+                    {{notification.created_on * 1000 | date: 'h:mm a'}}
+                </ng-container>
+            </span>
+        </aside>
+    </section>
+</ng-template>

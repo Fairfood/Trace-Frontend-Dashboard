@@ -1,0 +1,289 @@
+<section class="wrapper d-flex">
+    <section class="col px-0 left">
+        <aside aria-label="card" class="no-border flex-column">
+            <h3 class="text-sm text-blue font-1-bold header-wrap">
+                <span *ngIf="stockRequestLinked" class="ff-flex-align-center text-xs">
+                    <mat-icon class="linked">check_circle</mat-icon>
+                    Stock request linked
+                </span>
+                <ng-container *ngIf="!stockRequestLinked">
+                    Link stock request
+                </ng-container>
+                <span *ngIf="stockRequestLinked" class="cursor-pointer" (click)="removeStockRequest()" id="removeRequest">
+                    <svg width="20" height="20" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.8737 8.42057V5.03109C3.8737 4.90267 3.82268 4.7795 3.73188 4.6887C3.64107 4.59789 3.51791 4.54688 3.38949 4.54688C3.26106 4.54688 3.1379 4.59789 3.0471 4.6887C2.95629 4.7795 2.90527 4.90267 2.90527 5.03109V8.42057C2.90527 8.54899 2.95629 8.67216 3.0471 8.76296C3.1379 8.85377 3.26106 8.90479 3.38949 8.90479C3.51791 8.90479 3.64107 8.85377 3.73188 8.76296C3.82268 8.67216 3.8737 8.54899 3.8737 8.42057Z"
+                            fill="#EA2553" />
+                        <path
+                            d="M7.74756 3.57837C7.61914 3.57837 7.49598 3.62938 7.40517 3.72019C7.31436 3.811 7.26335 3.93416 7.26335 4.06258V9.4814C7.24946 9.72626 7.13938 9.95571 6.95708 10.1198C6.77479 10.2838 6.53505 10.3692 6.29008 10.3573H2.42607C2.1811 10.3692 1.94136 10.2838 1.75907 10.1198C1.57677 9.95571 1.46669 9.72626 1.4528 9.4814V4.06258C1.4528 3.93416 1.40178 3.811 1.31098 3.72019C1.22017 3.62938 1.09701 3.57837 0.968587 3.57837C0.840166 3.57837 0.717005 3.62938 0.626198 3.72019C0.53539 3.811 0.484375 3.93416 0.484375 4.06258V9.4814C0.498196 9.98316 0.7103 10.459 1.07423 10.8047C1.43817 11.1504 1.92426 11.3377 2.42607 11.3258H6.29008C6.79188 11.3377 7.27798 11.1504 7.64192 10.8047C8.00585 10.459 8.21795 9.98316 8.23177 9.4814V4.06258C8.23177 3.93416 8.18076 3.811 8.08995 3.72019C7.99914 3.62938 7.87598 3.57837 7.74756 3.57837Z"
+                            fill="#EA2553" />
+                        <path
+                            d="M8.23161 2.12598H6.29476V1.15755C6.29476 1.02913 6.24374 0.90597 6.15294 0.815162C6.06213 0.724355 5.93897 0.67334 5.81055 0.67334H2.90527C2.77685 0.67334 2.65369 0.724355 2.56288 0.815162C2.47208 0.90597 2.42106 1.02913 2.42106 1.15755V2.12598H0.484212C0.355791 2.12598 0.23263 2.17699 0.141822 2.2678C0.0510151 2.35861 0 2.48177 0 2.61019C0 2.73861 0.0510151 2.86177 0.141822 2.95258C0.23263 3.04339 0.355791 3.0944 0.484212 3.0944H8.23161C8.36003 3.0944 8.48319 3.04339 8.574 2.95258C8.66481 2.86177 8.71582 2.73861 8.71582 2.61019C8.71582 2.48177 8.66481 2.35861 8.574 2.2678C8.48319 2.17699 8.36003 2.12598 8.23161 2.12598ZM3.38949 2.12598V1.64176H5.32633V2.12598H3.38949Z"
+                            fill="#EA2553" />
+                        <path
+                            d="M5.81022 8.42057V5.03109C5.81022 4.90267 5.75921 4.7795 5.6684 4.6887C5.57759 4.59789 5.45443 4.54688 5.32601 4.54688C5.19759 4.54688 5.07443 4.59789 4.98362 4.6887C4.89281 4.7795 4.8418 4.90267 4.8418 5.03109V8.42057C4.8418 8.54899 4.89281 8.67216 4.98362 8.76296C5.07443 8.85377 5.19759 8.90479 5.32601 8.90479C5.45443 8.90479 5.57759 8.85377 5.6684 8.76296C5.75921 8.67216 5.81022 8.54899 5.81022 8.42057Z"
+                            fill="#EA2553" />
+                    </svg>
+
+                    Remove request
+                </span>
+            </h3>
+
+            <article class="mb-20" *ngIf="!stockRequestLinked">
+                <label class="has-float-label custom-input">
+                    <input placeholder=" " type="text" class="stock" [formControl]="requestControl"
+                        [matAutocomplete]="inputAutoComplete" id="selectRequest" />
+                    <span class="label">Select link request</span>
+                    <mat-icon>keyboard_arrow_down</mat-icon>
+                </label>
+                <mat-autocomplete #inputAutoComplete="matAutocomplete">
+                    <div class="mb-20 link-search-wrap">
+                        <h3 class="text-sm text-blue font-1-bold">
+                            Available requests ({{(requestFilterOptions | async)?.length}})
+                        </h3>
+                        <ng-container *ngFor="let req of requestFilterOptions | async">
+                            <aside class="text-xs font-1-normal text-blue name-wrap pointer ff-flex-align-center"
+                                (click)="linkStockRequest(req)" aria-label="Request details" id="linkStockRequest">
+                                <article class="item item-req">
+                                    <span class="key">Request ID</span>
+                                    <span class="value">{{req?.number}}</span>
+                                </article>
+                                <article class="item item-req">
+                                    <span class="key">Request receive from</span>
+                                    <span class="value">{{req?.node?.name}}</span>
+                                </article>
+                                <article class="item item-req">
+                                    <span class="key">Product/Quantity</span>
+                                    <span class="value ff-flex-align-center">
+                                        <span class="text-overflow"
+                                            title="{{req.product?.name}}">{{req.product?.name}}</span> /
+                                        {{req?.quantity}}&nbsp;kg</span>
+
+                                </article>
+                                <!-- svg file arrow selection  -->
+                                <svg width="10" class="arrow-right" height="24" viewBox="0 0 10 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.44336 13.873L1.63086 20.0254L0.859375 19.2051L7.61719 13.873L0.859375 8.54102L1.63086 7.7207L9.44336 13.873Z"
+                                        fill="#92DDF6" />
+                                </svg>
+
+                            </aside>
+                        </ng-container>
+
+                        <mat-option style="display: none;">
+                        </mat-option>
+                    </div>
+                </mat-autocomplete>
+            </article>
+            <section class="req-selected ff-flex-align-center" *ngIf="stockRequestLinked">
+                <article class="item item-req">
+                    <span class="key">Request ID</span>
+                    <span class="value">{{linkedData?.number}}</span>
+                </article>
+                <article class="item item-req">
+                    <span class="key">Request receive from</span>
+                    <span class="value">{{linkedData?.node?.name}}</span>
+                </article>
+                <article class="item item-req">
+                    <span class="key">Product/Quantity</span>
+                    <span class="value ff-flex-align-center">
+                        <span class="text-overflow"
+                            title="{{linkedData.product?.name}}">{{linkedData.product?.name}}</span> /
+                        {{linkedData?.quantity}}&nbsp;kg</span>
+                </article>
+            </section>
+            <section class="req-selected" *ngIf="claimsInvalid">
+                <mat-icon>error_outline</mat-icon>Selected batch doesn’t have claims mentioned in stock request.
+            </section>
+            <ng-container *ngIf="!stockRequestLinked">
+                <article class="or-box ff-flex-center">
+                    <p class="ff-flex-center">Or</p>
+                    <hr>
+                </article>
+                <h3 class="text-sm text-blue font-1-bold header-wrap">
+                    Fill details
+                </h3>
+            </ng-container>
+
+            <section [formGroup]="sendForm">
+                <!-- company selection autocomplete  -->
+                <article class="mb-20" *ngIf="!stockRequestLinked">
+                    <label class="has-float-label custom-input"
+                        [ngClass]="{'has-error': ccontrol.name.invalid && ccontrol.name.touched }">
+                        <input placeholder=" " formControlName="name" type="text" class="stock"
+                            [matAutocomplete]="receivingCompany" />
+                        <span class="label">Receiving company*</span>
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                    </label>
+                    <mat-autocomplete #receivingCompany="matAutocomplete">
+                        <aside class="inside-container" aria-label="Add connection">
+                            <span class="autocomplete-heading">
+                                {{connectedList?'Connected': 'Add connection / Invite connection'}}
+                            </span>
+                            <ng-container *ngIf="autocompleteLoader">
+                                <mat-option>
+                                    <app-loader [noText]="true" loaderType="type1"></app-loader>
+                                </mat-option>
+                            </ng-container>
+                            <ng-container *ngFor="let item of companyFilterOptions | async">
+                                <ng-container *ngIf="!autocompleteLoader">
+                                    <mat-option *ngIf="item?.connectable" [value]="item.name"
+                                        (click)="selectCompany(item)" id="select-option{{item.name}}">
+                                        <article>
+                                            <span class="avatar-round">
+                                                {{item.name[0]}}
+                                            </span>
+                                            {{ item.name}}
+                                        </article>
+                                        <app-buttons buttonType="stroked" buttonSize="medium" *ngIf="!connectedList" id="inviteButton">
+                                            Invite
+                                        </app-buttons>
+                                    </mat-option>
+                                </ng-container>
+
+                            </ng-container>
+                            <mat-option *ngIf="!connectedList">
+                                {{ccontrol.name.value}}
+
+                                <app-buttons buttonType="fill" buttonSize="medium" *ngIf="!connectedList"
+                                    (buttonClicked)="addCompanyPopup()" id="addConnectionPopup">
+                                    Add connection
+                                </app-buttons>
+                            </mat-option>
+                        </aside>
+
+                    </mat-autocomplete>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'name'}">
+                    </ng-container>
+                </article>
+                <!-- product selection autocomplete  -->
+                <article class="mb-20" *ngIf="!stockRequestLinked">
+                    <label class="has-float-label custom-input"
+                        [ngClass]="{'has-error': ccontrol.productName.invalid && ccontrol.productName.touched }">
+                        <input placeholder=" " formControlName="productName" type="text" class="stock"
+                            [matAutocomplete]="productSection" id="productAutocomplete"/>
+                        <span class="label">Product*</span>
+                        <span class="new-chip" *ngIf="newProduct">New</span>
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                    </label>
+                    <mat-autocomplete #productSection="matAutocomplete">
+                        <aside class="inside-container" aria-label="">
+                            <span class="autocomplete-heading" *ngIf="!(ccontrol.productName.value && newProduct)">
+                                Available products
+                            </span>
+                            <mat-option *ngIf="productLoader">
+                                <app-loader [noText]="true" loaderType="type1"></app-loader>
+                            </mat-option>
+                            <ng-container *ngFor="let item of productFilterOptions | async">
+                                <ng-container *ngIf="!productLoader">
+                                    <mat-option [value]="item.name" (click)="selectProduct(item)" id="productOption-{{item.name}}">
+                                        {{ item.name }}
+                                    </mat-option>
+                                </ng-container>
+                            </ng-container>
+                            <!-- if user starts typing or product input has a value show this option  -->
+                            <ng-container *ngIf="ccontrol.productName.value && newProduct">
+                                <span class="autocomplete-heading">
+                                    Add as new product <span class="new-chip">New</span>
+                                </span>
+                                <mat-option [value]="ccontrol.productName.value" (click)="selectProduct(null)" id="addNewProduct">
+                                    {{ccontrol.productName.value}}
+                                </mat-option>
+                            </ng-container>
+                        </aside>
+                    </mat-autocomplete>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'productName'}">
+                    </ng-container>
+                </article>
+                <div class="quantity-row flex-wrap">
+                    <article class="receive-row-item mb-20 margin-rig" *ngIf="!stockRequestLinked">
+                        <app-ff-input label="Quantity*" inputSize="profile" [parentFormGroup]="sendForm"
+                            controlName="quantity">
+                        </app-ff-input>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'quantity'}">
+                        </ng-container>
+                    </article>
+                    <article class="receive-row-item mb-20" *ngIf="!stockRequestLinked">
+                        <app-ff-dropdown label="Unit" [defaultValue]="ccontrol.unit.value" [dropdownOptions]="units"
+                            inputClass="profile" [hideSearch]="true">
+                        </app-ff-dropdown>
+                    </article>
+
+                </div>
+                <div class="w-100">
+                    <article class="mb-20">
+                        <label class="has-float-label custom-input">
+                            <input placeholder=" " matInput [matDatepicker]="transactionDate" [max]="maxDate"
+                                formControlName="date" type="text" class="profile" readonly />
+                            <span class="label">Transaction date*</span>
+                            <mat-icon class="pointer" (click)="transactionDate.open()">calendar_today</mat-icon>
+                        </label>
+                        <mat-datepicker #transactionDate></mat-datepicker>
+                        <ng-container [ngTemplateOutlet]="formErrorMessages"
+                            [ngTemplateOutletContext]="{formcontrol:'date'}">
+                        </ng-container>
+                    </article>
+                </div>
+                <div class="d-flex w-100">
+                    <article class="w-50 m-r-12">
+                        <label class="has-float-label"
+                            [ngClass]="{'has-error': ccontrol.buyerRefNo.invalid && ccontrol.buyerRefNo.touched }">
+                            <input placeholder=" " formControlName="buyerRefNo" type="text" class="profile"
+                                maxlength="30" />
+                            <span class="label">Buyer reference number</span>
+                        </label>
+                    </article>
+                    <article class="w-50">
+                        <label class="has-float-label"
+                            [ngClass]="{'has-error': ccontrol.sellerRefNo.invalid && ccontrol.sellerRefNo.touched }">
+                            <input placeholder=" " formControlName="sellerRefNo" type="text" class="profile"
+                                maxlength="30" />
+                            <span class="label">Seller reference number</span>
+                        </label>
+                    </article>
+                </div>
+            </section>
+
+
+        </aside>
+    </section>
+    <app-summary-card class="right"></app-summary-card>
+</section>
+
+<app-stock-action-button [buttonNextState]="nextButtonState" (buttonsClicked)="navigationOutOfComponent($event)">
+</app-stock-action-button>
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched || submitted)">
+        {{'commonValidationError'|translate}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'productName'">
+        <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched || submitted)">
+            <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
+                {{'productMaxLength'|translate}}
+            </span>
+            <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
+                {{'productMinLength'|translate}}
+            </span>
+        </article>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'quantity'">
+        <span *ngIf="ccontrol.quantity.invalid && ccontrol.quantity.value && (ccontrol.quantity.touched || submitted)"
+            class="error-message">
+            {{ 'trRequest.invalidQty'|translate }}
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'date'">
+        <span class="error-message" *ngIf="ccontrol.date.invalid && (ccontrol.date.touched || submitted)">
+            {{ 'stock.invalidDate'|translate }}
+        </span>
+    </ng-container>
+</ng-template>

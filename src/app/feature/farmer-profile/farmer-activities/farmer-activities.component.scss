@@ -1,0 +1,33 @@
+@import 'src/styles/utils';
+@include reset-ul;
+.top-box {
+  border-radius: 3px;
+  margin-top: 15px;
+  background-color: var(--color-table-row-active);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 30px;
+
+  ul {
+    width: 100%;
+    padding-left: 0;
+    li {
+      padding: 15px 5px;
+      display: flex;
+      .avatar-round, .img-round {
+        margin-right: 20px;
+        height: 36px;
+        width: 36px;
+      }
+      .avatar-round {
+        @include set-avatar-props(16px, var(--color-white), var(--font-color));
+        margin-right: 15px;
+        font-size: 12px;
+      }
+      .img-round {
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+  }
+}

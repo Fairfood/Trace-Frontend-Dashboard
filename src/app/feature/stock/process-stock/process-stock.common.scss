@@ -1,0 +1,80 @@
+@import 'src/styles/responsive';
+@import 'src/styles/utils';
+@import 'src/styles/flex';
+
+@include autocomplete-common;
+@include custom-input;
+.wrapper {
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.header-wrap {
+  @extend %flex-common-center;
+  @include justify-content(space-between);
+  margin-bottom: 15px;
+}
+
+.left {
+  width: 100%;
+  @include devices(laptop) {
+    max-width: 50%;
+    width: 50%;
+  }
+}
+
+.right {
+  width: 100%;
+  margin-top: 25px;
+  @include devices(laptop) {
+    padding-left: 60px;
+    max-width: 40%;
+    width: 40%;
+    margin-top: 0;
+  }
+
+  img {
+    width: auto;
+    @include devices(laptop) {
+      width: 80%;
+    }
+    @include devices(laptop-lg) {
+      width: auto;
+    }
+  }
+}
+
+.input-container-with-error {
+  margin-bottom: 20px;
+}
+
+.quantity-row {
+  display: flex;
+  width: 100%;
+}
+
+.w-25-ff {
+  width: 25%;
+  margin-right: 12px;
+}
+.w-50-ff {
+  width: 50%;
+}
+.m-r-12 {
+  margin-right: 12px;
+}
+
+.receive-row-item {
+  width: 100%;
+  @include devices(tablet) {
+    width: 50%;
+  }
+  &.margin-rig {
+    margin-right: 0;
+    @include devices(tablet) {
+      margin-right: 10px;
+      width: 48%;
+    }
+  }
+}
+

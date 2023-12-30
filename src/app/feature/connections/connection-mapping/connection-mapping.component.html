@@ -1,0 +1,28 @@
+<mat-checkbox [checked]="selectAll" (change)="modelChange()" class="w-100" *ngIf="supplySelection.length > 1"
+    id="selectAllMapping">
+    Select all
+</mat-checkbox>
+
+<ul class="supplied-for" *ngIf="supplySelection.length">
+    <ng-container *ngFor="let supply of supplySelection; trackBy: trackByFn;let i=index">
+        <li [ngClass]="{'selected': supply.selected}" class="ff-flex-between" (click)="updateTagging(supply)"
+            *ngIf="supply.tier === 1" id="supplyTagging{{i}}">
+            <span>
+                {{supply.name}}
+            </span>
+            <mat-icon [ngClass]="supply.selected ? 'set-primary': 'set-disabled'">
+                {{supply.selected ? 'check_circle': 'add_circle'}}
+            </mat-icon>
+        </li>
+    </ng-container>
+    <ng-container *ngIf="!additionalLoader && !selectAll">
+        <span class="value-tr load-more ff-flex-align-center"
+            *ngIf="supplySelection.length!==supplySelectionCount && supplySelectionCount > 10" (click)="loadMore()" id="loadMoreData">
+            Load more
+        </span>
+    </ng-container>
+</ul>
+
+<ng-container *ngIf="additionalLoader">
+    <app-loader [noText]="true" loaderType="type2"></app-loader>
+</ng-container>

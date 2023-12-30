@@ -1,0 +1,71 @@
+@import 'src/styles/utils';
+
+::ng-deep .export-ui-menu {
+  max-width: 350px !important;
+  width: 350px !important;
+  max-height: 250px!important;
+  @include scrollbar;
+}
+.font-12 {
+  font-size: 12px!important;
+}
+
+.downloading-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 15px 25px;
+    display: flex;
+    flex-direction: column;
+    .row1 {
+      display: flex;
+      align-items: center;
+      padding-bottom: 10px;
+    }
+    .row2,
+    .row3 {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+
+    .other-text,
+    .status {
+      font-size: 14px;
+      color: var(--font-color-2);
+    }
+  }
+}
+.row1 {
+  .file-name-download {
+    max-width: 140px;
+    font-size: 14px;
+
+    &.completed {
+      max-width: 170px;
+    }
+  }
+}
+.row2 {
+  ::ng-deep .mdc-linear-progress {
+    height: 6px !important;
+  }
+}
+.row3 {
+  .cancel {
+    font-size: 14px;
+    color: var(--color-disabled);
+  }
+  .download {
+    color: var(--color-primary-1);
+  }
+  .error-message {
+    font-size: 14px;
+  }
+}
+
+.mat-progress-bar {
+  height: 8px !important;
+}

@@ -1,0 +1,11 @@
+@import 'src/styles/utils';
+::ng-deep .mat-dialog-container {
+  padding: 0px !important;
+}
+
+.p-20-button {
+  padding: 20px;
+}
+.pop-content {
+  padding-top: 20px;
+}

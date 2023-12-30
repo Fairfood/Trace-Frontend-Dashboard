@@ -1,0 +1,27 @@
+<article class="qr-wrapper ff-flex-center flex-column">
+    <aside aria-label="qr code seciton only without download" id="qrcode" class="ff-flex-start flex-column">
+        <article class="ff-flex-align-center">
+            <a class="url text-xxxs text-overflow font-1-normal" href="{{storyTellingUrl}}" target="_blank">
+                {{storyTellingUrl}}
+            </a>
+            <mat-icon class="pointer" [cdkCopyToClipboard]="storyTellingUrl" matTooltip="Copied"  #tooltip="matTooltip"
+                matTooltipPosition="above" (mouseenter)="$event.stopImmediatePropagation()"
+                (mouseleave)="$event.stopImmediatePropagation()" (click)="tooltip.show()" id="copyContent">content_copy</mat-icon>
+        </article>
+
+        <ngx-qrcode *ngIf="qrCodeValue" id="qrCodeImage" [value]="qrCodeValue">
+        </ngx-qrcode>
+        <img src="../../../../assets/images/F_logo.png" alt="F" class="center-logo">
+    </aside>
+    <span class="download text-xs pointer" (click)="downloadImage()" id="downloadQrCode">
+        <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M6.10979 6.71212L6.10962 6.71195L3.4844 3.96172L3.48428 3.96159C3.40864 3.88246 3.4653 3.75029 3.57459 3.75029H4.9497H5.1997V3.50029V0.625051C5.1997 0.418594 5.3683 0.25 5.57475 0.25H6.82485C7.03131 0.25 7.19991 0.418594 7.19991 0.625051V3.50029V3.75029H7.44991H8.82502C8.93431 3.75029 8.99096 3.88246 8.91532 3.96159L8.9152 3.96172L6.28999 6.71195L6.28982 6.71212C6.26656 6.73654 6.23399 6.75058 6.1998 6.75058C6.16561 6.75058 6.13305 6.73654 6.10979 6.71212Z"
+                fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+            <path
+                d="M11.3233 9.74984H1.07415C0.729759 9.74984 0.449219 9.4693 0.449219 9.12491V8.87493C0.449219 8.53054 0.729759 8.25 1.07415 8.25H11.3233C11.6677 8.25 11.9483 8.53054 11.9483 8.87493V9.12491C11.9483 9.4693 11.6677 9.74984 11.3233 9.74984Z"
+                fill="#003A60" stroke="#003A60" stroke-width="0.5" />
+        </svg>
+        Download QR
+    </span>
+</article>

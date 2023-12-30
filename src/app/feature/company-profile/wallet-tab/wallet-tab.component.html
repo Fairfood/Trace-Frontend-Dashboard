@@ -1,0 +1,39 @@
+<section class="wallet-tab">
+    <div class="header ff-flex-between mb-10">
+        <h3>{{walletCount}} wallets</h3>
+    </div>
+    <section class="ff-table-container w-100">
+        <table aria-label="wallet">
+            <thead>
+                <tr>
+                    <th class="large-column pointer">
+                        Public address
+                    </th>
+                    <th class="normal-column">
+                        Status
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="pointer" *ngFor="let element of walletData">
+                    <td class="mat-cell large-column">
+                        <app-common-wallet [type]="element.wallet_type" [url]="element.explorer_url"
+                            [wallet]="element.public" [showCopyIcon]="true">
+                        </app-common-wallet>
+                    </td>
+                    <td class="mat-cell large-column">
+                        <span *ngIf="element.default">Active</span>
+                        <span *ngIf="!element.default">Inactive</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="walletCount === 0" [hidden]="loader">
+            No wallet found
+        </div>
+
+        <app-loader [loaderText]="'Loading documents'" [loaderType]="'type1'" *ngIf="loader"
+            class="min-h-300"></app-loader>
+    </section>
+</section>

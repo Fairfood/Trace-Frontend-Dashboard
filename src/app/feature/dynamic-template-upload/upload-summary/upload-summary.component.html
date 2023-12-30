@@ -1,0 +1,49 @@
+<div class="w-100 row-md mt-30">
+    <div class="col-md-6 mt-30" *ngIf="summaryData && !loading">
+        <section class="flex-wrap">
+            <article class="item" *ngIf="templateType === dynamicTemplateType.TRANSACTION">
+                <span class="key">No.of Transactions</span>
+                <span class="value">{{summaryData.transactions_to_add}}</span>
+            </article>
+            <article class="item">
+                <span class="key">No.of Farmers to add</span>
+                <span class="value">{{summaryData.farmers_to_add}}</span>
+            </article>
+            <article class="item" *ngIf="templateType === dynamicTemplateType.CONNECTION">
+                <span class="key">No.of Farmers to update</span>
+                <span class="value">{{summaryData.farmers_to_update}}</span>
+            </article>
+            <ng-container *ngIf="templateType === dynamicTemplateType.TRANSACTION">
+                <article class="item">
+                    <span class="key">Product</span>
+                    <span class="value">{{summaryData.productName}}</span>
+                </article>
+                <article class="item">
+                    <span class="key">Total quantity</span>
+                    <span class="value">{{summaryData.total_quantity}} kg</span>
+                </article>
+                <article class="item">
+                    <span class="key">Total price</span>
+                    <span class="value">{{summaryData.total_price}} {{summaryData?.currency}}</span>
+                </article>
+                <article class="item">
+                    <span class="key">Highest delivery quantity</span>
+                    <span class="value">{{summaryData.highest_quantity}} kg</span>
+                </article>
+                <article class="item">
+                    <span class="key">Lowest delivery quantity</span>
+                    <span class="value">{{summaryData.lowest_quantity}} kg</span>
+                </article>
+            </ng-container>
+            <article class="item">
+                <span class="key">Logged date</span>
+                <span class="value">{{ today | date: 'dd MMMM y' }}</span>
+            </article>
+        </section>
+        <app-action-buttons [buttonNextState]="nextButton" (buttonsClicked)="buttonAction($event)"></app-action-buttons>
+    </div>
+    <app-loader [loaderText]="loaderText" [loaderType]="'type1'" *ngIf="loading" class="col-md-6 mt-30"></app-loader>
+    <div class="col-md-6 ff-flex-center mt-30">
+        <img src="../../../../assets/images/bulk_template.svg" alt="" class="illustration">
+    </div>
+</div>

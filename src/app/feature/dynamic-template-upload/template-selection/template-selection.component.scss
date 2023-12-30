@@ -1,0 +1,24 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include autocomplete-common;
+@include input-common-css;
+@include custom-input;
+
+.m50 {
+  margin-top: 50px;
+}
+
+.template-download {
+  background-color: var(--color-table-row-active);
+  border-radius: 6px;
+  padding: 20px;
+  margin-top: 30px;
+  .value-tr,
+  .label-tr {
+    padding: 5px 0;
+  }
+}
+
+.with-error {
+  margin-top: 20px;
+}

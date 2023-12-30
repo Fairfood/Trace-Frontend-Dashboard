@@ -1,0 +1,53 @@
+<div class="row-md m50">
+    <section class="col-md-6" *ngIf="dataLoaded">
+
+        <span class="value-tr p20">
+            Select an excel template or use your own excel file to create multiple transaction
+        </span>
+        <app-template-dropdown [form]="templateForm"></app-template-dropdown>
+        <app-template-form *ngIf="templateForm.valid && templateType === dynamicTemplateType.TRANSACTION"
+            [templateSelectionForm]="templateSelectionForm"></app-template-form>
+
+
+        <ng-container *ngIf="showDownload">
+            <!-- download template section  -->
+            <section class="template-download ff-flex-between">
+                <ng-container *ngIf="!downloading">
+                    <article class="flex-column">
+                        <span class="value-tr">
+                            <ng-container *ngIf="templateType === dynamicTemplateType.TRANSACTION">
+                                Download template
+                            </ng-container>
+                            <ng-container *ngIf="templateType === dynamicTemplateType.CONNECTION">
+                                Download farmer list to update or add farmers
+                            </ng-container>
+                        </span>
+                        <span class="label-tr">
+                            Download data added excel template
+                        </span>
+                    </article>
+                    <app-buttons buttonType="stroked" (buttonClicked)="downloadTemplate()" [isDisabled]="downloading"
+                        buttonSize="medium">
+                        Download template
+                    </app-buttons>
+                </ng-container>
+                <app-loader [loaderText]="'Downloading template. Please wait'" loaderType="type2" class="w-100"
+                    *ngIf="downloading"></app-loader>
+            </section>
+        </ng-container>
+        <app-action-buttons [buttonNextState]="nextButton" (buttonsClicked)="buttonAction($event)"></app-action-buttons>
+    </section>
+
+    <section class="col-md-6" *ngIf="!dataLoaded">
+        <app-loader [loaderText]="loaderText" [loaderType]="'type1'"></app-loader>
+    </section>
+    <!-- illustration on the right side  -->
+    <aside class="col-md-6 ff-flex-center">
+        <img src="../../../../assets/images/bulk_template.svg" alt=""
+            *ngIf="templateType === dynamicTemplateType.TRANSACTION">
+        <img src="../../../../assets/images/famer_bulk.svg" alt=""
+            *ngIf="templateType === dynamicTemplateType.CONNECTION">
+    </aside>
+    <input type="file" #templateFileUpload (click)="templateFileUpload.value = null" value="" class="input-file"
+        placeholder="No file chosen" (change)="uploadTemplate($event)" hidden accept=".xlsx,.xls">
+</div>

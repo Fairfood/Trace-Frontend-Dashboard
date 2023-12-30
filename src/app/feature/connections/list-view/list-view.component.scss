@@ -1,0 +1,65 @@
+@import 'src/styles/responsive';
+.utils {
+  width: 100%;
+  &.no-border {
+    border: 0;
+  }
+
+  @include devices(tablet-md) {
+    flex-direction: row;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+.search-wrap {
+  width: 100%;
+  margin-top: 10px;
+  font-family: var(--font-regular);
+
+  &.full-width {
+    width: 75%;
+  }
+
+  @include devices(tablet-md) {
+    width: 50%;
+    margin-top: 0;
+  }
+  @include devices(laptop-xlg) {
+    width: 60%;
+  }
+
+  .search-item {
+    width: 100%;
+    margin-right: 15px;
+  }
+}
+.button-text {
+  display: none;
+  @include devices(laptop) {
+    display: block;
+    margin-left: 10px;
+  }
+}
+
+::ng-deep .connection-option {
+  ul {
+    font-family: var(--font-medium);
+  }
+}
+
+::ng-deep .ff-dropdown-container {
+  margin-right: 10px;
+}
+
+::ng-deep.normal-column {
+  button {
+    width: 130px;
+    justify-content: center;
+  }
+}
+
+::ng-deep .more-button-receive {
+  ul {
+    font-family: var(--font-medium);
+  }
+}

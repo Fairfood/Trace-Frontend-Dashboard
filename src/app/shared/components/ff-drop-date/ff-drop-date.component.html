@@ -1,0 +1,58 @@
+<ng-container *ngIf="isMobile;then dateTemplateBody else desktop">
+
+</ng-container>
+
+<ng-template #desktop>
+
+    <app-ff-filter-box [label]="label" [value]="dateFilterApplied?dateFilterText: 'Select date'"
+        [boxState]="dateFilterApplied?'selected':'default'" [matMenuTriggerFor]="dateFilterMenu"></app-ff-filter-box>
+
+</ng-template>
+
+
+<mat-menu #dateFilterMenu="matMenu" class="ff-date-menu">
+    <ng-container [ngTemplateOutlet]="dateTemplateBody">
+    </ng-container>
+    <article class="footer-action" (click)="$event.stopPropagation()">
+        <app-buttons buttonType="stroked" (buttonClicked)="closeFilter()">
+            Reset filter
+        </app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="applyDateFilter()">
+            Apply filter
+        </app-buttons>
+    </article>
+</mat-menu>
+
+<ng-template #dateTemplateBody>
+    <form class="mat-menu-date dateform" [formGroup]="dateForm" (click)="$event.stopPropagation()">
+        <mat-radio-group formControlName="selectedType" class="radio-container">
+            <ng-container *ngFor="let dItem of dateFormModel; let i=index">
+                <mat-radio-button class="text-xs" [value]="dItem?.type">
+                    {{dItem?.label}}
+                </mat-radio-button>
+            </ng-container>
+        </mat-radio-group>
+        <aside class="date-picker-container" (click)="$event.stopPropagation()">
+            <ng-container *ngIf="dateForm.value.selectedType === 2">
+                <div class="range-input ff-flex-center">
+                    <input matInput [matDatepicker]="picker" placeholder="Choose date" readonly="true"
+                        formControlName="selectedDate" [max]="maxDate" class="custom-style-mat font-1-medium text-sm">
+                    <mat-datepicker-toggle matSuffix [for]="picker">
+                        <mat-icon>calendar_today</mat-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </div>
+
+            </ng-container>
+
+            <div class="range-input ff-flex-center" *ngIf="dateForm.value.selectedType === 1">
+                <mat-date-range-input [formGroup]="dateForm" [rangePicker]="pickerRange" [max]="maxDate">
+                    <input matStartDate formControlName="start" placeholder="Start date" readonly>
+                    <input matEndDate formControlName="end" placeholder="End date" readonly>
+                </mat-date-range-input>
+                <mat-datepicker-toggle matSuffix [for]="pickerRange"></mat-datepicker-toggle>
+                <mat-date-range-picker #pickerRange></mat-date-range-picker>
+            </div>
+        </aside>
+    </form>
+</ng-template>

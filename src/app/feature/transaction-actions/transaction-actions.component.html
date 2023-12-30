@@ -1,0 +1,54 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        {{!data.type ? 'Remove Stock': 'Reject transaction'}}
+    </h4>
+    <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+<aside class="details flex-column" aria-label="">
+    <ng-container *ngIf="!data.type">
+        <span class="value-tr">
+            Are you sure you want to remove stock?
+        </span>
+        <span class="value-tr">
+            By clicking on remove stock, this stock will be considered as loss.
+        </span>
+    </ng-container>
+    <ng-container *ngIf="data.type">
+        <span class="value-tr">
+            On rejecting, this transaction will be reversed back to the supplier.
+        </span>
+        <span class="value-tr">
+            Are you sure you want to reject this transaction?
+        </span>
+
+    </ng-container>
+    <article class="input-container-with-error col-12">
+        <app-ff-input [label]="data.type?'Reason for rejecting transaction':'Reason for removing this stock'"
+            [parentFormGroup]="detailsForm" [controlName]="'comment'" inputSize="profile" [isTextarea]="true"
+            class="w-100">
+        </app-ff-input>
+        <ng-container *ngIf="detailsForm.controls.comment.touched">
+            <span class="error-message" *ngIf="detailsForm.controls.comment.errors?.required">
+                This field cannot be empty
+            </span>
+            <span class="error-message"
+                *ngIf="detailsForm.controls.comment.invalid && detailsForm.controls.comment.value">
+                Maximum length is 50
+            </span>
+        </ng-container>
+
+    </article>
+</aside>
+<article class="ff-flex-end p-20-button">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+    <app-buttons *ngIf="!data.type" buttonType="fill" [isDisabled]="detailsForm.controls.comment.invalid"
+        (buttonClicked)="removeStock()">
+        <img *ngIf="loading" class="img-loader" src="../../.././../assets/images/loading-white.svg" width="20" alt="">
+        {{loading?'Removing':'Remove stock'}}
+    </app-buttons>
+    <app-buttons *ngIf="data.type" buttonType="fill" [isDisabled]="detailsForm.controls.comment.invalid"
+        (buttonClicked)="rejectTransaction()">
+        <img *ngIf="loading" class="img-loader" src="../../.././../assets/images/loading-white.svg" width="20" alt="">
+        {{loading?'Rejecting':'Reject transaction'}}
+    </app-buttons>
+</article>

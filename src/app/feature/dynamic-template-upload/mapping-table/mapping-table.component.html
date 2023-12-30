@@ -1,0 +1,25 @@
+<section class="ff-table-container w-100 pt-20">
+    <table aria-label="Mapping table in excel">
+        <thead>
+            <tr>
+                <th *ngFor="let item of displayedColumns; let i=index" class="large-column">
+                    <section class="flex-column">
+                        <span class="heading">
+                            {{item}}
+                        </span>
+                        <app-ff-column-mapping-box [dropdownMasterData]="dropdownMasterData$ | async"
+                            [defaultValue]="schemaData | mapColumnName: i" (clearSelection)="clearDropdown($event, i)"
+                            (itemSelected)="mapFields($event, i)"></app-ff-column-mapping-box>
+                    </section>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of dataRows; trackBy: trackByFn;let i=index">
+                <td *ngFor="let cell of row" class="large-column">
+                    {{ cell || '-' }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>

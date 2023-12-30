@@ -1,0 +1,179 @@
+<div class="team-members-table">
+    <section class="header ff-flex-between">
+        <app-search-box placeholder="Search here" [hideOptions]="true" class="search" *ngIf="!addMemberScreenVisible"
+            (searchText)="searchFilter($event)">
+        </app-search-box>
+        <h3 *ngIf="addMemberScreenVisible">Add team member</h3>
+        <aside class="ff-flex-start" aria-label="Team member">
+            <app-buttons buttonType="stroked" *ngIf="asAdmin" (buttonClicked)="toggleAddMember()">
+                {{!addMemberScreenVisible?'Add team member':'Cancel'}}
+            </app-buttons>
+            <app-buttons buttonType="fill" *ngIf="addMemberScreenVisible" (buttonClicked)="addTeamMember()">
+                Send invite
+            </app-buttons>
+        </aside>
+
+    </section>
+
+    <section class="ff-table-container w-100" *ngIf="!addMemberScreenVisible">
+        <table aria-label="Team member listing">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                        <article class="ff-flex-start pointer">
+                            {{item.name}}
+                        </article>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of teamMembers" class="pointer">
+                    <td class="mat-cell large-column ff-flex-start">
+                        <span class="avatar-round" *ngIf="!item?.image">
+                            {{item|avatarPipe}}
+                        </span>
+                        <img class="user-img img-round-small" [src]="item?.image" alt="" *ngIf="item?.image">
+                        <span class="text-captilize name-wrap">
+                            &nbsp;{{item.first_name}} {{item.last_name}}
+                        </span>
+                    </td>
+                    <td class="mat-cell normal-column">
+                        <ng-container [ngSwitch]="item.type">
+                            <span *ngSwitchCase="1">Admin</span>
+                            <span *ngSwitchCase="2">Member</span>
+                            <span *ngSwitchCase="3">Viewer</span>
+                        </ng-container>
+                    </td>
+                    <td class="mat-cell normal-column">
+                        <span class="text-overflow" title="{{item?.email}}">{{item?.email}}</span>
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{item?.phone?.dial_code || '-'}} {{item?.phone?.phone}}
+                    </td>
+                    <td class="mat-cell smaller-column">
+                        {{item?.active?'Active': 'Inactive'}}
+                    </td>
+                    <td class="mat-cell options-column" (click)="$event.stopPropagation()">
+                        <span class="pointer" [matMenuTriggerFor]="moreOptionsTeam">
+                            <mat-icon>more_vert</mat-icon>
+                        </span>
+                        <mat-menu class="mat-menu" #moreOptionsTeam="matMenu" xPosition="before">
+                            <button *ngIf="asAdmin && item.type != 1" class="text-xs text-blue"
+                                (click)="changeMemberRole(item, 'admin')" mat-menu-item id="makeAdmin">Make admin
+                            </button>
+                            <button *ngIf="asAdmin && item.type != 2" class="text-xs text-blue"
+                                (click)="changeMemberRole(item, 'member')" mat-menu-item id="makeMember">
+                                Make member
+                            </button>
+                            <button *ngIf="asAdmin && item.type != 3" class="text-xs text-blue"
+                                (click)="changeMemberRole(item, 'viewer')" mat-menu-item id="makeViewer">
+                                Make viewer
+                            </button>
+                            <button *ngIf="!item.active" class="text-xs text-blue" (click)="resendInvite(item)"
+                                mat-menu-item id="resend">
+                                Resend invite
+                            </button>
+                            <button *ngIf="asAdmin" class="text-xs text-blue" (click)="openTeammemberDeleteDialog(item)"
+                                mat-menu-item id="remove">
+                                Remove
+                            </button>
+                        </mat-menu>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="no-data w-100" aria-label="" *ngIf="teamMembers?.length === 0" [hidden]="dataLoading">
+            No team member found
+        </div>
+
+        <app-loader [loaderText]="'Loading member list'" [loaderType]="'type1'" *ngIf="dataLoading"
+            class="min-h-300"></app-loader>
+    </section>
+
+    <app-ff-pagination [totalCount]="teamMembersCount" (paginationAction)="paginatorEvent($event)"
+        *ngIf="!addMemberScreenVisible"></app-ff-pagination>
+
+    <section class="add-member-form row-md" *ngIf="addMemberScreenVisible" [formGroup]="teamMemberForm">
+        <ng-container *ngIf="!dataLoading">
+            <aside aria-label="" class="col-md-12">
+                <label class="has-float-label"
+                    [ngClass]="{'has-error': teamMemberForm.controls['email'].invalid && teamMemberForm.controls['email'].touched }">
+                    <input placeholder=" " type="text" formControlName="email" class="stock"
+                        [matAutocomplete]="inputAutoComplete" id="emailField" />
+                    <span class="label">Email</span>
+                </label>
+                <mat-autocomplete #inputAutoComplete="matAutocomplete" (optionSelected)="optionsSelected($event)">
+                    <mat-option class="text-xs font-1-normal text-blue name-wrap ff-flex-align-center"
+                        *ngFor="let option of autoCompleteOptions;trackBy: trackByFn;let i=index"
+                        [value]="option?.email" id="userSelection-{{i}}">
+                        <img class="selection-img" [src]="option.image" alt="" *ngIf="option.image">
+                        <span class="avatar-round" *ngIf="!option?.image">
+                            {{option.first_name[0]}}{{option.last_name[0]}}
+                        </span>
+                        <span>
+                            {{option?.email}}
+                            <span class="text-sm">({{option?.first_name}} {{option?.last_name}})</span>
+                        </span>
+                    </mat-option>
+                </mat-autocomplete>
+                <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'email'}">
+                </ng-container>
+            </aside>
+            <ng-container *ngIf="showAdditional">
+                <article class="flex-column col-md-4">
+                    <app-ff-input label="First name *" [parentFormGroup]="teamMemberForm" controlName="firstName"
+                        inputSize="full" inputType="text" class="item">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'firstName'}">
+                    </ng-container>
+                </article>
+                <article class="flex-column col-md-4">
+                    <app-ff-input label="Last name *" [parentFormGroup]="teamMemberForm" controlName="lastName"
+                        inputSize="full" inputType="text" class="item">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'lastName'}">
+                    </ng-container>
+                </article>
+                <article class="flex-column col-md-4">
+                    <app-ff-dropdown label="Role *" [dropdownOptions]="roles" [hideSearch]="true"
+                        [defaultValue]="teamMemberForm?.controls?.role?.value" inputClass="full"
+                        (selectionChange)="roleSelected($event)"></app-ff-dropdown>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:'role'}">
+                    </ng-container>
+                </article>
+            </ng-container>
+        </ng-container>
+
+        <div class="col-12" *ngIf="dataLoading">
+            <app-loader loaderText="Inviting member. Please wait" [loaderType]="'type1'"></app-loader>
+        </div>
+    </section>
+
+</div>
+
+
+<!-- created a template to show error messages  -->
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <!-- showing required error message  -->
+    <span class="error-message"
+        *ngIf="teamMemberForm.controls[formcontrol]?.errors?.required && (submitted || teamMemberForm.controls[formcontrol]?.touched)">
+        This field is required *
+    </span>
+    <!-- specific condition for email  -->
+    <ng-container *ngIf="formcontrol === 'email'">
+        <span class="error-message"
+            *ngIf="teamMemberForm.controls['email']?.errors?.pattern && (submitted || teamMemberForm.controls['email']?.touched)">
+            Invalid email
+        </span>
+        <span class="error-message"
+            *ngIf="teamMemberForm.controls['email']?.errors?.incorrect && (submitted || teamMemberForm.controls['email']?.touched)">
+            User is already a team member
+        </span>
+    </ng-container>
+
+</ng-template>

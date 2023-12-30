@@ -1,0 +1,62 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include reset-ul;
+
+.add-connection {
+  padding: 20px 40px;
+  padding-bottom: 10px;
+}
+.content {
+  padding: 0 40px 10px 40px;
+  margin-bottom: 0;
+  margin-top: 20px;
+  .info {
+    font-size: 14px;
+    color: var(--font-color-2);
+    margin-top: 20px;
+  }
+}
+.input-container-with-error {
+  margin-bottom: 20px;
+}
+
+.w-50-cc {
+  width: 50%;
+}
+.m-r-12 {
+  margin-right: 12px;
+}
+.tabs {
+  padding-left: 40px;
+}
+.second-page {
+  h3 {
+    margin-bottom: 15px;
+    font-size: 14px;
+  }
+}
+
+.loader-wrapper {
+  min-height: 300px;
+}
+.mb-10 {
+  margin-bottom: 10px;
+}
+.supplied-for {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0;
+  margin-bottom: 20px;
+
+  li {
+    padding: 5px;
+    font-size: 14px;
+    background-color: var(--color-primary-2);
+    color: var(--font-color);
+    font-family: var(--font-medium);
+  }
+}
+.p20 {
+  padding: 20px 0;
+}

@@ -1,0 +1,29 @@
+<label class="has-float-label custom-input"
+    [ngClass]="{'has-error': productControl.invalid && productControl.touched }">
+    <input placeholder=" " [formControl]="productControl" type="text" class="stock"
+        [matAutocomplete]="productSection" />
+    <span class="label">Product*</span>
+    <span class="new-chip" *ngIf="newProduct">New</span>
+    <mat-icon>keyboard_arrow_down</mat-icon>
+</label>
+<mat-autocomplete #productSection="matAutocomplete">
+    <aside class="inside-container" aria-label="">
+        <span class="autocomplete-heading" *ngIf="!(productControl.value && newProduct)">
+            Available products
+        </span>
+        <ng-container *ngFor="let item of (productFilterOptions$ | async)">
+            <mat-option [value]="item.name" (click)="selectProduct(item)">
+                {{ item.name }}
+            </mat-option>
+        </ng-container>
+        <!-- if user starts typing or product input has a value show this option  -->
+        <ng-container *ngIf="productControl.value && newProduct">
+            <span class="autocomplete-heading">
+                Add as new product <span class="new-chip">New</span>
+            </span>
+            <mat-option [value]="productControl.value" (click)="selectProduct(null)">
+                {{productControl.value}}
+            </mat-option>
+        </ng-container>
+    </aside>
+</mat-autocomplete>

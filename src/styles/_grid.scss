@@ -1,0 +1,38 @@
+$grid-columns: 12;
+$grid-gutter: 20px;
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+);
+
+@mixin row {
+  display: grid;
+  grid-template-columns: repeat($grid-columns, 1fr);
+  grid-gap: $grid-gutter;
+}
+
+@mixin col($span: 1, $offset: 0) {
+  grid-column: span $span / span $span;
+}
+
+// Responsive mixins
+@each $breakpoint, $width in $grid-breakpoints {
+  @media (min-width: $width) {
+    .row-#{$breakpoint} {
+      @include row;
+    }
+
+    @for $i from 1 through $grid-columns {
+      .col-#{$breakpoint}-#{$i} {
+        @include col($i);
+      }
+
+      .col-#{$breakpoint}-offset-#{$i} {
+        @include col(1, $i);
+      }
+    }
+  }
+}

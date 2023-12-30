@@ -1,0 +1,158 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        Request stock
+    </h4>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</section>
+
+<section class="main-div" *ngIf="dataLoaded" id="createtransparencyRequest">
+    <form [formGroup]="requestForm">
+        <article class="mb-20 flex-column">
+            <label class="has-float-label custom-input"
+                [ngClass]="{'has-error': fcontrol.supplier.invalid && fcontrol.supplier.touched }">
+                <input placeholder=" " formControlName="supplier" type="text" class="stock"
+                    [matAutocomplete]="fromFarmer" (input)="checkSupplier()" />
+                <span class="label">Send request to*</span>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+            </label>
+            <mat-autocomplete #fromFarmer="matAutocomplete" (optionSelected)="onSupplierSelected($event)">
+                <aside class="inside-container" aria-label="">
+                    <ng-container *ngFor="let item of filteredOptionsSupplier$ | async">
+                        <mat-option [value]="item.name">
+                            {{ item?.name }}
+                        </mat-option>
+                    </ng-container>
+                </aside>
+            </mat-autocomplete>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'supplier'}">
+            </ng-container>
+        </article>
+        <div *ngIf="silentInvite" class="bg-light-blue warning-msg d-flex">
+            <div class="ff-flex-align-center">
+                <mat-icon class="mr-3 text-blue">error_outline</mat-icon>
+            </div>
+            <div class="ff-flex-align-center">
+                <p class="font-1-normal text-xs text-blue mb-0">
+                    This company was mapped silently. Performing this
+                    action will send an invitaion to join Fairfood trace.
+                </p>
+            </div>
+        </div>
+        <!-- product selection autocomplete  -->
+        <article class="mb-20 flex-column">
+            <label class="has-float-label custom-input"
+                [ngClass]="{'has-error': fcontrol.product.invalid && fcontrol.product.touched }">
+                <input placeholder=" " formControlName="product" type="text" class="stock"
+                    [matAutocomplete]="productSection" />
+                <span class="label">Product*</span>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+            </label>
+            <mat-autocomplete #productSection="matAutocomplete">
+                <aside class="inside-container" aria-label="">
+                    <ng-container *ngFor="let item of filteredOptionsProducts$ | async">
+                        <mat-option [value]="item.name">
+                            {{ item.name }}
+                        </mat-option>
+                    </ng-container>
+                </aside>
+            </mat-autocomplete>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'product'}">
+            </ng-container>
+        </article>
+
+        <div class="quantity-row flex-wrap">
+            <article class="receive-row-item mb-20 margin-rig">
+                <app-ff-input label="Quantity*" inputSize="profile" [parentFormGroup]="requestForm"
+                    controlName="quantity">
+                </app-ff-input>
+                <ng-container [ngTemplateOutlet]="formErrorMessages"
+                    [ngTemplateOutletContext]="{formcontrol:'quantity'}">
+                </ng-container>
+            </article>
+            <article class="receive-row-item mb-20">
+                <app-ff-dropdown label="Unit" [defaultValue]="fcontrol.unit.value" [dropdownOptions]="units"
+                    inputClass="profile" [hideSearch]="true">
+                </app-ff-dropdown>
+            </article>
+            <article class="receive-row-item mb-20 margin-rig">
+                <app-ff-input label="Price" inputSize="profile" [parentFormGroup]="requestForm"
+                    controlName="price">
+                </app-ff-input>
+                <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'price'}">
+                </ng-container>
+            </article>
+            <article class="receive-row-item mb-20 m-r-0">
+                <app-ff-dropdown label="Currency" [defaultValue]="fcontrol.currency.value"
+                    [dropdownOptions]="currencies" inputClass="profile" (selectionChange)="setCurrency($event)">
+                </app-ff-dropdown>
+            </article>
+        </div>
+        <ul class="supplied-for mb-20" *ngIf="claims.length">
+            <ng-container *ngFor="let claim of claims; let i = index">
+                <li [ngClass]="{'selected': claim.selected}" class="ff-flex-between" (click)="selectClaim(i)">
+                    <span>
+                        {{claim.name}}
+                    </span>
+                    <mat-icon [ngClass]="claim.selected ? 'set-primary': 'set-disabled'">
+                        {{claim.selected ? 'check_circle': 'add_circle'}}
+                    </mat-icon>
+                </li>
+            </ng-container>
+        </ul>
+        <article class="flex-column w-100 mb-20">
+            <app-ff-input label="Note" [parentFormGroup]="requestForm" [controlName]="'note'"
+                inputSize="profile" [isTextarea]="true" class="form-items w-100">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:'note'}">
+            </ng-container>
+        </article>
+        <section aria-label class="button-wrapper ff-flex-end">
+            <app-buttons buttonType="stroked" (buttonClicked)="close()">
+                Cancel
+            </app-buttons>
+            <app-buttons buttonType="fill" [isDisabled]="requestForm.invalid || creatingRequest"
+                (buttonClicked)="createRequest()">
+                Send request
+            </app-buttons>
+        </section>
+    </form>
+</section>
+
+<!-- Loader  -->
+<section class="min-h-300" *ngIf="!dataLoaded">
+    <app-loader [loaderText]="'Loading Data'" [loaderType]="'type1'"></app-loader>
+</section>
+<!-- Loader end -->
+
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="fcontrol[formcontrol]?.errors?.required && (fcontrol[formcontrol]?.touched || submitted)">
+        {{'commonValidationError'|translate}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'product'">
+        <article *ngIf="fcontrol.product.invalid && (fcontrol.product.touched || submitted)">
+            <span *ngIf="fcontrol.product.errors.maxlength" class="error-message">
+                {{'productMaxLength'|translate}}
+            </span>
+            <span *ngIf="fcontrol.product.errors.minlength" class="error-message">
+                {{'productMinLength'|translate}}
+            </span>
+        </article>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'quantity'">
+        <span *ngIf="fcontrol.quantity.invalid && fcontrol.quantity.value && (fcontrol.quantity.touched || submitted)"
+            class="error-message">
+            {{ 'trRequest.invalidQty'|translate }}
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'price'">
+        <span *ngIf="fcontrol.price.invalid && fcontrol.price.value && (fcontrol.price.touched || submitted)"
+            class="error-message">
+            Invalid price
+        </span>
+    </ng-container>
+</ng-template>

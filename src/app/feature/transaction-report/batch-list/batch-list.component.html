@@ -1,0 +1,111 @@
+<h3 class="text-md font-1-bold head text-blue">Lots ({{batches?.length}})</h3>
+<div class="container-main">
+    <section class="ff-table-container">
+        <table mat-table [dataSource]="dataSource" class="w-100" aria-label="Batch list table data">
+
+            <ng-container matColumnDef="number">
+                <th class="normal-column" mat-header-cell *matHeaderCellDef>Number</th>
+                <td mat-cell *matCellDef="let element" class="normal-column">
+                    {{element.number}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th class="large-column" mat-header-cell *matHeaderCellDef>Product</th>
+                <td mat-cell *matCellDef="let element" class="large-column text-overflow">
+                    {{element.name}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="quantity">
+                <th class="normal-column" mat-header-cell *matHeaderCellDef>Quantity</th>
+                <td mat-cell *matCellDef="let element" class="normal-column">
+                    {{element.quantity}} kg
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="farmers">
+                <th class="normal-column" mat-header-cell *matHeaderCellDef>Farmers</th>
+                <td mat-cell *matCellDef="let element" class="normal-column ellipsis-text"
+                    [ngClass]="{'pointer': element.farmers > 0 }">
+                    <article class="farmer" (click)="getBatchInformation(element)" id="farmersCount">
+                        <span [ngClass]="{'details': element.farmers > 0 }">
+                            {{element.farmers}} farmer(s)
+                        </span>
+                        <mat-icon class="font-weight-bold" *ngIf="element.farmers>0">keyboard_arrow_right</mat-icon>
+                    </article>
+
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row class="table-row" *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="batches?.length === 0">
+            No batches found
+        </section>
+    </section>
+    <aside aria-label="extra information" class="information-section">
+        <h3 class="text-md font-1-bold d-flex">
+            <ng-container *ngIf="!selectedBatchInfo?.id">
+                {{batches?.length}} {{batches?.length === 1 ? 'Lot': 'Lots'}} - {{farmersCount}} {{farmersCount>1 ?
+                'Farmers': 'Farmer'}}
+            </ng-container>
+            <ng-container *ngIf="selectedBatchInfo?.id">
+                <span class="country text-overflow">
+                    {{selectedBatchInfo?.name}}
+                </span>
+                <article class="dot-wrap">
+                    <span class="dot"></span>
+                </article>
+                <span class="font-1-normal">{{selectedBatchInfo?.quantity}} kg</span>
+            </ng-container>
+        </h3>
+        <span class="font-1-normal text-off-blue" *ngIf="selectedBatchInfo?.id">{{selectedBatchInfo?.number}}</span>
+        <ul class="transition" *ngIf="!selectedBatchInfo?.id">
+            <li class="d-flex">
+                <span class="label-tr">Source</span>
+                <span class="value-tr">
+                    {{batches?.length}} {{batches?.length === 1 ? 'Lot': 'Lots'}}
+                    ({{stockIds.join(', ')}})
+                </span>
+            </li>
+            <li class="d-flex">
+                <span class="label-tr">Destination</span>
+                <span class="value-tr">{{destination}}</span>
+                <span class="arrow-down-stage"></span>
+            </li>
+        </ul>
+        <section class="farmer-list" *ngIf="selectedBatchInfo?.id && !loading">
+            <article class="heading">
+                <span class="text-xs font-1-bold">{{selectedBatchInfo.farmers}}&nbsp;</span>
+                <span class="text-xs font-1-normal">Farmers</span>
+            </article>
+            <ul class="d-flex flex-column">
+                <ng-container *ngFor="let item of selectedBatchInfo?.farmersList">
+                    <li class="d-flex">
+                        <img [src]="item?.farmer?.image" *ngIf="item?.farmer?.image" alt="">
+                        <span class="avatar-round" *ngIf="!item?.farmer?.image">
+                            {{item?.farmer?.first_name && item?.farmer?.first_name[0]}}
+                            {{item?.farmer?.last_name && item?.farmer?.last_name[0]}}
+                        </span>
+                        <article class="d-flex flex-column text-xxs">
+                            <span class="value-tr text-xs">
+                                {{item?.farmer?.first_name}} {{item?.farmer?.last_name}}
+                            </span>
+                            <span class="value-tr font-1-normal">Id: {{item?.farmer?.identification_no || '-'}}</span>
+                            <span class="font-1-medium text-off-blue country text-overflow"
+                                title="{{item?.farmer?.province}}, {{item?.farmer?.country}}">
+                                {{item?.farmer?.province}}, {{item?.farmer?.country}}
+                            </span>
+                        </article>
+                    </li>
+                </ng-container>
+
+            </ul>
+        </section>
+        <section class="farmer-list" *ngIf="selectedBatchInfo?.id && loading">
+            <app-loader loaderText="Fetching farmer details" loaderType="type1"></app-loader>
+        </section>
+        <h3 class="view-all text-sky-blue text-xs" *ngIf="selectedBatchInfo?.farmers > 3" (click)="gotoTrace()" id="viewAll">
+            View all +{{selectedBatchInfo?.farmers - 3}} Farmers
+        </h3>
+    </aside>
+</div>

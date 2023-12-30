@@ -1,0 +1,146 @@
+<section class="summary-bg">
+    <h3 class="text-sm text-blue font-1-bold">Summary</h3>
+    <span class="text-xs font-1-normal">Review your steps</span>
+
+    <aside aria-label="batch details summary" class="batches">
+        <ng-container *ngIf="summaryData">
+
+            <!-- send , convert stock : transaction form section summary  -->
+            <!-- this section shows the batch details  -->
+            <ng-container *ngIf="summaryData.currentStep === StepValues.TRANSACTION">
+                <span class="summary">
+                    <span class="font-1-normal text-blue">
+                        <b>{{summaryData.batches}}</b>&nbsp;batch{{summaryData.batches === 1?'':'es'}}
+                    </span>
+                    |
+                    <span class="font-1-normal text-blue"><b>{{summaryData.batchQuantity}}</b>&nbsp;kg</span>
+                </span>
+                <ng-container [ngTemplateOutlet]="productDisplay"
+                    [ngTemplateOutletContext]="{products:summaryData.products}">
+                </ng-container>
+            </ng-container>
+            <!-- claim view section summary  -->
+            <!-- previous step summary  -->
+            <ng-container *ngIf="summaryData.currentStep === StepValues.CLAIMS">
+
+                <ng-container *ngIf="currentAction === 'send'">
+                    <span class="summary">
+                        <span class="font-1-normal text-blue">
+                            <b>{{summaryData.product}}</b>
+                        </span>
+                        |
+                        <span class="font-1-normal text-blue"><b>{{summaryData.totalQuantity}}</b>&nbsp;kg</span>
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="currentAction === 'convert'">
+                    <article class="item p-l-0">
+                        <span class="key">Destination products</span>
+                        <span class="value">
+                            <ng-container [ngTemplateOutlet]="productDisplay"
+                                [ngTemplateOutletContext]="{products:summaryData.destinationProducts}">
+                            </ng-container>
+                        </span>
+                    </article>
+                </ng-container>
+                <ng-container *ngIf="currentAction === 'receive'">
+                    <span class="summary">
+                        {{summaryData?.farmerName}}
+                    </span>
+                    <span class="summary">
+                        <span class="font-1-normal text-blue">
+                            <b>{{summaryData.product}}</b>
+                        </span>
+                        |
+                        <span class="font-1-normal text-blue"><b>{{summaryData.totalQuantity}}</b>&nbsp;kg</span>
+                        |
+                        <span class="font-1-normal text-blue"><b>{{summaryData.totalPrice}}</b>&nbsp;{{summaryData.currency}}</span>
+                    </span>
+                </ng-container>
+                <div class="d-flex second-row">
+                    <article class="item" *ngIf="summaryData.destinationQuantity">
+                        <span class="key">Destination quantity</span>
+                        <span class="value">{{summaryData.destinationQuantity}} kg</span>
+                    </article>
+                    <article class="item">
+                        <span class="key">Transaction date</span>
+                        <span class="value">{{summaryData?.transactionDate | date: 'dd MMMM y'}}</span>
+                    </article>
+                    <article class="item" *ngIf="summaryData?.companyName">
+                        <span class="key">Receiving company</span>
+                        <span class="value">{{summaryData?.companyName}}</span>
+                    </article>
+                </div>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="!summaryData">
+            <span class="font-1-normal">No batches selected</span>
+        </ng-container>
+    </aside>
+</section>
+
+
+<ng-container *ngIf="currentAction === 'send'">
+
+    <section class="summary-bg margin-top-1"
+        *ngIf="summaryData?.currentStep === StepValues.CLAIMS && summaryData?.requestLinked">
+        <h3 class="text-xs text-blue font-1-medium">Stock request {{summaryData?.requestedData?.number}} linked</h3>
+        <aside aria-label="batch details summary" class="batches flex-column">
+            <span class="summary">
+                <ng-container *ngIf="summaryData.currentStep === StepValues.CLAIMS">
+                    <span class="font-1-normal text-blue">
+                        <b>{{summaryData.requestedData.product?.name}}</b>
+                    </span>
+                </ng-container>
+                |
+                <span class="font-1-normal text-blue"><b>{{summaryData.requestedData.quantity}}</b>&nbsp;kg</span>
+            </span>
+            <div class="d-flex second-row">
+                <article class="item">
+                    <span class="key">Requested date</span>
+                    <span class="value">{{+(summaryData?.requestedData?.created_on)*1000 | date: 'dd MMMM y'}}</span>
+                </article>
+                <article class="item">
+                    <span class="key">Requested claims</span>
+                    <span class="value">
+                        <ng-container *ngIf="claims.length">
+                            {{claims.splice(0, 1).join(', ')}}
+                        </ng-container>
+                        <ng-container *ngIf="claims.length === 0">
+                            -
+                        </ng-container>
+                    </span>
+                </article>
+            </div>
+        </aside>
+    </section>
+</ng-container>
+
+
+<ng-template #productDisplay let-products="products">
+    <article class="ff-flex-align-center">
+        <!-- showing 2 products then showing ellipsis -->
+        <span class="product-list font-1-bold text-overflow text-blue" title="{{ products?.slice(0,2).join(', ') }}">
+            {{ products?.slice(0,2).join(', ') }}
+        </span>
+        <!-- additional products if any  -->
+        <span class="additional-count pointer" *ngIf="products.length > 2" [matMenuTriggerFor]="moreProducts">
+            +{{products.length-2}}
+        </span>
+        <mat-menu class="mat-menu more-products" #moreProducts="matMenu" xPosition="before">
+            <ul>
+                <ng-container *ngIf="products.length<=7">
+                    <li class="text-overflow" *ngFor="let item of products?.slice(2, products.length)">
+                        {{item}}
+                    </li>
+                </ng-container>
+                <!-- showing only limited data if the batch length is more than 7 -->
+                <ng-container *ngIf="products.length>7">
+                    <li class="text-overflow" *ngFor="let item of products?.slice(2, 7)">
+                        {{item}}
+                    </li>
+                    and more
+                </ng-container>
+            </ul>
+        </mat-menu>
+    </article>
+</ng-template>

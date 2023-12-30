@@ -1,0 +1,25 @@
+::ng-deep .mat-dialog-container {
+  padding: 0px !important;
+}
+
+.action,
+.content {
+  margin-top: 10px;
+  padding: 0 40px 10px 40px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+
+  .input-container-with-error {
+    margin: 10px 0;
+  }
+}
+.file-name {
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  width: 100%;
+  margin-bottom: 0;
+}

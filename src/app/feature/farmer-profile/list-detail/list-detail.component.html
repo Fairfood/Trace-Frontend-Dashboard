@@ -1,0 +1,23 @@
+<ul>
+    <li *ngFor="let item of iterationList; let i=index; trackBy: trackFn" [ngClass]="{'active': i === activeItem }"
+        (click)="itemClicked(item, i)" id="reference{{i}}">
+        <article class="left-side">
+            <ng-container *ngIf="item?.leftIcon">
+                <mat-icon *ngIf="item?.leftIcon?.isMatIcon">{{item?.leftIcon?.icon}}</mat-icon>
+                <img [src]="item?.leftIcon?.icon" alt="image" *ngIf="!item?.leftIcon?.isMatIcon">
+            </ng-container>
+            <article class="content">
+                <article class="ff-flex-align-center">
+                    <span class="font-1-bold text-blue">{{item?.title}}</span>
+                </article>
+                <span class="font-1-normal desc text-overflow">{{item?.description}}</span>
+            </article>
+        </article>
+        <aside aria-label="" class="flex-center" *ngIf="item?.rightIcon">
+            <mat-icon *ngIf="item?.rightIcon?.isMatIcon">{{item?.rightIcon?.icon}}</mat-icon>
+        </aside>
+    </li>
+    <li *ngIf="showAddButton" class="add-button font-1-bold" (click)="buttonClicked()" id="addButton">
+        {{addButtonText}}
+    </li>
+</ul>

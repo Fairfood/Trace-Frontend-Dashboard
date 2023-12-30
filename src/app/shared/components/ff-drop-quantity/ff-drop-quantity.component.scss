@@ -1,0 +1,24 @@
+// color variables
+@import 'src/styles/utils';
+
+.ff-dropdown-container {
+  @include input-box-common-styles;
+  padding: 10px 20px;
+}
+
+::ng-deep .ff-qty-menu {
+  min-width: 300px !important;
+  .mat-mdc-menu-content {
+    width: 300px;
+    max-width: 400px;
+  }
+}
+
+.form-wrap {
+  padding: 10px;
+  padding: 24px 10px 10px 10px;
+}
+.footer-action {
+  border-top: 1px solid var(--border-color);
+  padding: 5px 0;
+}

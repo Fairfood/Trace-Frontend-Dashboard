@@ -1,0 +1,137 @@
+@import 'src/styles/responsive.scss';
+@import 'src/styles/utils.scss';
+
+.flex-column {
+  margin-left: 20px;
+}
+
+.badge-label {
+  border-radius: 50%;
+  background-color: var(--font-color);
+  color: var(--color-white);
+  padding: 3px 10px;
+  font-size: 14px;
+
+  &.two-digits {
+    padding: 5px 8px;
+  }
+  &.three-digits {
+    padding: 5px 6px;
+  }
+}
+
+.ff-wizard {
+  margin-right: 30px;
+  margin-bottom: 25px;
+
+  ul {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    list-style: none;
+    flex-wrap: wrap;
+    @include devices(laptop) {
+      flex-wrap: nowrap;
+    }
+
+    &.overflow-flex {
+      flex-wrap: wrap;
+
+      li {
+        min-width: 250px;
+        margin-bottom: 10px;
+      }
+    }
+
+    > li {
+      flex-grow: 1;
+      flex-basis: 0;
+      height: 65px;
+      position: relative;
+      padding: 0;
+      margin: 0;
+      border: 1px solid var(--color-primary-2);
+      min-width: 250px;
+      margin-bottom: 10px;
+      @include devices(laptop) {
+        min-width: auto;
+        margin-bottom: 0;
+      }
+
+      &.active {
+        background-color: var(--color-primary-2);
+        color: var(--color-white);
+        .list-content-area::before {
+          border-color: transparent transparent transparent
+            var(--color-primary-2);
+        }
+
+        .badge-label {
+          background-color: var(--color-white);
+          color: var(--font-color);
+        }
+        .text-xs {
+          color: var(--color-white) !important;
+        }
+      }
+
+      &:first-child {
+        flex-shrink: 1;
+      }
+
+      .list-content-area {
+        position: relative;
+        height: 100%;
+        width: 100%;
+
+        &:before,
+        &:after {
+          content: '';
+          display: inline-block;
+          border-width: 33px;
+          border-style: solid;
+          width: 0;
+          height: 0;
+          left: 100%;
+          top: -1px;
+          position: absolute;
+          z-index: 1;
+          @include devices(desktop) {
+            top: 0px;
+          }
+        }
+
+        &:after {
+          border-color: transparent transparent transparent
+            var(--color-primary-2);
+        }
+
+        &:before {
+          border-width: 31px;
+          display: block;
+          border-color: transparent transparent transparent var(--color-white);
+          z-index: 2;
+          top: 1px;
+          @include devices(desktop) {
+            border-width: 32px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.hide-details {
+  display: none;
+}
+
+.max-width-li {
+  max-width: 100px;
+}
+
+.margin-left-30 {
+  margin-left: 15px;
+}

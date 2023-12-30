@@ -1,0 +1,31 @@
+<app-ff-custom-tab [tabGroupItems]="stockTabs" [activeTabId]="currentStep" (tabChanged)="changeHistoryTab($event)"
+    [withDescription]="true"></app-ff-custom-tab>
+<ng-container *ngIf="!loading">
+
+    <ng-container [ngSwitch]="currentStep">
+        <ng-container *ngSwitchCase="StepValues.TRANSACTION">
+            <ng-container *ngIf="actionUrl === '/stock/stock-send'">
+                <app-stock-send (nextPage)="goToClaims($event)" (disableNextTab)="disableClaimTab($event)"></app-stock-send>
+            </ng-container>
+            <ng-container *ngIf="actionUrl === '/stock/receive'">
+                <app-receive-stock-single (nextPage)="goToClaims($event)"></app-receive-stock-single>
+            </ng-container>
+            <ng-container *ngIf="actionUrl === '/stock/process-convert'">
+                <app-stock-convert (nextPage)="goToClaims($event)"></app-stock-convert>
+            </ng-container>
+            <ng-container *ngIf="actionUrl === '/stock/process-merge'">
+                <app-stock-merge (nextPage)="mergeStockNavigation($event)"></app-stock-merge>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="StepValues.CLAIMS">
+            <app-stock-claims (nextPage)="fromClaims($event)"></app-stock-claims>
+        </ng-container>
+        <ng-container *ngSwitchCase="StepValues.SUMMARY">
+            <app-transaction-summary (nextPage)="fromSummary($event)"></app-transaction-summary>
+        </ng-container>
+        <ng-container *ngSwitchDefault>N/A</ng-container>
+    </ng-container>
+</ng-container>
+<section class="loader-wrap ff-flex-center" *ngIf="loading">
+    <app-loader [loaderText]="loaderText" [loaderType]="'type1'"></app-loader>
+</section>

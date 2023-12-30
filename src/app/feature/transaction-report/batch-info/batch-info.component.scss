@@ -1,0 +1,30 @@
+
+.top-sec {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+
+  svg {
+    margin-right: 30px;
+  }
+
+  .custom-color {
+    fill: var(--color-primary-1);
+  }
+}
+.input-container-with-error {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.m-20 {
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+.loss {
+  background-color: var(--color-loss);
+  color: var(--color-white);
+}
+.width-product {
+  max-width: 250px;
+  display: block;
+}

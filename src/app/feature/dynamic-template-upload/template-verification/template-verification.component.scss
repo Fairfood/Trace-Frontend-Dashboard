@@ -1,0 +1,116 @@
+@import 'src/styles/utils';
+
+@include input-common-css;
+
+.info {
+  background-color: var(--color-table-row-active);
+  padding: 20px;
+  margin: 25px 0;
+
+  mat-icon {
+    color: var(--font-color-2);
+    margin-right: 10px;
+  }
+}
+
+.column-value {
+  margin: 5px 10px;
+  min-height: 40px;
+  border-radius: 6px;
+  &.is-error {
+    border: 1px solid var(--color-secondary);
+  }
+}
+
+.error-wrap {
+  display: flex;
+  align-items: flex-start;
+
+  .error-message {
+    font-size: 14px;
+    max-width: 80%;
+    line-height: 1.7;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+  }
+}
+
+.err {
+  background-color: var(--color-error-bg);
+  align-items: flex-start;
+  padding: 20px;
+  margin: 25px 0;
+  .error-message {
+    font-size: 14px;
+  }
+  mat-icon {
+    color: var(--color-secondary);
+    margin-right: 10px;
+  }
+}
+
+.second-row {
+  width: 90%;
+  padding: 10px 25px;
+}
+.demo-inline-calendar-card {
+  width: 250px;
+}
+::ng-deep .date-picker {
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+  }
+}
+
+.no-data {
+  .label-tr {
+    line-height: 2.5;
+  }
+}
+
+.additional-rows {
+  padding: 10px;
+}
+
+.file-empty {
+  border: 1px solid var(--border-color);
+  margin-top: 30px;
+  h3 {
+    font-size: 20px;
+  }
+
+  img {
+    margin-top: 30px;
+  }
+  .m-15 {
+    margin: 15px 0;
+  }
+}
+
+.header-bar {
+  background-color: var(--color-primary-3);
+  height: 40px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.scroll {
+  max-height: 40vh;
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 22;
+    background-color: var(--color-primary-2);
+    &.last {
+      position: sticky;
+      right: 0;
+    }
+  }
+  .action {
+    position: sticky;
+    right: 0;
+    background-color: var(--color-white);
+    .ff-flex-end {
+      padding-right: 20px;
+    }
+  }
+}

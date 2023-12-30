@@ -1,0 +1,32 @@
+@mixin flex-container {
+  display: flex;
+}
+
+@mixin flex-direction($direction) {
+  flex-direction: $direction;
+}
+
+@mixin flex-wrap($wrap) {
+  flex-wrap: $wrap;
+}
+
+@mixin justify-content($alignment) {
+  justify-content: $alignment;
+}
+
+@mixin align-items($alignment) {
+  align-items: $alignment;
+}
+
+@mixin align-content($alignment) {
+  align-content: $alignment;
+}
+
+@mixin align-self($alignment) {
+  align-self: $alignment;
+}
+
+%flex-common-center {
+  @include flex-container;
+  @include align-items(center);
+}

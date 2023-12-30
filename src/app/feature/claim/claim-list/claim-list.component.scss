@@ -1,0 +1,27 @@
+@import 'src/styles/responsive';
+.utils {
+  width: 100%;
+  &.no-border {
+    border: 0;
+  }
+
+  @include devices(tablet-md) {
+    flex-direction: row;
+  }
+}
+.search-item {
+  width: 50%;
+  margin-right: 10px;
+}
+::ng-deep .ff-dropdown-container {
+  margin-right: 10px;
+}
+
+::ng-deep .more-options {
+  .mat-mdc-menu-content {
+    padding: 0!important;
+  }
+  ul {
+    font-family: var(--font-medium);
+  }
+}

@@ -1,0 +1,15 @@
+<div class="ff-dropdown-container ff-flex-align-center pointer" [matMenuTriggerFor]="beforeMenu"
+    [ngClass]="boxState === 'selected'?'active': 'default'" #dropdownMenuTrigger="matMenuTrigger">
+    <span class="box-label" *ngIf="boxState !== 'selected'">Map column</span>
+    <mat-icon class="check" *ngIf="boxState === 'selected'">check_circle</mat-icon>
+    <span class="box-value text-overflow" *ngIf="boxState === 'selected'">
+        {{value}}
+    </span>
+    <mat-icon class="arrow">keyboard_arrow_down</mat-icon>
+</div>
+
+<mat-menu class="ff-mat-menu-dropdown" #beforeMenu="matMenu" xPosition="after">
+    <app-ff-dropdown-select [menuItems]="dropdownMasterData" (click)="$event.stopPropagation();" [hideSearch]="false"
+        [hideFooter]="false" (currentSelected)="selectedItem($event)"
+        (footerClicked)="itemClicked($event)"></app-ff-dropdown-select>
+</mat-menu>

@@ -1,0 +1,17 @@
+<section class="pop-header ff-flex-between" aria-label="">
+    <h4>
+        Please select connection type
+    </h4>
+    <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+<section class="pop-content">
+    <mat-radio-group class="text-blue" [formControl]="connectionType"
+        aria-label="Select an option">
+        <mat-radio-button value="1" id="company">Company</mat-radio-button>
+        <mat-radio-button value="2" id="farmer">Farmer</mat-radio-button>
+    </mat-radio-group>
+</section>
+<section class="ff-flex-between p-20-button">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="newConnection()">Continue</app-buttons>
+</section>

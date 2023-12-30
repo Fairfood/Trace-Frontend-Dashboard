@@ -1,0 +1,149 @@
+<section [formGroup]="detailsForm">
+    <ng-container *ngIf="isEditing">
+        <h3 class="font-1-bold">Basic details</h3>
+        <section class="w-100 d-flex">
+            <aside aria-label="list item wrapping" class="d-flex item-wrapper"
+                [ngClass]="isEditing? 'editing': 'not-editing'">
+                <ng-container *ngFor="let item of basicDetails">
+                    <ng-container [ngTemplateOutlet]="editingFormValues" [ngTemplateOutletContext]="{item:item}">
+                    </ng-container>
+                </ng-container>
+            </aside>
+            <app-profile-avatar [imageUrl]="farmerPic" [avatar]="profileData?.avatar" [isEditing]="true"
+                (itemClicked)="openImageUpload($event)" class="avatar-box"></app-profile-avatar>
+        </section>
+        <article class="underline"></article>
+    </ng-container>
+
+    <aside aria-label="content header" class="ff-flex-between">
+        <h3 class="font-1-bold">Contact details</h3>
+        <ng-container *ngIf="profileData?.is_editable">
+            <span class="ff-flex-align-center pointer text-blue" *ngIf="!isEditing && countryDataLoaded"
+                (click)="editBasicDetails()" id="editDetails">
+                <mat-icon class="edit">edit</mat-icon> Edit
+            </span>
+        </ng-container>
+    </aside>
+    <aside aria-label="list item wrapping" class="d-flex item-wrapper" [ngClass]="isEditing? 'editing': 'not-editing'">
+        <ng-container *ngFor="let item of contactDetails">
+            <ng-container *ngIf="!isEditing">
+                <ng-container *ngIf="item.key !=='dialCode' && item.key !=='phoneNumber'">
+                    <article class="item">
+                        <span class="key">{{item?.label}}</span>
+                        <span class="value">
+                            {{profileData[item.key] || '-'}}
+                        </span>
+                    </article>
+                </ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="isEditing && countryDataLoaded">
+                <ng-container [ngTemplateOutlet]="editingFormValues" [ngTemplateOutletContext]="{item:item}">
+                </ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="!isEditing">
+            <article class="item">
+                <span class="key">Contact number</span>
+                <span class="value">
+                    {{profileData.dialCode }} {{profileData.phoneNumber || '-'}}
+                </span>
+            </article>
+        </ng-container>
+    </aside>
+    <article class="underline"></article>
+    <h3 class="font-1-bold">Personal details</h3>
+    <aside aria-label="list item wrapping" class="d-flex item-wrapper" [ngClass]="isEditing? 'editing': 'not-editing'">
+        <ng-container *ngFor="let item of personalDetails">
+            <ng-container *ngIf="!isEditing">
+                <article class="item">
+                    <span class="key">{{item?.label}}</span>
+                    <span class="value">
+                        {{profileData[item.key] || '-'}}
+                    </span>
+                </article>
+            </ng-container>
+
+            <ng-container *ngIf="isEditing">
+                <ng-container [ngTemplateOutlet]="editingFormValues" [ngTemplateOutletContext]="{item:item}">
+                </ng-container>
+
+            </ng-container>
+        </ng-container>
+
+
+        <article class="flex-column form-items" *ngIf="isEditing">
+            <label class="has-float-label custom-input">
+                <input placeholder=" " [matDatepicker]="farmerDob" [max]="maxDate" formControlName="dob" type="text"
+                    class="full" readonly />
+                <span class="label">Date of birth</span>
+                <mat-icon class="pointer" (click)="farmerDob.open()" id="calenderIcon">calendar_today</mat-icon>
+            </label>
+            <mat-datepicker #farmerDob></mat-datepicker>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'dob'}">
+            </ng-container>
+        </article>
+    </aside>
+    <article class="underline"></article>
+
+    <aside class="ff-flex-center action" aria-label="action buttons" *ngIf="isEditing">
+        <app-buttons buttonType="stroked" (buttonClicked)="buttonAction('cancel')" id="cancelButton">
+            Cancel
+        </app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="buttonAction('submit')">
+            Save changes
+        </app-buttons>
+    </aside>
+
+</section>
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="formControlsFarmer[formcontrol]?.errors?.required && (submitted || formControlsFarmer[formcontrol]?.touched)">
+        This field shouldn't be empty *
+    </span>
+    <ng-container *ngIf="formcontrol === 'phoneNumber'">
+        <span class="error-message"
+            *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
+            Phone number is invalid
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'familyMembers'">
+        <span class="error-message"
+            *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
+            Please enter correct value
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'email'">
+        <span class="error-message"
+            *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
+            Invalid email
+        </span>
+    </ng-container>
+</ng-template>
+
+<ng-template #editingFormValues let-item="item">
+
+    <ng-container *ngIf="item.type === 'text'">
+        <article class="flex-column">
+            <app-ff-input [label]="item?.label" [parentFormGroup]="detailsForm" [controlName]="item.controlName"
+                inputSize="profile" inputType="text" class="form-items">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:item.controlName}">
+            </ng-container>
+        </article>
+    </ng-container>
+
+    <ng-container *ngIf="item.type === 'dropdown'">
+        <article class="flex-column">
+            <app-ff-dropdown [label]="item?.label" [dropdownOptions]="item?.optionName | transformOptions:this"
+                inputClass="profile" [defaultValue]="formControlsFarmer[item.controlName].value"
+                [hideSearch]="item.hideSearch" [hideFooter]="item.hideClear"
+                [showRedBorder]="formControlsFarmer[item.controlName].errors && submitted" class="form-items"
+                (selectionChange)="dropdownChanged($event, item.defaultValue)"></app-ff-dropdown>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:item.controlName}">
+            </ng-container>
+        </article>
+    </ng-container>
+</ng-template>

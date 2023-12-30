@@ -1,0 +1,123 @@
+<section class="pop-header ff-flex-between">
+    <h4>
+        <mat-icon>verified_user</mat-icon>
+        <span class="name" id="claimName">{{data?.name}}</span>
+    </h4>
+    <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+<section class="details">
+    <article class="ff-flex-between">
+        <span class="font-1-bold text-blue">Description</span>
+    </article>
+    <p class="text-off-blue" id="claimDescription">
+        {{data?.description_full}}
+    </p>
+    <article class="ff-flex-between" *ngIf="data?.evidence">
+        <span class="font-1-bold text-blue">Upload{{data?.inherited?'ed':''}} evidence</span>
+    </article>
+    <section class="evidence" *ngIf="data?.criteria?.length">
+        <ng-container *ngFor="let criteria of data?.criteria; index as i">
+            <!-- Inherited criterias -->
+            <section *ngIf="data?.inherited && criteria.fields.length > 0" class="row m-0">
+                <div class="col-12">
+                    <ng-container *ngFor="let evid of criteria.evidence">
+                        <ng-container *ngFor="let item of evid.node_responses">
+
+                            <ng-container *ngFor="let res of item.responses;index as j">
+                                <article class="flex-col flex-column">
+                                    <span>{{j+1}}. Evidence {{j+1}}</span>
+                                    <span *ngIf="res.field_response.type === 3">
+                                        <a href="{{res.field_response.file}}" target="_blank">View file</a>
+                                    </span>
+                                    <span *ngIf="res.field_response.type !== 3" class="text-blue font-1-normal">
+                                        {{res.field_response.title}}: {{res.field_response.response}}
+                                    </span>
+                                </article>
+                            </ng-container>
+                            <article class="flex-col flex-column">
+                                <span class="font-1-bold text-blue">Uploaded by</span>
+                                <h5 class="text-sm text-blue font-1-medium line-margin">{{ item.added_by.name }}</h5>
+                            </article>
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </section>
+            <ng-container [formGroup]="evidenceForm">
+                <!-- Not Inherited criterias -->
+                <section *ngIf="!data?.inherited && criteria?.fields?.length > 0" class="row evidence-section">
+                    <ng-container *ngFor="let field of criteria.fields;index as j">
+                        <!-- file upload is required as claim evidence  -->
+                        <aside aria-label="evidence row file" class="sub-row flex-column col-12" *ngIf="field.type === 3">
+                            <p class="font-1-medium text-blue">
+                                {{ field.title}}
+                            </p>
+                            <div class="ff-flex-align-center">
+                                <span class="file-name text-overflow" *ngIf="field.file"
+                                    title="{{field.fileName}}">{{field.fileName}}</span>
+                                <app-buttons *ngIf="!field.file && !data?.inherited" buttonType="fill"
+                                    (buttonClicked)="attachFile.click()" buttonSize="medium">
+                                    Upload file
+                                </app-buttons>
+                                <app-buttons *ngIf="!field.file && data?.inherited" buttonType="fill"
+                                    (buttonClicked)="viewFiles(field)" buttonSize="medium" id="viewFiles">
+                                    View files
+                                </app-buttons>
+                                <input type="file" #attachFile (click)="attachFile.value = null" value=""
+                                    (change)="claimsFile($event, field)" class="input-file" placeholder="No file chosen"
+                                    hidden accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
+                                <app-buttons *ngIf="field.file" buttonType="stroked"
+                                    (buttonClicked)="removeClaimFile(field)" buttonSize="medium" id="removeClaim">
+                                    Remove
+                                </app-buttons>
+                            </div>
+                        </aside>
+                        <aside aria-label="field type is dropdown" *ngIf="field.type == 2" class="col-6 form-element">
+                            <app-ff-dropdown [dropdownOptions]="field.options" label="{{ field.title }}*"
+                                [hideSearch]="field?.options?.length>5?false: true"
+                                [defaultValue]="evidenceForm.controls[field.id].value"
+                                (selectionChange)="setDropdownValue($event, field)"></app-ff-dropdown>
+                        </aside>
+                        <aside aria-label="field type is input" *ngIf="field.type == 1" class="col-6 form-element m-12">
+                            <label class="has-float-label">
+                                <input placeholder=" " [hidden]="data.inherited" [formControlName]="field.id"
+                                    type="text" class="full" maxlength="25" (change)="setInputTypes(field)"id="input-{{field.id}}" />
+                                <span class="label">{{ field.title }}*</span>
+                            </label>
+                        </aside>
+                    </ng-container>
+                </section>
+
+
+                <section *ngIf="!data?.inherited" class="col-12 form-element p-0 my-2">
+                    <div *ngIf="data?.assignVerifier" class="flex-col flex-column">
+                        <label class="has-float-label custom-input">
+                            <input placeholder=" " formControlName="verifier" type="text" class="full"
+                                [matAutocomplete]="verifier" id="verifierInput" />
+                            <span class="label">Assign verifier*</span>
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                        </label>
+                        <mat-autocomplete #verifier="matAutocomplete">
+                            <ng-container *ngFor="let item of verifierFilterOptions | async">
+                                <mat-option [value]="item.name" (click)="setVerifier(item)">
+                                    <span class="text-blue text-capitalize">{{ item.name }}</span>
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                        <p class="error-message" *ngIf="verifierControl.invalid && verifierControl.touched">
+                            Please assign verifier
+                        </p>
+                    </div>
+                </section>
+            </ng-container>
+        </ng-container>
+
+    </section>
+</section>
+
+<article class="ff-flex-between p-20-button" *ngIf="!data?.inherited">
+    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
+    <app-buttons buttonType="fill" [isDisabled]="evidenceForm?.invalid" (buttonClicked)="claimValidation()">
+        {{data?.isEdit?'Save': 'Add claim'}}
+    </app-buttons>
+</article>

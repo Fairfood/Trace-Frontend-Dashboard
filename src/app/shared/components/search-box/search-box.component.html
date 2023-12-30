@@ -1,0 +1,26 @@
+<span class="search-b ff-flex-between">
+  <input class="text-xs text-blue" [formControl]="keywordControl" placeholder="{{placeholder}}"
+    [ngClass]="{'w-100': hideOptions}" id="serachBox"/>
+  <aside class="search-by" [matMenuTriggerFor]="serachByMenu" *ngIf="!hideOptions">
+    <span class="label ff-flex-align-center">Search by</span>
+    <span class="selected ff-flex-align-center text-overflow">
+      {{searchByOption?.name}}
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </span>
+  </aside>
+
+  <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="5" cy="5" r="4.5" stroke="#5691AE" />
+    <line y1="-1" x2="4.46301" y2="-1" transform="matrix(0.552178 0.833726 -0.878595 0.477568 6.49231 9.39453)"
+      stroke="#5691AE" stroke-width="2" />
+  </svg>
+</span>
+<mat-menu class="serach-by" #serachByMenu="matMenu" xPosition="after">
+  <ul>
+    <li *ngFor="let item of searchByOptions;let i=index" (click)="searchByOption = item">
+      <mat-radio-button [checked]="searchByOption?.id === item.id" id="radioButton{{i}}">
+        {{ item.name }}
+      </mat-radio-button>
+    </li>
+  </ul>
+</mat-menu>

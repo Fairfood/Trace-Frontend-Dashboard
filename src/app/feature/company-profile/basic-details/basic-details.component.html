@@ -1,0 +1,168 @@
+<article class="ff-flex-between">
+    <h3 class="font-1-bold">Company details</h3>
+    <ng-container *ngIf="!isConnection && asAdmin">
+        <span class="ff-flex-align-center pointer text-blue" *ngIf="!isEdit" (click)="toggleEdit()" id="editIcon">
+            <mat-icon class="edit">edit</mat-icon> Edit
+        </span>
+    </ng-container>
+</article>
+<section class="first-details mb-15">
+    <ng-container *ngIf="!isEdit">
+        <ng-container *ngFor="let item of tabOne">
+            <article class="item" [ngClass]="{'w-100': item.type === 'textarea'}" id="item{{item.key}}">
+                <span class="key">{{item?.label}}</span>
+                <span class="value">
+                    {{companyProfileData[item.key] || '-'}}
+                </span>
+            </article>
+        </ng-container>
+    </ng-container>
+    <!-- editable form  -->
+    <ng-container *ngIf="isEdit">
+        <article class="flex-column">
+            <app-ff-input label="Company name *" [parentFormGroup]="detailsForm" [controlName]="'name'"
+                inputSize="profile" inputType="text" class="form-items">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'name'}">
+            </ng-container>
+        </article>
+        <article class="flex-column">
+            <app-ff-input label="Registration number" [parentFormGroup]="detailsForm" [controlName]="'regNo'"
+                inputSize="profile" inputType="text" class="form-items">
+            </app-ff-input>
+
+        </article>
+        <ng-container *ngFor="let item of tabOne">
+
+            <ng-container *ngIf="item.type === 'textarea'">
+                <article class="flex-column w-100">
+                    <app-ff-input [label]="item?.label" [parentFormGroup]="detailsForm" [controlName]="item.controlName"
+                        inputSize="profile" [isTextarea]="true" class="form-items w-100">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:item.controlName}">
+                    </ng-container>
+                </article>
+
+            </ng-container>
+
+            <ng-container *ngIf="item.type === 'text'">
+                <article class="flex-column">
+                    <app-ff-input [label]="item?.label" [parentFormGroup]="detailsForm" [controlName]="item.controlName"
+                        inputSize="profile" inputType="text" class="form-items">
+                    </app-ff-input>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:item.controlName}">
+                    </ng-container>
+                </article>
+            </ng-container>
+
+            <ng-container *ngIf="item.type === 'dropdown'">
+                <article class="flex-column">
+                    <app-ff-dropdown [label]="item?.label"
+                        [dropdownOptions]="item.controlName === 'country'?countryList: stateList" inputClass="profile"
+                        [defaultValue]="formControlsCompany[item.controlName].value" class="form-items"
+                        (selectionChange)="dropdownChanged($event, item.defaultValue)"></app-ff-dropdown>
+                    <ng-container [ngTemplateOutlet]="formErrorMessages"
+                        [ngTemplateOutletContext]="{formcontrol:item.controlName}">
+                    </ng-container>
+                </article>
+            </ng-container>
+
+        </ng-container>
+    </ng-container>
+</section>
+<h3 class="font-1-bold">Contact details</h3>
+<section class="second-details">
+    <ng-container *ngIf="!isEdit">
+        <div class="item" id="itemName">
+            <span class="key">Name</span>
+            <span class="value">
+                {{companyProfileData?.incharge?.first_name}}
+            </span>
+        </div>
+        <div class="item" id="itemEmail">
+            <span class="key">Email</span>
+            <span class="value">
+                {{companyProfileData?.incharge?.email}}
+            </span>
+        </div>
+        <div class="item" id="itemNumber">
+            <span class="key">Contact number</span>
+            <span class="value">
+                {{companyProfileData?.phone?.dial_code + ' ' + companyProfileData?.phone?.phone}}
+            </span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="isEdit">
+        <article class="flex-column">
+            <app-ff-input label="Name *" [parentFormGroup]="detailsForm" controlName="inName" inputSize="profile"
+                inputType="text" class="form-items">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'inName'}">
+            </ng-container>
+        </article>
+        <article class="flex-column">
+            <app-ff-input label="Email *" [parentFormGroup]="detailsForm" controlName="inEmail" inputSize="profile"
+                inputType="text" class="form-items">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'inEmail'}">
+            </ng-container>
+        </article>
+        <article class="flex-column">
+            <app-ff-dropdown label="Country code *" [dropdownOptions]="countryCodeList" inputClass="profile"
+                [defaultValue]="formControlsCompany.inDialCode.value" class="form-items"
+                (selectionChange)="dropdownChanged($event, 'dialCode')"></app-ff-dropdown>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'inDialCode'}">
+            </ng-container>
+        </article>
+
+        <article class="flex-column">
+            <app-ff-input label="Contact number *" [parentFormGroup]="detailsForm" controlName="inMobile"
+                inputSize="profile" inputType="text" class="form-items">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'inMobile'}">
+            </ng-container>
+        </article>
+
+    </ng-container>
+</section>
+<section class="form-button ff-flex-end" *ngIf="isEdit">
+    <app-buttons buttonType="stroked" (buttonClicked)="toggleEdit()" [isDisabled]="savingProfile">
+        Cancel
+    </app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="updateProfilePic()" [isDisabled]="savingProfile">
+        {{savingProfile?'Profile saving please wait':'Save changes'}}
+    </app-buttons>
+</section>
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="formControlsCompany[formcontrol]?.errors?.required && (submitted || formControlsCompany[formcontrol]?.touched)">
+        {{errorMessage}}
+    </span>
+
+    <ng-container *ngIf="formcontrol === 'inMobile'">
+        <span class="error-message"
+            *ngIf="formControlsCompany[formcontrol]?.errors?.pattern && (submitted || formControlsCompany[formcontrol]?.touched)">
+            Invalid mobile number
+        </span>
+        <span class="error-message"
+            *ngIf="formControlsCompany[formcontrol]?.errors?.minlength && (submitted || formControlsCompany[formcontrol]?.touched)">
+            Invalid mobile number
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="formcontrol === 'latitude' || formcontrol === 'longitude'">
+        <span class="error-message"
+            *ngIf="formControlsCompany[formcontrol]?.invalid && (submitted || formControlsCompany[formcontrol]?.touched)">
+            Invalid value
+        </span>
+    </ng-container>
+    <ng-container *ngIf="formcontrol === 'description'">
+        <span class="error-message"
+            *ngIf="formControlsCompany[formcontrol]?.invalid && (submitted || formControlsCompany[formcontrol]?.touched)">
+            Please reduce the length of description
+        </span>
+    </ng-container>
+</ng-template>

@@ -1,8 +1,21 @@
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  RouterStateSnapshot,
+} from '@angular/router';
 import { environment } from 'src/environments/environment';
 
-export const authGuard = () => {
-  if (localStorage.getItem('isFairfoodUserLoggedin')) {
-    return isVerified();
+export const authGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  // first time login
+  if (state.url.includes('dashboard?code=')) {
+    return true;
+  } else {
+    if (localStorage.getItem('isFairfoodUserLoggedin')) {
+      return isVerified();
+    }
   }
 
   return toLogin();
@@ -13,7 +26,7 @@ export function isVerified(): boolean {
   const impersonate = localStorage.getItem('impersonate');
   if (impersonate) {
     return true;
-  } else if (user?.email_verified && user?.status > 1) {
+  } else if (user?.status > 1) {
     return true;
   } else {
     return toLogin();
@@ -22,6 +35,6 @@ export function isVerified(): boolean {
 
 /* istanbul ignore next */
 export function toLogin(): boolean {
-  window.location.href = environment.authUrl;
-  return false;
+  window.location.href = environment.authenticateUrl;
+  return true;
 }

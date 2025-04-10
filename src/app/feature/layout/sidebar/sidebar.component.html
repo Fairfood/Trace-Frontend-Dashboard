@@ -14,7 +14,7 @@
 
         <div *ngIf="adminUser" class="nested-menu">
             <a class="list-group-item" (click)="addExpandClass('assets')" id="assetManagement">
-                Asset management
+                {{'menu.asset'|translate}}
                 <mat-icon style="position: absolute;">arrow_drop_down</mat-icon>
             </a>
             <section class="nested" [class.expand]="showMenu === 'assets'">
@@ -22,44 +22,44 @@
                     <li (click)="resetStock()">
                         <a routerLink="/transactions" [routerLinkActive]="['router-link-active']"
                             class="list-group-item font-1-medium " id="transactions">
-                            Transactions
+                            {{'menu.transaction'|translate}}
                         </a>
                     </li>
                     <li (click)="resetStock(true)">
                         <a routerLink="/stock/listing" [routerLinkActive]="['router-link-active']"
                             class="list-group-item font-1-medium " id="stock">
-                            Stock
+                            {{'menu.stock'|translate}}
                         </a>
                     </li>
                     <li (click)="resetStock()">
                         <a routerLink="/claims" [routerLinkActive]="['router-link-active']"
                             class="list-group-item font-1-medium  pb-0" id="claim">
-                            Claims
+                            {{'menu.claims'|translate}}
                         </a>
                     </li>
                 </ul>
             </section>
         </div>
         <a routerLink="/company-profile" routerLinkActive="router-link-active" class="list-group-item company-bottom">
-            <span class="text-xxs  company-title" id="myCompany">My company</span> <br>
+            <span class="text-xxs  company-title" id="myCompany">{{'menu.mine'|translate}}</span> <br>
             <span class="company-name" id="companyName">{{ companyDetails?.name || '' }}</span>
         </a>
 
         <div class="header-fields" *ngIf="!viewAsAdmin">
             <ul class="nested-menu">
                 <a class="list-group-item font-1-medium" (click)="addExpandClass('profile')">
-                    <span id="accountMenu"> Account</span>
+                    <span id="accountMenu">{{'menu.account'|translate}}</span>
                 </a>
                 <li class="nested" [class.expand]="showMenu === 'profile'">
                     <ul class="submenu">
                         <li>
                             <a [routerLink]="['/user-profile']" id="profile">
-                                Profile
+                                {{'menu.profile'|translate}}
                             </a>
                         </li>
                         <li>
                             <a (click)="logout()" class="pointer" id="logout">
-                                Log Out
+                                {{'menu.logout'|translate}}
                             </a>
                         </li>
                     </ul>

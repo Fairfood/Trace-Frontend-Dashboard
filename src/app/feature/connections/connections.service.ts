@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HTTP_OPTION_3, HTTP_OPTION_4, headerOptions } from 'fairfood-utils';
 import { BehaviorSubject, Observable, map, tap } from 'rxjs';
-import {
-  BASE_URL,
-  HTTP_OPTION_3,
-  HTTP_OPTION_4,
-} from 'src/app/shared/configs/app.constants';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { BASE_URL } from 'src/app/shared/configs/app.constants';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { StorageService } from 'src/app/shared/service';
 
 @Injectable({
@@ -28,7 +23,7 @@ export class ConnectionService {
           id +
           '/map/?supply_chain=' +
           chain,
-        this.options(id)
+        headerOptions(HTTP_OPTION_3)
       )
       .pipe(
         tap((res: any) => {
@@ -58,7 +53,7 @@ export class ConnectionService {
 
   inviteCompany(id: string, params: any) {
     const url = `${BASE_URL}/supply-chain/invite/company/`;
-    return this.http.post(url, params, this.options(id));
+    return this.http.post(url, params, headerOptions(HTTP_OPTION_3));
   }
 
   getBuyers(chainId: string): Observable<any> {
@@ -81,7 +76,7 @@ export class ConnectionService {
     return this.http.post(
       BASE_URL + '/supply-chain/invite/farmer/',
       params,
-      this.options(id)
+      headerOptions(HTTP_OPTION_3)
     );
   }
 
@@ -123,6 +118,10 @@ export class ConnectionService {
       relationship,
       primaryOperation,
       status,
+      country,
+      province,
+      location_type,
+      search_by,
     } = params;
     const url = `${BASE_URL}/supply-chain/supply-chains/connection-nodes/?limit=${limit}&offset=${offset}&search=${
       searchString || ''
@@ -131,7 +130,9 @@ export class ConnectionService {
       type || ''
     }&relationship=${relationship}&primary_operation=${
       primaryOperation || ''
-    }&status=${status || ''}`;
+    }&status=${status || ''}&country=${country || ''}&province=${
+      province || ''
+    }&location_type=${location_type || ''}&search_by=${search_by || ''}`;
     return this.http
       .get(
         `${url}&supply_chain=${this.storage.retrieveStoredData(
@@ -154,12 +155,15 @@ export class ConnectionService {
   getCompanyDetails(id: string): Observable<any> {
     return this.http.get(
       BASE_URL + '/supply-chain/company/' + id + '/',
-      this.options(id)
+      headerOptions(HTTP_OPTION_3)
     );
   }
 
   getSupplychains(id: string): Observable<any> {
-    return this.http.get(BASE_URL + '/supply-chain/', this.options(id));
+    return this.http.get(
+      BASE_URL + '/supply-chain/',
+      headerOptions(HTTP_OPTION_3)
+    );
   }
 
   memberTypeDetails(): number {
@@ -326,9 +330,9 @@ export class ConnectionService {
 
     const req: any = {
       'Content-Type': 'application/json',
-      Bearer: data.token,
-      'User-ID': data.id,
-      'Node-ID': id ? id : nodeId,
+      Bearer: data?.token,
+      'User-ID': data?.id,
+      'Node-ID': id ?? nodeId,
     };
 
     if (impersonate) {

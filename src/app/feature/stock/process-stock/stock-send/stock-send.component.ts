@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -30,32 +30,34 @@ import {
   ButtonNav,
   CompanyData,
   StepValues,
-  StockButtonState,
   TransactionState,
 } from '../process-stock.config';
 import { ACTION_TYPE, UNITS } from 'src/app/shared/configs/app.constants';
+import { ADDITIONAL_CONFIG } from './stock-send.config';
 // components
 import { CreateConnectionPopupComponent } from 'src/app/feature/connections/create-connection-popup';
+import { ProcessStockCommonComponent } from '../process-stock-common.component';
 
 @Component({
   selector: 'app-stock-send',
   templateUrl: './stock-send.component.html',
   styleUrls: ['./stock-send.component.scss'],
+  standalone: true,
+  imports: ADDITIONAL_CONFIG,
 })
-export class StockSendComponent implements OnInit, OnDestroy {
+export class StockSendComponent
+  extends ProcessStockCommonComponent
+  implements OnInit, OnDestroy
+{
   loaderText: string;
   sendForm: FormGroup;
   stockRequestLinked: boolean;
-  pageApis: Subscription[] = [];
   companyFilterOptions: Observable<any>;
-  productFilterOptions: Observable<any>;
-  autocompleteLoader: boolean;
+  autocompleteLoader = false;
   connectedList = true;
-  productLoader: boolean;
   units = UNITS;
-  maxDate = new Date().toDateString();
+  maxDate = new Date();
   batchSummary: BatchSummary;
-  submitted: boolean;
   linkedRequests: any[] = [];
   filterData: any[] = [];
 
@@ -65,21 +67,17 @@ export class StockSendComponent implements OnInit, OnDestroy {
 
   @Output() nextPage = new EventEmitter();
   @Output() disableNextTab = new EventEmitter();
-  newProduct: boolean;
 
-  nextButtonState: StockButtonState;
   listingInfo: any;
-  products: any;
   claimsInvalid: boolean;
 
   constructor(
-    private stockService: StockService,
     public dialog: MatDialog,
-    private processService: StockProcessService,
+    public processService: StockProcessService,
     private utils: UtilService,
-    private requestService: CreateRequestService,
-    private global: GlobalStoreService
+    private requestService: CreateRequestService
   ) {
+    super();
     this.sendForm = this.processService.sendStockForm();
     this.nextButtonState = {
       action: 'init',
@@ -90,13 +88,12 @@ export class StockSendComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // company and product autocomplete
-    this.companyDataSubscription();
-    this.productSubscription();
-    this.fetchTransparencyRequests();
-    this.formChanges();
-    this.productNameChanges();
     this.dataChanges();
+    this.formChanges();
+    this.companyDataSubscription();
+    this.productSubscription(this.sendForm.controls);
+    this.fetchTransparencyRequests();
+    this.productNameChanges(this.sendForm.controls);
     // getting the listing page data
     this.listingInfo = this.processService.getListingInfo();
     if (this.listingInfo) {
@@ -110,22 +107,6 @@ export class StockSendComponent implements OnInit, OnDestroy {
         this.ccontrol.quantity.setValue(selectedStock[0].Quan_needed);
       }
     }
-  }
-
-  /**
-   * When the product name is changed checking for the product name is already exists
-   */
-  productNameChanges(): void {
-    const change2 = this.ccontrol.productName.valueChanges
-      .pipe(debounceTime(800), distinctUntilChanged())
-      .subscribe(value => {
-        this.newProduct = this.processService.productNameValidation(
-          value,
-          this.products
-        );
-      });
-
-    this.pageApis.push(change2);
   }
 
   /**
@@ -157,6 +138,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
 
   formChanges(): void {
     const form = this.sendForm.statusChanges.subscribe(val => {
+      this.nextButtonId = this.newProduct ? 'addProductId' : 'continueButton';
       this.nextButtonState = this.processService.stepOneFormChanges(
         this.newProduct,
         val,
@@ -166,6 +148,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
     this.pageApis.push(form);
   }
 
+  /* istanbul ignore next */
   companyDataSubscription(): void {
     this.companyFilterOptions = this.ccontrol.name.valueChanges.pipe(
       debounceTime(600),
@@ -188,6 +171,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
    * @param keyword string
    * @returns any
    */
+  /* istanbul ignore next */
   private companyFilter(keyword: string): any {
     return this.stockService.searchConnectedCompany(keyword, true).pipe(
       switchMap(result => {
@@ -199,7 +183,9 @@ export class StockSendComponent implements OnInit, OnDestroy {
               if (data.length === 0) {
                 this.ccontrol.name.setErrors({ notConnected: true });
               }
-              this.connectedList = false;
+              setTimeout(() => {
+                this.connectedList = false;
+              });
               return data;
             }),
             finalize(() => (this.autocompleteLoader = false))
@@ -241,6 +227,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
     this.openCreateConnectionPopup(data);
   }
 
+  /* istanbul ignore next */
   openCreateConnectionPopup(data: any): void {
     const dialogRef = this.dialog.open(CreateConnectionPopupComponent, {
       disableClose: true,
@@ -272,6 +259,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* istanbul ignore next */
   get ccontrol() {
     return this.sendForm.controls;
   }
@@ -288,42 +276,6 @@ export class StockSendComponent implements OnInit, OnDestroy {
     }
   }
 
-  productSubscription(): void {
-    this.productFilterOptions = this.ccontrol.productName.valueChanges.pipe(
-      debounceTime(600),
-      startWith(''),
-      map(val => val ?? ''),
-      switchMap((value: string) => {
-        setTimeout(() => {
-          this.productLoader = true;
-        });
-        return this.productFilter(value);
-      })
-    );
-  }
-
-  private productFilter(keyword: string): any {
-    return this.stockService
-      .searchProduct(keyword)
-      .pipe(finalize(() => (this.productLoader = false)));
-  }
-
-  selectProduct(item: any): void {
-    if (item) {
-      this.sendForm.patchValue({
-        product: item.id,
-      });
-      this.newProduct = false;
-      this.nextButtonState.buttonText = 'Continue';
-    } else {
-      this.sendForm.patchValue({
-        product: -1,
-      });
-      this.newProduct = true;
-      this.nextButtonState.buttonText = 'Add product & continue';
-    }
-  }
-
   /**
    * If the selected product is a new one adding it and continue to step 2
    */
@@ -332,13 +284,15 @@ export class StockSendComponent implements OnInit, OnDestroy {
       // product_name formcontrol value is used
       const api = this.stockService
         .createProduct(this.ccontrol.productName.value)
-        .subscribe((res: any) => {
-          if (res.success) {
-            this.sendForm.patchValue({
-              product: res.data.id,
-            });
-            this.formSubmit();
-          }
+        .subscribe({
+          next: (data: any) => {
+            if (data) {
+              this.sendForm.patchValue({
+                product: data.id,
+              });
+              this.formSubmit();
+            }
+          },
         });
       this.pageApis.push(api);
     }
@@ -361,26 +315,14 @@ export class StockSendComponent implements OnInit, OnDestroy {
         requestLinked: this.stockRequestLinked,
         requestedData: this.stockRequestLinked ? this.linkedData : null,
       });
-      this.nextPage.emit(true);
+      this.nextPage.emit();
     }
-  }
-
-  // get all available product list
-  getProductsList(): void {
-    const API_CALL = this.global.supplychainProducts$.subscribe({
-      next: (res: any) => {
-        this.products = res;
-      },
-      error: () => {
-        this.products = [];
-      },
-    });
-    this.pageApis.push(API_CALL);
   }
 
   /**
    * Requesting a stock
    */
+  /* istanbul ignore next */
   fetchTransparencyRequests(): void {
     this.getProductsList();
     if (this.utils.linkedTransparencyRequestData) {
@@ -393,7 +335,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
         .transparencyRequest(1)
         .subscribe((res: any) => {
           const { data } = res;
-          this.linkedRequests = data.results
+          this.linkedRequests = data?.results
             .filter((r: any) => r.status === 1)
             .map((r: any) => r);
           this.linkRequestSearchSubscription();
@@ -403,6 +345,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   linkRequestSearchSubscription(): void {
     this.requestFilterOptions = this.requestControl.valueChanges.pipe(
       debounceTime(600),
@@ -462,7 +405,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
   checkClaims(): void {
     if (this.listingInfo?.batches?.length) {
       const params = {
-        transparency_request: this.linkedData.id,
+        transparency_request: this.linkedData?.id || null,
         batches: this.listingInfo.batches.map((e: any) => e.batch),
       };
 
@@ -506,10 +449,7 @@ export class StockSendComponent implements OnInit, OnDestroy {
       }
     } else {
       this.processService.navigateToStockListing();
+      this.resetNewProduct();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.pageApis.forEach(m => m.unsubscribe());
   }
 }

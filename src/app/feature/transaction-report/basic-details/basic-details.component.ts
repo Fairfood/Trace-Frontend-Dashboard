@@ -3,6 +3,8 @@ import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslateModule } from '@ngx-translate/core';
+
 // services
 import { TransactionReportStoreService } from '../transaction-report-store.service';
 // config
@@ -14,7 +16,12 @@ import { CommonWalletComponent } from 'src/app/shared/components/common-wallet';
   templateUrl: './basic-details.component.html',
   styleUrls: ['./basic-details.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatTableModule, CommonWalletComponent],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    CommonWalletComponent,
+    TranslateModule,
+  ],
 })
 export class BasicDetailsComponent implements OnInit, OnDestroy {
   transactionData: ITransactionDetail;
@@ -28,7 +35,24 @@ export class BasicDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sub = this.store.transactionDetails$.subscribe({
       next: (res: ITransactionDetail) => {
-        this.transactionData = res;
+        const data = { ...res };
+        const removeDuplicateNames = (names: string): string => {
+          return [...new Set(names.split(',').map(name => name.trim()))].join(
+            ', '
+          );
+        };
+        if (typeof data.sourceProductNames === 'string') {
+          data.sourceProductNames = removeDuplicateNames(
+            data.sourceProductNames
+          );
+        }
+        if (typeof data.destinationProductNames === 'string') {
+          data.destinationProductNames = removeDuplicateNames(
+            data.destinationProductNames
+          );
+        }
+        this.transactionData = data;
+
         if (res.transaction === 'internal') {
           this.displayedColumns = ['number', 'name', 'quantity'];
           this.dataSource1 = new MatTableDataSource();
@@ -43,6 +67,6 @@ export class BasicDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.sub?.unsubscribe();
   }
 }

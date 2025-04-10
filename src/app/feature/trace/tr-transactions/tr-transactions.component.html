@@ -5,11 +5,13 @@
         <app-buttons buttonType="secondary" (buttonClicked)="filterClicked()">
             <ng-container *ngIf="toggleFilter">
                 <mat-icon>close</mat-icon>
-                <span class="button-text">Clear filters</span>
+                <span class="button-text">
+                    {{'misc.clearFilterText' | translate}}
+                </span>
             </ng-container>
             <ng-container *ngIf="!toggleFilter">
                 <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
-                <span class="button-text">Filters</span>
+                <span class="button-text">{{'misc.filterText'|translate}}</span>
             </ng-container>
         </app-buttons>
     </article>
@@ -84,9 +86,10 @@
 
     <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="tableCount === 0"
         [hidden]="tableLoading">
-        No transactions found
+        {{'transactions.noTransaction' | translate }}
     </section>
 </section>
 <div class="col-12 mt-10">
-    <app-ff-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+    <!-- <app-ff-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+    <app-ff-custom-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
 </div>

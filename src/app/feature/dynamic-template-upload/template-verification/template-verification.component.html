@@ -13,13 +13,21 @@
     <article class="error-wrap">
         <mat-icon>error_outline</mat-icon>
         <span class="error-message">
-            Errors in the uploaded excel. Either complete the field here or reupload the excel file after corrections.
-            Issues found in {{(errorRow$ | async).length}} row
+            Errors in the uploaded excel.
+            <ng-container *ngIf="(errorCount$ | async) < 100">
+                Either complete the field here or reupload the excel file after corrections.
+            </ng-container>
+            <ng-container *ngIf="(errorCount$ | async) > 100">
+                Please reupload the excel file after corrections.
+            </ng-container>
+            Issues found in {{(errorCount$ | async)}} row
         </span>
+
     </article>
     <article class="ff-flex-between second-row">
         <span class="error-message">
-            {{(errorRow$ | async).length}} issues found
+            {{errorCount$ | async}} issues found 
+            <span *ngIf="duplicateErrorCount>0">( Includes {{duplicateErrorCount}} duplicate entries )</span>
         </span>
         <span class="d-flex pointer">
             <ng-container [ngTemplateOutlet]="deleteIcon" [ngTemplateOutletContext]="{i: -1}"></ng-container>
@@ -63,6 +71,10 @@
                     <tr>
                         <td *ngFor="let column of displayedColumns" class="{{column.class}}">
 
+                            <ng-container *ngIf="isObject(item[column.sortKey]); else showValue;">
+                                Geo Json 
+                              </ng-container>
+                              <ng-template #showValue>
                             <!-- if column value has no errors  -->
                             <ng-container [ngTemplateOutlet]="validColumnMapping"
                                 [ngTemplateOutletContext]="{item, column}"
@@ -113,6 +125,7 @@
 
                             </ng-container>
                             <!-- if column value has errors ends here-->
+                        </ng-template>
                         </td>
                         <td class="smaller-column action">
                             <!-- action section  -->
@@ -130,9 +143,14 @@
                 </ng-container>
                 <tr *ngFor="let success of (successData$ | async)">
                     <td *ngFor="let column of displayedColumns" class="{{column.class}}">
+                        <ng-container *ngIf="isObject(success[column.sortKey]); else showValue;">
+                            Geo Json 
+                          </ng-container>
+                          <ng-template #showValue>
                         <ng-container [ngTemplateOutlet]="validColumnMapping"
                             [ngTemplateOutletContext]="{item: success, column}">
                         </ng-container>
+                    </ng-template>
                     </td>
                 </tr>
             </tbody>
@@ -184,6 +202,8 @@
 </ng-template>
 
 <ng-template #duplicateIcon>
+    <span matTooltip="Duplicate entry"
+    matTooltipPosition="above" id="duplicate" class="text-primary custom-tooltip cursor-pointer">
     <svg width="20" height="20" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_821_5188)">
             <path
@@ -199,6 +219,7 @@
             </clipPath>
         </defs>
     </svg>
+</span>
 </ng-template>
 
 <ng-template #deleteIcon let-i="i">

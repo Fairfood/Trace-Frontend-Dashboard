@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +7,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { ITabItem } from 'src/app/shared/configs/app.model';
 // standalne components
-import { ShowRequiredErrorPipe } from 'src/app/shared/pipes';
+import { SafeHtmlPipe, ShowRequiredErrorPipe } from 'src/app/shared/pipes';
 
 import { ConnectionMappingComponent } from '../connection-mapping';
 import {
@@ -18,6 +19,7 @@ import {
   ActionButtonsComponent,
   FairFoodCustomTabComponent,
 } from 'fairfood-utils';
+import { TranslateModule } from '@ngx-translate/core';
 
 export const IMPORTS = [
   CommonModule,
@@ -32,6 +34,8 @@ export const IMPORTS = [
   MatRadioModule,
   MatCheckboxModule,
   ConnectionMappingComponent,
+  SafeHtmlPipe,
+  TranslateModule,
 ];
 
 export const CONNECTION_TABS: ITabItem[] = [

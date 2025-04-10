@@ -1,24 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { HTTP_OPTION_4 } from 'src/app/shared/configs/app.constants';
 import {
-  headerOptions,
   mapResults,
   successFormatter,
 } from 'src/app/shared/configs/app.methods';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { headerOptions } from 'fairfood-utils';
+
 import { StorageService } from 'src/app/shared/service';
 
 import { environment } from 'src/environments/environment';
 import { IClaim, IClaimCriteria, IClaimField } from './claim.model';
+import { InheritableClaimAPI } from '../stock/process-stock/process-stock.config';
 const BASE_URL = environment.baseUrl;
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClaimService {
+  selectedTab = 0;
+  private initialState = {
+    selectedProduct: '',
+    selectedClaim: '',
+    selectedAssignor: '',
+    searchString: '',
+    limit: 10,
+    offset: 0,
+    status: '',
+  };
+
+  private paginationState = new BehaviorSubject<any>({ ...this.initialState });
+
+  paginationState$ = this.paginationState.asObservable();
   constructor(private http: HttpClient, private storage: StorageService) {}
 
   supplyChainData(): string {
@@ -162,7 +178,12 @@ export class ClaimService {
   }
 
   /* istanbul ignore next */
-  veriticationRequests(reqOptions: any): Observable<any> {
+  /**
+   * Verification requests sent or received
+   * @param reqOptions any
+   * @returns
+   */
+  veriticationRequests(reqOptions: any, isReceived: boolean): Observable<any> {
     const supplyChainId = this.supplyChainData();
     const {
       limit,
@@ -175,23 +196,11 @@ export class ClaimService {
     } = reqOptions;
     return this.http
       .get(
-        BASE_URL +
-          '/claims/verification/sent/?limit=' +
-          limit +
-          '&offset=' +
-          offset +
-          '&search=' +
-          searchString +
-          '&claim=' +
-          selectedClaim +
-          '&status=' +
-          status +
-          '&verifier=' +
-          selectedAssignor +
-          '&supply_chain=' +
-          supplyChainId +
-          '&product=' +
-          selectedProduct,
+        `
+        ${BASE_URL}/claims/verification/${
+          isReceived ? 'received' : 'sent'
+        }/?limit=${limit}&offset=${offset}&search=${searchString}&claim=${selectedClaim}&status=${status}&verifier=${selectedAssignor}&supply_chain=${supplyChainId}&product=${selectedProduct}
+        `,
         headerOptions(HTTP_OPTION_4)
       )
       .pipe(map(successFormatter));
@@ -206,7 +215,22 @@ export class ClaimService {
   }
 
   /* istanbul ignore next */
-  getInheritableClaims(params: any): Observable<any> {
+  getInheritableClaims(apiParams: InheritableClaimAPI): Observable<any> {
+    const { batches, actionUrl, formData } = apiParams;
+
+    let output_products: any[];
+    if (actionUrl === '/stock/process-convert') {
+      const { items } = formData;
+      output_products = items?.map((p: any) => p.product);
+    } else {
+      output_products = [formData.product];
+    }
+
+    const params = {
+      batches,
+      output_products,
+    };
+
     return this.http
       .post(
         `${BASE_URL}/claims/inheritable/`,
@@ -222,11 +246,29 @@ export class ClaimService {
   }
 
   /* istanbul ignore next */
-  addComments(params: any) {
+  addComments(params: any): Observable<any> {
     return this.http.post(
       `${BASE_URL}/claims/comment/`,
       params,
       headerOptions(HTTP_OPTION_4)
     );
+  }
+
+  /* istanbul ignore next */
+  updateVerification(id: string, params: any): Observable<any> {
+    return this.http.patch(
+      `${BASE_URL}/claims/verification/${id}/`,
+      params,
+      headerOptions(HTTP_OPTION_4)
+    );
+  }
+
+  setPaginationState(newState: any) {
+    this.paginationState.next(newState);
+  }
+
+  /** Reset pagination state to initial values */
+  resetPaginationState() {
+    this.paginationState.next({ ...this.initialState });
   }
 }

@@ -5,7 +5,7 @@
 <ng-container [formGroup]="templateSelectionForm">
     <section class="row-md">
         <article class="col-md-12 ff-flex-between p20" *ngIf="linkFields">
-            <app-ff-input label="File name" [parentFormGroup]="templateSelectionForm" [controlName]="'fileName'"
+            <app-ff-input label="File name" [parentFormGroup]="templateSelectionForm" controlName="fileName"
                 inputSize="profile" inputType="text" class="w-100">
             </app-ff-input>
             <app-buttons buttonType="stroked" (buttonClicked)="removeUploadedFile()">
@@ -49,16 +49,16 @@
 
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message" *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'productName'">
         <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched)">
             <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
-                {{'productMaxLength'|translate}}
+                {{'formValidation.productMaxLength'|translate}}
             </span>
             <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
-                {{'productMinLength'|translate}}
+                {{'formValidation.productMinLength'|translate}}
             </span>
         </article>
     </ng-container>
@@ -75,7 +75,7 @@
     </div>
     <div class="flex-column additional-item">
         <span class="label-tr">Select additional fields which are required*</span>
-        <aside aria-label="" class="additional-item">
+        <aside aria-label="additional items" class="additional-item">
             <span class="col-6 pl-0" *ngFor="let item of additionalFields; let i = index;">
                 <mat-checkbox class="font-1-normal text-xs" [checked]="item?.checked"
                     (change)="additionalFieldsSelected($event, i)">

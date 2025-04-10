@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -17,6 +18,8 @@ import {
 } from 'fairfood-form-components';
 
 import { ITabItem } from 'src/app/shared/configs/app.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { SafeHtmlPipe } from 'src/app/shared/pipes';
 
 export const COMPONENT_IMPORTS = [
   CommonModule,
@@ -31,6 +34,8 @@ export const COMPONENT_IMPORTS = [
   FairFoodInputComponent,
   FfDropdownComponent,
   ActionButtonsComponent,
+  TranslateModule,
+  SafeHtmlPipe,
 ];
 
 export const INVITE_ONLY: ITabItem[] = [

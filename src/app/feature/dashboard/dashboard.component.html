@@ -1,7 +1,7 @@
 <div class="page-container">
     <section class="heading-section">
         <h1 class="page-heading">
-            Dashboard
+            {{'dashboard.heading'|translate}}
         </h1>
     </section>
     <section class="row-xl bg-primary-lighter" *ngIf="dataLoaded">
@@ -12,14 +12,14 @@
                 <article class="legend-item" id="farmersCount">
                     <span class="font-1-normal text-sm text-blue ff-flex-align-center">
                         <span class="color-box bg-graph-1"></span>
-                        <span>Farmers</span>
+                        <span>{{'misc.farmers'|translate}}</span>
                     </span>
                     {{statistics?.farmer_count}}
                 </article>
                 <article class="legend-item" id="companyCount">
                     <span class="font-1-normal text-sm text-blue ff-flex-align-center">
                         <span class="color-box bg-graph-1"></span>
-                        <span>Companies</span>
+                        <span>{{'misc.companies'|translate}}</span>
                     </span>
                     {{statistics?.company_count}}
                 </article>
@@ -29,17 +29,17 @@
             <div class="row-md">
                 <article class="col-md-4 item items">
                     <span class="value">{{ statistics?.supply_chain_count }}</span>
-                    <span class="key">Active supply chains</span>
+                    <span class="key">{{'dashboard.active'|translate}}</span>
                 </article>
                 <article class="col-md-4 item items">
                     <span class="value">{{statistics?.tier_count}}</span>
-                    <span class="key">Largest tier length</span>
+                    <span class="key">{{'dashboard.tierLength'|translate}}</span>
                 </article>
                 <article class="col-md-4 item items">
                     <span class="value">{{statistics?.chain_length}}</span>
                     <span class="key">
-                        <span *ngIf="supplyChainSelected">Maximum</span>
-                        <span *ngIf="!supplyChainSelected">Average</span> chain length (in Km)
+                        <span *ngIf="supplyChainSelected">{{'dashboard.thLength'|translate}}</span>
+                        <span *ngIf="!supplyChainSelected">{{'dashboard.averageChain'|translate}}</span>
                     </span>
                 </article>
             </div>
@@ -47,28 +47,30 @@
                 <p class="mb-0 ff-flex-start">
                     <span class="text-blue font-1-bold text-lg">{{statistics?.traceable_chain_percent}}</span><sup
                         class="text-blue font-1-normal text-md">% </sup>
-                    <span class="font-1-normal text-xxxs text-off-blue pl-2"> Chains tracable to farmers</span>
+                    <span class="font-1-normal text-xxxs text-off-blue pl-2">
+                        {{'dashboard.tracableToFarmerText'|translate}}
+                    </span>
                 </p>
                 <mat-progress-bar mode="determinate" value="{{statistics?.traceable_chain_percent}}">
                 </mat-progress-bar>
             </div>
-            <span class="font-1-bold text-xs text-blue c-heading">Company details</span>
+            <span class="font-1-bold text-xs text-blue c-heading">{{'company.details'|translate}}</span>
             <div class="statistics-data">
                 <article class="col-md-3 item items">
                     <span class="value" id="invitedActorCount">{{ statistics?.invited_actor_count }}</span>
-                    <span class="key">Invited</span>
+                    <span class="key">{{'status.invited'|translate}}</span>
                 </article>
                 <article class="col-md-3 item items">
                     <span class="value" id="activeActorCount">{{ statistics?.active_actor_count }}</span>
-                    <span class="key">Active</span>
+                    <span class="key">{{'status.active'|translate}}</span>
                 </article>
                 <article class="col-md-3 item items">
                     <span class="value" id="pendingActorCount">{{ statistics?.pending_invite_count }}</span>
-                    <span class="key">Pending</span>
+                    <span class="key">{{'status.pending'|translate}}</span>
                 </article>
                 <article class="col-md-3 item items">
                     <span class="value" id="mappedActorCount">{{ statistics?.mapped_actor_count }}</span>
-                    <span class="key">Mapped</span>
+                    <span class="key">{{'status.mappedOnly'|translate}}</span>
                 </article>
             </div>
         </div>
@@ -83,7 +85,7 @@
         <div class="col-md-6 flex-column common-bg">
             <section class="table-top-heading heading-bg">
                 <span class="text-md text-blue font-1-bold">
-                    Activity log
+                    {{'activities.log'|translate}}
                 </span>
             </section>
             <section class="block-body flex-column">
@@ -96,18 +98,18 @@
                         </span>
                     </li>
                 </ul>
-                <app-loader loaderText="Loading activities" [loaderType]="'type1'" class="min-h-300"
+                <app-loader loaderText="{{'loaderText.logs'|translate}}" loaderType="type1" class="min-h-300"
                     *ngIf="activityLoading"></app-loader>
                 <aside class="no-data w-100" aria-label="no data" *ngIf="activities?.length == 0"
                     [hidden]="activityLoading">
-                    No activities found
+                    {{'activities.noActivities'|translate}}
                 </aside>
             </section>
         </div>
         <aside aria-label="actions required" class="col-md-6 flex-column common-bg">
             <section class="table-top-heading heading-bg">
                 <span class="text-md text-blue font-1-bold">
-                    Actions required
+                    {{'dashboard.actions'|translate}}
                 </span>
             </section>
             <section class="block-body flex-column">
@@ -129,12 +131,12 @@
                     </li>
                 </ul>
                 <aside class="no-data w-100" aria-label="no data" *ngIf="dashboardStatistics?.actions?.length == 0">
-                    No actions required
+                    {{'dashboard.noActions'|translate}}
                 </aside>
             </section>
         </aside>
     </div>
 
-    <app-loader loaderText="Loading dashboard data" [loaderType]="'type1'" class="min-h-300"
+    <app-loader loaderText="{{'loaderText.dashboard'|translate}}" loaderType="type1" class="min-h-300"
         *ngIf="!dataLoaded"></app-loader>
 </div>

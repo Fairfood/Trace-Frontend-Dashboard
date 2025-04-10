@@ -59,4 +59,8 @@ export class RouterService {
   navigateArray(url: any[]): void {
     this.router.navigate(url);
   }
+
+  currentUrl(): string {
+    return this.router.url;
+  }
 }

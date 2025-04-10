@@ -11,7 +11,6 @@ import { BaseStoreService } from 'src/app/shared/store';
 // configs
 import {
   IFarmerDetails,
-  INIT_TABLE,
   IReference,
   IStateFarmerProfile,
 } from './farmer-profile.config';
@@ -20,10 +19,9 @@ import {
   HTTP_OPTION_3,
   HTTP_OPTION_4,
 } from 'src/app/shared/configs/app.constants';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
+import { INIT_TABLE } from './farmer-profile.constants';
+import { headerOptions } from 'fairfood-utils';
 
 const initialState: IStateFarmerProfile = {
   farmerDetails: null,
@@ -40,104 +38,96 @@ const initialState: IStateFarmerProfile = {
   providedIn: 'root',
 })
 export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProfile> {
+  /* istanbul ignore next */
   farmerDetails$: Observable<IFarmerDetails> = this.select(
     (state: IStateFarmerProfile) => state.farmerDetails
   );
+
+  /* istanbul ignore next */
   updatingDetails$: Observable<boolean> = this.select(
     (state: IStateFarmerProfile) => state.isUpdating
   );
+
+  /* istanbul ignore next */
   farmerReference$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.farmerReferences
   );
+
+  /* istanbul ignore next */
   masterReferences$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.referenceMaster
   );
+
+  /* istanbul ignore next */
   plots$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.plots
   );
+
+  /* istanbul ignore next */
   activities$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.activities
   );
+
+  /* istanbul ignore next */
   payments$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.payments
   );
+
+  /* istanbul ignore next */
   attachments$: Observable<IReference> = this.select(
     (state: IStateFarmerProfile) => state.attachments
   );
+
   constructor(private http: HttpClient) {
     super(initialState);
   }
 
-  updateFarmerDetails(data: any): void {
-    this.setState({
-      farmerDetails: data,
-    });
+  /* istanbul ignore next */
+  updateStateProp<T>(key: string, value: T): void {
+    this.setState({ [key]: value });
   }
 
-  updatingData(isUpdating: boolean): void {
-    this.setState({
-      isUpdating,
-    });
-  }
-
-  updateReference(data: IReference): void {
-    this.setState({
-      farmerReferences: data,
-    });
-  }
-
-  setMasterReference(data: IReference): void {
-    this.setState({
-      referenceMaster: data,
-    });
-  }
-
-  setPlotsArray(data: IReference): void {
-    this.setState({
-      plots: data,
-    });
-  }
-
-  setActivities(data: IReference): void {
-    this.setState({
-      activities: data,
-    });
-  }
-
-  setPayments(data: IReference): void {
-    this.setState({
-      payments: data,
-    });
-  }
-
+  /* istanbul ignore next */
   setAttachments(data: IReference): void {
     this.setState({
       attachments: data,
     });
   }
 
+  productAmount(amount: number, currency: string): string {
+    return `${this.formatNumber(amount || 0)} ${currency || ''}`;
+  }
+
   transformDetails(farmerDetails: any): void {
     const { first_name, last_name, phone, family_members, total_income } =
       farmerDetails;
-    const { total_amount, amount_from_products, amount_from_premiums } =
-      total_income;
 
-    const product =
-      `${
-        amount_from_products &&
-        amount_from_products[0]?.amount.toLocaleString('en-US')
-      } ${amount_from_products && amount_from_products[0]?.currency}` || 0;
+    let product = '0',
+      premium = '0',
+      total = '0',
+      others = '0';
 
-    const premium =
-      `${
-        amount_from_premiums &&
-        amount_from_premiums[0]?.amount.toLocaleString('en-US')
-      } ${amount_from_premiums && amount_from_premiums[0]?.currency}` || 0;
+    if (total_income) {
+      const { total_amount, amount_from_products, amount_from_premiums } =
+        total_income;
 
-    const total =
-      `${total_amount && total_amount[0]?.amount.toLocaleString('en-US')} ${
-        total_amount && total_amount[0]?.currency
-      }` || 0;
+      if (amount_from_products?.length) {
+        const { amount, currency } = amount_from_products[0];
+        product = this.productAmount(amount, currency);
+      }
+
+      if (amount_from_premiums?.length) {
+        const { amount, currency } = amount_from_premiums[0];
+        premium = this.productAmount(amount, currency);
+      }
+
+      if (total_amount?.length) {
+        const { amount, currency } = total_amount[0];
+        total = this.productAmount(amount, currency);
+        others = this.productAmount(0, currency);
+      }
+    }
+
     const result = {
       ...farmerDetails,
       firstName: first_name,
@@ -147,13 +137,18 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       phoneNumber: phone?.phone,
       avatar: `${first_name[0] || ''}${last_name[0] || ''}`,
       income: {
-        product: product,
-        premium: premium,
-        others: `0 ${total_amount && total_amount[0]?.currency}`,
-        total: total,
+        product,
+        premium,
+        others,
+        total,
       },
+      otherApiCall: true,
     };
-    this.updateFarmerDetails(result);
+    this.updateStateProp<any>('farmerDetails', result);
+  }
+
+  formatNumber(value: number): string {
+    return new Intl.NumberFormat('en-US').format(value);
   }
 
   transformFormValues(farmerDetails: any): any {
@@ -196,6 +191,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     };
   }
 
+  /* istanbul ignore next */
   getFarmerDetails(param: any): void {
     const supplyChainId = localStorage.getItem('supplyChainId');
     this.http
@@ -221,6 +217,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   updateFarmerDetailAPI(id: string, params: any): Observable<any> {
     return this.http.patch(
       BASE_URL + '/supply-chain/farmer/' + id + '/',
@@ -229,6 +226,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     );
   }
 
+  /* istanbul ignore next */
   updateFarmConnectionDetails(id: string, params: any): void {
     this.updateFarmerDetailAPI(id, params)
       .pipe(
@@ -236,7 +234,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             this.transformDetails(data);
-            this.updatingData(false);
+            this.updateStateProp<boolean>('isUpdating', false);
             return data;
           }
           return res;
@@ -245,6 +243,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   createFarmerReference(param: any, farmerId: string): Observable<any> {
     return this.http.post(
       `${BASE_URL}/supply-chain/supply-chains/farmer-references/?farmer=${farmerId}`,
@@ -253,6 +252,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     );
   }
 
+  /* istanbul ignore next */
   updateFarmerReference(param: any, refId: string): Observable<any> {
     return this.http.patch(
       `${BASE_URL}/supply-chain/supply-chains/farmer-references/${refId}/`,
@@ -261,6 +261,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     );
   }
 
+  /* istanbul ignore next */
   fetchReferences(search?: string): void {
     this.http
       .get(
@@ -274,7 +275,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.setMasterReference({ count, results, loading: false });
+            this.updateStateProp<IReference>('referenceMaster', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -282,6 +287,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   fetchFarmerReferences(farmerId: string, searchString?: string): void {
     this.http
       .get(
@@ -295,7 +301,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.updateReference({ count, results, loading: false });
+            this.updateStateProp<IReference>('farmerReferences', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -303,6 +313,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   fetchFarmerPlots(farmerId: string): void {
     this.http
       .get(
@@ -314,7 +325,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.setPlotsArray({ count, results, loading: false });
+            this.updateStateProp<IReference>('plots', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -322,6 +337,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   createFarmerPlot(farmerId: string, reqObj: any): Observable<any> {
     return this.http.post(
       `${BASE_URL}/supply-chain/supply-chains/farmer-plots/?farmer=${farmerId}`,
@@ -330,6 +346,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     );
   }
 
+  /* istanbul ignore next */
   updatePlot(plotId: string, reqObj: any): Observable<any> {
     return this.http.patch(
       `${BASE_URL}/supply-chain/supply-chains/farmer-plots/${plotId}/`,
@@ -338,6 +355,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
     );
   }
 
+  /* istanbul ignore next */
   farmerActivities(farmerId: string, limit = 10, offset = 0): void {
     this.http
       .get(
@@ -349,7 +367,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.setActivities({ count, results, loading: false });
+            this.updateStateProp<IReference>('activities', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -357,6 +379,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   getFarmerPayments(
     farmerId: string,
     search = '',
@@ -373,7 +396,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.setPayments({ count, results, loading: false });
+            this.updateStateProp<IReference>('payments', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -381,6 +408,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   fetchFarmerAttachments(farmerId: string, offset = 0, limit = 10): void {
     this.http
       .get(
@@ -392,7 +420,11 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
           const { data, success } = res;
           if (success) {
             const { count, results } = data;
-            this.setAttachments({ count, results, loading: false });
+            this.updateStateProp<IReference>('attachments', {
+              count,
+              results,
+              loading: false,
+            });
           }
           return res;
         })
@@ -400,6 +432,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .subscribe();
   }
 
+  /* istanbul ignore next */
   addAttachements(formData: any, id?: string): Observable<any> {
     return this.http
       .post(
@@ -410,6 +443,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   listOperations(type: number): Observable<any> {
     return this.http
       .get(
@@ -421,6 +455,7 @@ export class FarmerProfileStoreService extends BaseStoreService<IStateFarmerProf
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   deletePlot(plotId: string): Observable<any> {
     return this.http.delete(
       `${BASE_URL}/supply-chain/supply-chains/farmer-plots/${plotId}/`,

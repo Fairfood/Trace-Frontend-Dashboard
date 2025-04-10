@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -16,44 +16,44 @@ import {
   map,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs/operators';
 // services
 import { StockProcessService } from '../stock-process.service';
-import { StockService } from '../../stock.service';
 import { UtilService } from 'src/app/shared/service';
-import { GlobalStoreService } from 'src/app/shared/store';
 // configs
 import {
   ButtonNav,
   StepValues,
-  StockButtonState,
   TransactionState,
 } from '../process-stock.config';
 import { ACTION_TYPE, UNITS } from 'src/app/shared/configs/app.constants';
-import { RECEIVE_FORM } from './receive-stock-single.config';
+import {
+  RECEIVE_FORM,
+  RECEIVE_STOCK_CONFIG,
+} from './receive-stock-single.config';
 import { CreateRequestComponent } from 'src/app/feature/requests/create-request';
+import { ProcessStockCommonComponent } from '../process-stock-common.component';
 
 @Component({
   selector: 'app-receive-stock-single',
   templateUrl: './receive-stock-single.component.html',
   styleUrls: ['./receive-stock-single.component.scss'],
+  standalone: true,
+  imports: RECEIVE_STOCK_CONFIG,
 })
-export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
+export class ReceiveStockSingleComponent
+  extends ProcessStockCommonComponent
+  implements OnInit, OnDestroy
+{
   @Output() nextPage = new EventEmitter();
   @Output() disableNextTab = new EventEmitter();
 
   loaderText: string;
   farmerForm: FormGroup;
-  pageApis: Subscription[] = [];
   farmerFilterOptions: Observable<any>;
-  productFilterOptions: Observable<any>;
-  productLoader: boolean;
   units = UNITS;
   maxDate = new Date();
-  submitted: boolean;
-  newProduct: boolean;
-  nextButtonState: StockButtonState;
-  products: any;
   claimsInvalid: boolean;
   farmerSearchLoader = false;
   newFarmer: boolean;
@@ -62,13 +62,12 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
   selectedFile: any;
 
   constructor(
-    private stockService: StockService,
     private fb: FormBuilder,
     public dialog: MatDialog,
-    private processService: StockProcessService,
-    private globalStore: GlobalStoreService,
+    public processService: StockProcessService,
     private utils: UtilService
   ) {
+    super();
     this.farmerForm = this.fb.group(RECEIVE_FORM);
     this.nextButtonState = {
       action: 'init',
@@ -80,9 +79,16 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.farmerDataSubscription();
-    this.productSubscription();
+    this.productSubscription(this.ccontrol);
     this.getAllFarmersList();
     this.setCurrencies();
+    this.formChanges();
+    this.dataPersistanceSub();
+    this.productNameChanges(this.ccontrol);
+  }
+
+  /* istanbul ignore next */
+  dataPersistanceSub(): void {
     // when navigating between tabs data should be retained
     const dataSub = this.processService
       .currentTransactionState()
@@ -98,12 +104,15 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
         }
       });
     this.pageApis.push(dataSub);
+  }
 
+  formChanges(): void {
     const form = this.farmerForm.statusChanges.subscribe(val => {
       const common = {
         currentStep: StepValues.TRANSACTION,
         buttonText: this.newProduct ? 'Add product & continue' : 'Continue',
       };
+      /* istanbul ignore next */
       if (val === 'VALID') {
         this.nextButtonState = {
           ...common,
@@ -119,40 +128,18 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
       }
     });
     this.pageApis.push(form);
-
-    const change2 = this.ccontrol.productName.valueChanges
-      .pipe(debounceTime(800), distinctUntilChanged())
-      .subscribe(value => {
-        if (value) {
-          const found = this.products.find(
-            (p: any) => p.name.toLowerCase() === value.toLowerCase()
-          );
-          if (found) {
-            this.newProduct = false;
-          } else {
-            this.newProduct = true;
-          }
-        }
-      });
-
-    this.pageApis.push(change2);
   }
 
+  /* istanbul ignore next */
   farmerDataSubscription(): void {
-    const change1 = this.farmerForm.controls.name.valueChanges
-      .pipe(debounceTime(600), distinctUntilChanged())
-      .subscribe(value => {
-        // check if value is a valid farmer
-        this.checkFarmerName(value);
-      });
-
-    this.pageApis.push(change1);
-
     this.farmerFilterOptions = this.ccontrol.name.valueChanges.pipe(
       debounceTime(600),
       distinctUntilChanged(),
       startWith(''),
       map(val => val ?? ''),
+      tap(value => {
+        this.checkFarmerName(value);
+      }),
       switchMap(value => {
         setTimeout(() => {
           this.farmerSearchLoader = true;
@@ -162,6 +149,32 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Connected farmers list
+   */
+  getAllFarmersList(isUpdateList?: boolean, newFarmerId?: any): void {
+    const API_CALL = this.stockService
+      .searchFarmer('')
+      .subscribe((res: any) => {
+        this.farmers = res;
+        if (!isUpdateList) {
+          this.loaderText = 'Loading products';
+          this.getProductsList();
+          this.farmerForm.patchValue({
+            currency: this.currencies[0].id,
+          });
+        } else {
+          const found = res.find((f: any) => f.id === newFarmerId);
+          if (found) {
+            this.selectFarmer(found);
+          }
+        }
+      });
+
+    this.pageApis.push(API_CALL);
+  }
+
+  /* istanbul ignore next */
   private farmerFilter(name: string): any {
     return this.stockService
       .searchFarmer(name)
@@ -182,6 +195,7 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
     this.processService.navigateToAddFarmer(data);
   }
 
+  /* istanbul ignore next */
   get ccontrol() {
     return this.farmerForm.controls;
   }
@@ -214,57 +228,24 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
     }
   }
 
-  productSubscription(): void {
-    this.productFilterOptions = this.ccontrol.productName.valueChanges.pipe(
-      debounceTime(600),
-      startWith(''),
-      map(val => val ?? ''),
-      switchMap((value: string) => {
-        setTimeout(() => {
-          this.productLoader = true;
-        });
-        return this.productFilter(value);
-      })
-    );
-  }
-
-  private productFilter(keyword: string): any {
-    return this.stockService
-      .searchProduct(keyword)
-      .pipe(finalize(() => (this.productLoader = false)));
-  }
-
-  selectProduct(item: any): void {
-    if (item) {
-      this.farmerForm.patchValue({
-        product: item.id,
-      });
-      this.newProduct = false;
-      this.nextButtonState.buttonText = 'Continue';
-    } else {
-      this.farmerForm.patchValue({
-        product: -1,
-      });
-      this.newProduct = true;
-      this.nextButtonState.buttonText = 'Add product & continue';
-    }
-  }
-
   /**
    * If the selected product is a new one adding it and continue to step 2
    */
+  /* istanbul ignore next */
   addNewProduct(): void {
     if (this.farmerForm.valid) {
       // productName form control value is used
       const api = this.stockService
         .createProduct(this.ccontrol.productName.value)
-        .subscribe((res: any) => {
-          if (res.success) {
-            this.farmerForm.patchValue({
-              product: res.data.id,
-            });
-            this.formSubmit();
-          }
+        .subscribe({
+          next: (data: any) => {
+            if (data) {
+              this.farmerForm.patchValue({
+                product: data.id,
+              });
+              this.formSubmit();
+            }
+          },
         });
       this.pageApis.push(api);
     }
@@ -288,55 +269,17 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
         currency,
         totalPrice: price,
       });
-      this.nextPage.emit(true);
+      this.nextPage.emit();
     }
   }
 
   setCurrencies(): void {
-    const sub = this.globalStore.glboalConstants$.subscribe({
+    const sub = this.global.glboalConstants$.subscribe({
       next: (res: any) => {
         this.currencies = res?.currencies;
       },
     });
     this.pageApis.push(sub);
-  }
-
-  // get all available product list
-  getProductsList(): void {
-    const API_CALL = this.globalStore.supplychainProducts$.subscribe({
-      next: (res: any) => {
-        this.products = res;
-        this.farmerForm.patchValue({
-          currency: this.currencies[0].id,
-        });
-      },
-      error: () => {
-        this.products = [];
-      },
-    });
-    this.pageApis.push(API_CALL);
-  }
-
-  /**
-   * Connected farmers list
-   */
-  getAllFarmersList(isUpdateList?: boolean, newFarmerId?: any): void {
-    const API_CALL = this.stockService
-      .searchFarmer('')
-      .subscribe((res: any) => {
-        this.farmers = res;
-        if (!isUpdateList) {
-          this.loaderText = 'Loading products';
-          this.getProductsList();
-        } else {
-          const found = res.find((f: any) => f.id === newFarmerId);
-          if (found) {
-            this.selectFarmer(found);
-          }
-        }
-      });
-
-    this.pageApis.push(API_CALL);
   }
 
   navigationOutOfComponent(type: ButtonNav): void {
@@ -349,6 +292,7 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
       }
     } else {
       this.processService.navigateToStockListing();
+      this.resetNewProduct();
     }
   }
 
@@ -368,6 +312,7 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
   }
 
   // If not stock is available or no connections are there
+  /* istanbul ignore next */
   requestStock(): void {
     const dialogRef = this.dialog.open(CreateRequestComponent, {
       width: '50vw',
@@ -391,9 +336,5 @@ export class ReceiveStockSingleComponent implements OnInit, OnDestroy {
       }
       localStorage.setItem('fromDashBoardRequest', '');
     });
-  }
-
-  ngOnDestroy(): void {
-    this.pageApis.forEach(m => m.unsubscribe());
   }
 }

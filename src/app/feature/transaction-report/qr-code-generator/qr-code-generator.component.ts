@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
+import { QRCodeModule } from 'angularx-qrcode';
 import { ClipboardModule } from '@angular/cdk/clipboard';
-
 import domtoimage from 'dom-to-image';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-qr-code-generator',
@@ -16,15 +16,17 @@ import domtoimage from 'dom-to-image';
   imports: [
     CommonModule,
     MatIconModule,
-    NgxQRCodeModule,
+    QRCodeModule,
     MatTooltipModule,
     MatIconModule,
     ClipboardModule,
+    TranslateModule,
   ],
 })
 export class QrCodeGeneratorComponent {
   @Input() qrCodeValue: string;
   @Input() storyTellingUrl: string;
+  @Input() gtinNumber: string;
 
   downloadImage(): void {
     domtoimage

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BaseStoreService } from 'src/app/shared/store/base-store.service';

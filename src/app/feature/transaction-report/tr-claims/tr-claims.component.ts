@@ -23,7 +23,7 @@ import { GlobalStoreService } from 'src/app/shared/store';
   templateUrl: './tr-claims.component.html',
   styleUrls: ['./tr-claims.component.scss'],
   standalone: true,
-  imports: [...CL_IMPORTS],
+  imports: CL_IMPORTS,
 })
 export class TrClaimsComponent implements OnChanges, OnDestroy {
   @Input() attachedClaims: any[];

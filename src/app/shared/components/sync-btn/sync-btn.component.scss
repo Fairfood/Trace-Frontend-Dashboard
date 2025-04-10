@@ -1,0 +1,42 @@
+.ml-8 {
+    margin-left: 8px;
+}
+
+.sync {
+    &-text {
+        font-size: 14px;
+        color: var(--font-color);
+        font-family: var(--font-bold);
+    }
+
+    &-icon {
+        width: 15px;
+    }
+}
+
+.down-arrow {
+    padding-top: 4px;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.syncing-icon {
+    animation: rotate 2s linear infinite;
+}
+
+::ng-deep .mdc-tooltip__surface {
+    color: var(--color-white) !important;
+    background: var(--font-color-2) !important;
+    // min-width: 33vw !important;
+    padding: 15px !important;
+    font-size: var(--font-size-button1) !important;
+    font-weight: 400 !important;
+}

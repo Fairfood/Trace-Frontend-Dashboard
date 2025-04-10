@@ -1,18 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { CompanyProfileService } from '../company-profile.service';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { CompanyProfileService } from '../company-profile.service';
 import { LoaderComponent } from 'fairfood-utils';
-import { CommonWalletComponent } from 'src/app/shared/components/common-wallet/common-wallet.component';
+import { CommonWalletComponent } from 'src/app/shared/components/common-wallet';
 
 @Component({
   selector: 'app-wallet-tab',
   templateUrl: './wallet-tab.component.html',
   styleUrls: ['./wallet-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CommonWalletComponent],
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    CommonWalletComponent,
+    TranslateModule,
+  ],
 })
 export class WalletTabComponent implements OnInit, OnDestroy {
   loader = true;

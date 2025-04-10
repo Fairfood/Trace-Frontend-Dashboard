@@ -1,3 +1,30 @@
+@import 'src/styles/utils';
+// @import 'src/styles/responsive';
+@include autocomplete-common;
+@include input-common-css;
+@include custom-input;
+@include reset-ul;
+@include company-selection;
+
+
+.receive-row-item {
+  width: 100%;
+  @include devices(tablet) {
+    width: 50%;
+  }
+  &.margin-rig {
+    margin-right: 0;
+    @include devices(tablet) {
+      margin-right: 10px;
+      width: 48%;
+    }
+  }
+}
+
 .main-div {
   padding: 20px;
 }
+
+
+
+

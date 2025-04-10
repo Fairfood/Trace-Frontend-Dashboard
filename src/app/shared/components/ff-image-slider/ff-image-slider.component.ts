@@ -66,7 +66,6 @@ export class FfImageSliderComponent implements OnChanges {
     }
   }
 
-  /* istanbul ignore next */
   decrementIndex(label: number): number {
     if (label === 0) {
       return this.imageArray.length - 1;
@@ -75,7 +74,6 @@ export class FfImageSliderComponent implements OnChanges {
     }
   }
 
-  /* istanbul ignore next */
   incrementIndex(label: number): number {
     if (label === this.imageArray.length - 1) {
       return 0;

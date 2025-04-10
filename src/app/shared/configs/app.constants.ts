@@ -37,6 +37,11 @@ export const HTTP_OPTION_4: Partial<IhttpHeadConfig> = {
   timezone: true,
 };
 
+export const HTTP_OPTION_5: Partial<IhttpHeadConfig> = {
+  token: true,
+  contentType: true,
+};
+
 // Constants or Enums
 export enum NotificationEvent {
   UserProfile = 1,
@@ -81,4 +86,4 @@ export enum dynamicTemplateType {
   CONNECTION = 2,
 }
 
-export const emailRegex = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
+export const emailRegex = '^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';

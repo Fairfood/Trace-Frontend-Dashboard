@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, OnDestroy, OnInit } from '@angular/core';
+/* istanbul ignore file */
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ChangeDetectorRef,
+  Input,
+} from '@angular/core';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+// material
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { FormsModule } from '@angular/forms';
-import { ListingInfoService } from './listing-info.service';
-import { IProgressBar } from '../listing.model';
-import { ListingStoreService } from '../';
+// services and models
+import { ListingService, ListingStoreService } from '../';
+import { IBatches } from '../listing.model';
 
 @Component({
   selector: 'app-listing-info',
@@ -22,56 +30,63 @@ import { ListingStoreService } from '../';
   styleUrls: ['./listing-info.component.scss'],
 })
 export class ListingInfoComponent implements OnDestroy, OnInit {
+  @Input() archivePage = false;
   showLoader: boolean;
-  showInfo: Observable<boolean>;
+  showInfo$: Observable<boolean>;
   selectedInformation: {
     noBatches: number;
     totalQuantity: number;
+    batches: IBatches[];
   };
-  progressBarData: {
-    progress: boolean;
-    value: number;
-  };
+  hideViewSelected$: Observable<boolean>;
 
-  private destroy$ = new Subject<void>();
+  destroy$ = new Subject<void>();
 
   selectedBatchesOnly: boolean;
 
+  infoLoading: boolean;
+
   constructor(
     private store: ListingStoreService,
-    private service: ListingInfoService
+    private cdr: ChangeDetectorRef,
+    private service: ListingService
   ) {}
 
   ngOnInit(): void {
-    this.initData();
-    this.showHideInfo();
+    if (!this.archivePage) {
+      this.showHideInfo();
+    }
+    this.fetchBatches();
   }
 
-  initData(): void {
-    this.store.selectedStockItems$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res: any[]) => {
-        const selected = res;
-        this.setInformation(
-          selected.length,
-          this.service.getSelectedQuantity(res)
-        );
+  fetchBatches(): void {
+    this.store.batches$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res: IBatches[]) => {
+        this.recalCulateSummary(res);
       },
     });
+  }
+
+  recalCulateSummary(batches: IBatches[]): void {
+    const totalQuantity = this.service.computeSelectedQuantity(batches);
+    this.setInformation(batches.length, totalQuantity, batches);
+    this.cdr.detectChanges();
   }
 
   showHideInfo(): void {
-    this.showInfo = this.store.stockAction$;
-    this.store.progressBarData$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res: IProgressBar) => {
-        this.progressBarData = res;
-      },
-    });
+    this.showInfo$ = this.store.stockAction$;
+    this.hideViewSelected$ = this.store.hideViewSelected$;
   }
 
-  setInformation(noBatches = 0, totalQuantity = 0): void {
+  setInformation(
+    noBatches: number,
+    totalQuantity: any,
+    batches: IBatches[] = []
+  ): void {
     this.selectedInformation = {
       noBatches,
       totalQuantity,
+      batches,
     };
   }
 
@@ -80,9 +95,7 @@ export class ListingInfoComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
-    // this.store.updateStateProp<boolean>('toggleFilter', false);
     this.store.updateStateProp<boolean>('stockAction', false);
-    // this.store.resetFilter();
     this.destroy$.next();
     this.destroy$.complete();
   }

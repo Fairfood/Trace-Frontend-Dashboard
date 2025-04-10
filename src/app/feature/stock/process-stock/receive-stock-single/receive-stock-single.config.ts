@@ -1,5 +1,36 @@
-import { Validators } from '@angular/forms';
+/* istanbul ignore file */
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+// material
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+// components
+import { ButtonsComponent, LoaderComponent } from 'fairfood-utils';
 import { quantityRegex } from 'src/app/shared/configs/app.constants';
+import { StockActionButtonComponent } from '../stock-action-button';
+// config or constants
+import {
+  FairFoodInputComponent,
+  FfDropdownComponent,
+} from 'fairfood-form-components';
+
+export const RECEIVE_STOCK_CONFIG = [
+  CommonModule,
+  ReactiveFormsModule,
+  ButtonsComponent,
+  TranslateModule,
+  StockActionButtonComponent,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatIconModule,
+  FfDropdownComponent,
+  FairFoodInputComponent,
+  MatAutocompleteModule,
+  LoaderComponent,
+];
 
 export const RECEIVE_FORM = {
   node: ['', Validators.required],

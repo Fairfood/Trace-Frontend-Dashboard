@@ -92,7 +92,7 @@ export class ThemeService {
     } = theme;
     root.style.setProperty('--color-primary-1', colour_primary_alpha);
     root.style.setProperty('--color-primary-2', colour_primary_beta);
-    root.style.setProperty('--color-primary-3', colour_primary_delta);
+    root.style.setProperty('--color-filter-active', colour_primary_delta);
     root.style.setProperty('--color-primary-4', colour_primary_delta);
     root.style.setProperty('--color-secondary', colour_secondary);
 

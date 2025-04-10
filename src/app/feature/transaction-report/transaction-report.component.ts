@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 // configs
 import {
@@ -10,7 +10,6 @@ import {
   TAB,
 } from './transaction-report.config';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
-import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
 // services
 import { TransactionReportStoreService } from './transaction-report-store.service';
 import { TransactionReportService } from './transaction-report.service';
@@ -18,6 +17,10 @@ import { TraceStoreService } from '../trace/trace-store.service';
 import { UtilService } from 'src/app/shared/service';
 
 import { TransactionActionsComponent } from '../transaction-actions';
+import { ArchiveConfirmationPopupComponent } from 'src/app/shared/components/archive-confirmation-popup';
+import { TransactionsService } from '../transactions';
+import { Gs1PopupComponent } from './gs1-popup/gs1-popup.component';
+import { ACTION_TYPE } from 'fairfood-utils';
 
 @Component({
   selector: 'app-transaction-report',
@@ -33,8 +36,12 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
   storyTellingUrl: string;
   rootUrl = window.location.origin;
   theme: string;
-  tabItems: ICommonObj[];
+  tabItems: ICommonObj[] = [];
   activeTab: string;
+  transactionType: string;
+  private ngUnsubscribe = new Subject<void>();
+  batchData: any;
+  gtinNumber: any;
 
   constructor(
     public router: Router,
@@ -43,14 +50,33 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private store: TransactionReportStoreService,
     private traceStore: TraceStoreService,
-    private utils: UtilService
+    private utils: UtilService,
+    public trService: TransactionsService
   ) {
     this.theme = this.transactionService.getCiTheme();
   }
 
   ngOnInit(): void {
+    this.initComponent();
+    this.router.events.pipe(takeUntil(this.ngUnsubscribe)).subscribe(event => {
+      if (event instanceof NavigationStart) {
+        const nextRoute = event.url;
+        if (
+          nextRoute != '/archive-transactions' &&
+          nextRoute != '/transactions'
+        ) {
+          this.trService.resetPaginationStateInternal();
+          this.trService.resetPaginationState();
+          this.trService.transactionType = 'external';
+        }
+      }
+    });
+  }
+
+  initComponent(): void {
     this.memberType = +localStorage.getItem('memberType');
     const { id, transaction } = this.routes.snapshot.params;
+    this.transactionType = transaction;
     if (transaction && id) {
       this.getTransactionDetail(transaction, id);
     } else {
@@ -101,6 +127,7 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
           data.type
         );
 
+        this.gtinNumber = data?.gtin;
         let batchId: string;
         // external transaction
         if (data.transaction_type === 1) {
@@ -117,6 +144,8 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
             ?.map((m: any) => m.name)
             ?.join(', ');
         }
+
+        this.batchData = batchId;
         if (data.badgeText !== 'Stock loss') {
           this.tabItems = TAB;
           this.traceStore.fetchMapInfo(this.theme, batchId);
@@ -124,9 +153,12 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
         } else {
           this.tabItems = STOCK_LOSS;
         }
-
         const { storyTellingUrl, qrCodeValue } =
-          this.transactionService.generateQrcode(batchId, data);
+          this.transactionService.generateQrcode(
+            this.batchData,
+            data,
+            this.gtinNumber
+          );
         this.storyTellingUrl = storyTellingUrl;
         this.qrCodeValue = qrCodeValue;
         this.calculatePrice(data);
@@ -147,8 +179,8 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
     if (reload) {
       this.pageLoader = true;
       this.getTransactionDetail(
-        this.transactionData.transaction,
-        this.transactionData.id
+        this.transactionData?.transaction,
+        this.transactionData?.id
       );
     }
   }
@@ -176,7 +208,7 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
    */
   rejectTransactionDialog(): void {
     const data = {
-      id: this.transactionData.id,
+      id: this.transactionData?.id,
       type: 'reject',
     };
     const dialogRef = this.dialog.open(TransactionActionsComponent, {
@@ -189,18 +221,83 @@ export class TransactionReportComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const message = 'Transaction rejected successfully';
-        this.utils.customSnackBar(message, ACTION_TYPE.SUCCESS);
+        this.utils.transactionRejectMessage('success');
         this.router.navigateByUrl('/transactions');
       } else {
-        const message = 'Failed to reject transaction';
-        this.utils.customSnackBar(message, ACTION_TYPE.FAILED);
+        this.utils.transactionRejectMessage('fail');
       }
     });
+  }
+
+  /**
+   * The function `updateArchiveStatus` opens a dialog to confirm moving selected items to either
+   * transaction history or archive list based on the type provided.
+   */
+  updateArchiveStatus(type: string): void {
+    const data = {
+      selected_items: [this.transactionData?.id],
+      is_excluded: false,
+      restore: type === 'transaction-list',
+    };
+    let dialogData;
+    if (type === 'transaction-list') {
+      dialogData = {
+        title: 'Move to transaction history',
+        text: 'Are you sure you want to move the selected item to the transaction history?',
+        label: 'Once moved, you can access them from the transaction history.',
+        type: 'transactions',
+        params: data,
+        transactionType: this.transactionType,
+      };
+    } else {
+      dialogData = {
+        title: 'Move to archive',
+        text: 'Are you sure you want to move the selected item to the archive list?',
+        label: 'Once moved, you can access them from the archive list.',
+        type: 'transactions',
+        params: data,
+        transactionType: this.transactionType,
+      };
+    }
+
+    const dialogRef = this.dialog.open(ArchiveConfirmationPopupComponent, {
+      width: '35vw',
+      height: 'auto',
+      panelClass: 'custom-modalbox',
+      data: dialogData,
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.initComponent();
+      }
+    });
+  }
+
+  updateGs1Info(type: string): void {
+    if (!this.transactionData?.is_batch_editable) {
+      this.utils.customSnackBar(
+        'GS1 info cannot be modified for this transaction',
+        ACTION_TYPE.FAILED
+      );
+    } else {
+      const dialogRef = this.dialog.open(Gs1PopupComponent, {
+        width: '500px',
+        data: { id: this.batchData, type: type },
+        autoFocus: false,
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === true) {
+          this.pageLoader = true;
+          this.ngOnInit();
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.pageApis.forEach(m => m.unsubscribe());
     this.traceStore.resetState();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }

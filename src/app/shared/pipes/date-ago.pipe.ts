@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({

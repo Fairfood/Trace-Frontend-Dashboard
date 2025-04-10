@@ -3,8 +3,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 
-import { DynamicTemplateUploadService } from '../';
-import { DynamicTemplateStore } from '../';
+import { DynamicTemplateUploadService, DynamicTemplateStore } from '../';
 // service
 import { GlobalStoreService } from 'src/app/shared/store';
 // configs

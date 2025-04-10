@@ -39,7 +39,7 @@
   }
 
   .data {
-    margin-left: 15px;
+    margin-left: 25px;
   }
 }
 .heading-section,
@@ -103,4 +103,10 @@
   padding: 0;
   margin-bottom: 10px;
   width: 100%;
+}
+
+.item .value-tr{
+  max-width: 250px;
+  overflow-wrap: break-word;
+  white-space: normal;
 }

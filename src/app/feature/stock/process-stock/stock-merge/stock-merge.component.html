@@ -4,7 +4,7 @@
         <article class="mb-20 flex-column">
             <label class="has-float-label custom-input"
                 [ngClass]="{'has-error': ccontrol.productName.invalid && ccontrol.productName.touched }">
-                <input placeholder=" " formControlName="productName" type="text" class="stock"
+                <input placeholder=" " id="mergedProduct" formControlName="productName" type="text" class="stock"
                     [matAutocomplete]="productSection" />
                 <span class="label">Merged product*</span>
                 <span class="new-chip" *ngIf="newProduct">New</span>
@@ -16,11 +16,12 @@
                         Available products
                     </span>
                     <mat-option *ngIf="productLoader">
-                        <app-loader [noText]="true"></app-loader>
+                        <app-loader [noText]="true" loaderType="type2"></app-loader>
                     </mat-option>
-                    <ng-container *ngFor="let item of productFilterOptions | async">
+                    <ng-container *ngFor="let item of (productFilterOptions | async); let k=index; trackBy:trackByFn">
                         <ng-container *ngIf="!productLoader">
-                            <mat-option [value]="item.name" (click)="selectProduct(item)" id="productOption-{{item.name}}">
+                            <mat-option [value]="item.name"
+                                (click)="selectProduct(item, mergeForm, buttonConfiguration)" id="productOption-{{k}}">
                                 {{ item.name }}
                             </mat-option>
                         </ng-container>
@@ -30,7 +31,8 @@
                         <span class="autocomplete-heading">
                             Add as new product <span class="new-chip">New</span>
                         </span>
-                        <mat-option [value]="ccontrol.productName.value" (click)="selectProduct(null)" id="addNewProduct">
+                        <mat-option [value]="ccontrol.productName.value"
+                            (click)="selectProduct(null, mergeForm, buttonConfiguration)" id="addNewProduct">
                             {{ccontrol.productName.value}}
                         </mat-option>
                     </ng-container>
@@ -42,7 +44,8 @@
         </article>
         <div class="quantity-row flex-wrap">
             <article class="stock-merge-item mb-20 mr-10">
-                <app-ff-input label="Quantity*" inputSize="profile" [parentFormGroup]="mergeForm" controlName="quantity">
+                <app-ff-input label="Quantity*" inputSize="profile" [parentFormGroup]="mergeForm"
+                    controlName="quantity">
                 </app-ff-input>
                 <ng-container [ngTemplateOutlet]="formErrorMessages"
                     [ngTemplateOutletContext]="{formcontrol:'quantity'}">
@@ -55,10 +58,11 @@
             </article>
             <article class="stock-merge-item mb-20">
                 <label class="has-float-label custom-input">
-                    <input placeholder=" " matInput [matDatepicker]="transactionDate" [max]="maxDate"
-                        formControlName="date" type="text" class="date-picker" readonly />
+                    <input placeholder=" " id="transactionDate" matInput [matDatepicker]="transactionDate"
+                        [max]="maxDate" formControlName="date" type="text" class="date-picker" readonly />
                     <span class="label">Transaction date*</span>
-                    <mat-icon class="pointer" (click)="transactionDate.open()" id="calenderIcon">calendar_today</mat-icon>
+                    <mat-icon class="pointer" (click)="transactionDate.open()"
+                        id="calenderIcon">calendar_today</mat-icon>
                 </label>
                 <mat-datepicker #transactionDate></mat-datepicker>
                 <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'date'}">
@@ -69,7 +73,7 @@
     <app-summary-card class="right"></app-summary-card>
 </section>
 <section class="loader-wrap left" *ngIf="loader">
-    <app-loader [loaderText]="'Loading data'" [loaderType]="'type1'"></app-loader>
+    <app-loader loaderText="Loading data" loaderType="'type1"></app-loader>
 </section>
 
 <app-stock-action-button [buttonNextState]="nextButtonState" (buttonsClicked)="navigationOutOfComponent($event)">
@@ -77,16 +81,16 @@
 
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message" *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'productName'">
         <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched)">
             <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
-                {{'productMaxLength'|translate}}
+                {{'formValidation.productMaxLength'|translate}}
             </span>
             <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
-                {{'productMinLength'|translate}}
+                {{'formValidation.productMinLength'|translate}}
             </span>
         </article>
     </ng-container>

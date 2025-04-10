@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +15,7 @@ import {
   ButtonsComponent,
   FairFoodCustomTabComponent,
   FfPaginationComponent,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 import { FfFilterBoxWrapperComponent } from 'fairfood-form-components';
 
@@ -23,6 +25,7 @@ import { ExportIconComponent } from 'src/app/shared/components/export-icon';
 import { ConnectionTypeSelectionComponent } from './connection-type-selection';
 // pipes
 import { AvatarPipe, ToPositivePipe } from '../layout/header/header.pipe';
+import { SyncBtnComponent } from 'src/app/shared/components/sync-btn/sync-btn.component';
 
 export const C_IMPORTS = [
   CommonModule,
@@ -46,4 +49,6 @@ export const C_IMPORTS = [
   FfFilterBoxWrapperComponent,
   MapSuppliersRequestComponent,
   ConnectionTypeSelectionComponent,
+  SyncBtnComponent,
+  FfCustomPaginationComponent,
 ];

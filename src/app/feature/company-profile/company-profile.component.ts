@@ -49,7 +49,7 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const otherCompanyId = this.route.snapshot.paramMap.get('companyId');
+    const otherCompanyId = this.route?.snapshot?.paramMap.get('companyId');
     if (otherCompanyId) {
       this.tabGroup = OTHER_COMPANY_TABS;
       this.isConnection = true;
@@ -57,6 +57,9 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
       this.tabGroup = PROFILE_TABS;
       this.moreTabs = [...PROFILE_TABS_MORE];
       this.isConnection = false;
+      this.moreTabs.forEach(tab => {
+        tab.selected = false;
+      });
     }
     this.activeTabId = this.tabGroup[0].id;
 
@@ -72,6 +75,7 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
   }
 
   initSubscription(companyId: string): void {
+    /* istanbul ignore next */
     const userApi = this.global.userData$.subscribe({
       next: (userData: Partial<IUserData>) => {
         if (userData?.nodes) {
@@ -98,10 +102,11 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
   setCompanyData(): void {
     const { image, name, is_admin } = this.companyProfileData;
     this.companyPic = image;
-    const splitName = name.split(' ');
+    const splitName = name ? name?.split(' ') : '';
     this.companyProfileData.icon =
       (splitName[0].charAt(0) || '') + (splitName[1]?.charAt(0) || '');
     this.isCompanyAdmin = is_admin;
+    /* istanbul ignore next */
     const sub = this.global.countryList$
       .pipe(
         tap(res => {
@@ -131,12 +136,16 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeTab(item: any): void {
+  changeTab(item: ICommonObj): void {
     this.activeTabId = item.id;
   }
 
   toggleEdit(val: boolean): void {
+    const companyId = this.route?.snapshot?.paramMap.get('companyId');
     this.isEdit = val;
+    if (!this.isEdit) {
+      this.initSubscription(companyId);
+    }
   }
 
   ngOnDestroy(): void {

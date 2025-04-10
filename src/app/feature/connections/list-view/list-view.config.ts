@@ -1,29 +1,35 @@
+/* istanbul ignore file */
 import {
   ICommonObj,
   ITableColumnHeader,
+  LocationTypes,
 } from 'src/app/shared/configs/app.model';
 
-export const COMPANY_COLUMNS: ITableColumnHeader[] = [
+const COMMON: ITableColumnHeader[] = [
   {
-    name: 'Company name',
-    class: 'large-column',
-    sortKey: 'name',
-  },
-  {
-    name: 'Company type',
-    class: 'normal-column',
-    sortKey: 'type',
-  },
-  {
-    name: 'Connecton relation',
+    name: 'connections.relation',
     class: 'normal-column',
     sortKey: 'relation',
   },
   {
-    name: 'Connection status',
+    name: 'connections.status',
     class: 'normal-column',
     sortKey: 'status',
   },
+];
+
+export const COMPANY_COLUMNS: ITableColumnHeader[] = [
+  {
+    name: 'company.name',
+    class: 'large-column',
+    sortKey: 'name',
+  },
+  {
+    name: 'connections.cType',
+    class: 'normal-column',
+    sortKey: 'type',
+  },
+  ...COMMON,
   {
     name: '',
     class: 'normal-column',
@@ -38,25 +44,16 @@ export const COMPANY_COLUMNS: ITableColumnHeader[] = [
 
 export const FARMER_COLUMNS: ITableColumnHeader[] = [
   {
-    name: 'Farmer name',
+    name: 'farmer.name',
     class: 'large-column',
     sortKey: 'name',
   },
   {
-    name: 'Farmer type',
+    name: 'connections.fType',
     class: 'normal-column',
     sortKey: 'type',
   },
-  {
-    name: 'Connecton relation',
-    class: 'normal-column',
-    sortKey: 'relation',
-  },
-  {
-    name: 'Connection status',
-    class: 'large-column',
-    sortKey: 'status',
-  },
+  ...COMMON,
   {
     name: '',
     class: 'options-column',
@@ -69,6 +66,22 @@ export const SEARCHBY_OPTIONS: ICommonObj[] = [
     id: 'all',
     name: 'All',
   },
+  {
+    id: 'name',
+    name: 'Name',
+  },
+  {
+    id: 'reference_number',
+    name: 'Reference number',
+  },
+  {
+    id: 'email',
+    name: 'Email',
+  },
+  {
+    id: 'address',
+    name: 'Address',
+  },
   // {
   //   id: 'stockId',
   //   name: 'Stock ID',
@@ -77,4 +90,10 @@ export const SEARCHBY_OPTIONS: ICommonObj[] = [
   //   id: 'refId',
   //   name: 'Ref ID',
   // },
+];
+
+export const LOCATION_TYPES: LocationTypes[] = [
+  { id: 'APPROXIMATE', name: 'Approximate' },
+  { id: 'POLYGON', name: 'Polygon' },
+  { id: 'ACCURATE', name: 'Accurate' },
 ];

@@ -38,8 +38,10 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
   @Input() searchByOptions: any[];
   @Input() hideOptions: boolean;
   @Input() clearSearch = false; // New input to trigger search string clearing
+  @Input() searchString: string;
 
   @Output() searchText = new EventEmitter();
+  @Output() searchByOptionChange = new EventEmitter<any>();
 
   keyword: string;
   sub: Subscription[] = [];
@@ -50,6 +52,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
   constructor(private _dataService: UtilService) {}
 
   ngOnInit(): void {
+    let isFirstChange = true;
     const supplyChainIdSub = this._dataService.supplyChainData$.subscribe(
       (res: any) => {
         if (res && res !== this.supplyChainId) {
@@ -62,10 +65,10 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
     const inputChanges = this.keywordControl.valueChanges
       .pipe(debounceTime(600), distinctUntilChanged())
       .subscribe((value: string) => {
-        if (!this.clearSearch) {
-          // Check if clearSearch is false before emitting search text
+        if (!this.clearSearch && !isFirstChange) {
           this.searchText.emit(value);
         }
+        isFirstChange = false;
       });
 
     this.sub.push(inputChanges);
@@ -73,12 +76,19 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
     if (!this.hideOptions) {
       this.searchByOption = this.searchByOptions[0];
     }
+    this.keyword = this.searchString;
+    this.keywordControl.setValue(this.searchString, { emitEvent: false });
   }
 
   ngOnChanges(): void {
     if (this.clearSearch) {
       this.keywordControl.setValue('');
     }
+  }
+
+  onOptionSelect(option: any): void {
+    this.searchByOption = option;
+    this.searchByOptionChange.emit(option); // Emit the selected option
   }
 
   ngOnDestroy(): void {

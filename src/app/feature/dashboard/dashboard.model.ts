@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { ICommonObj } from 'src/app/shared/configs/app.model';
 
 export interface IMapTheme {

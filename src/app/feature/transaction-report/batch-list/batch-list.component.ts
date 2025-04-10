@@ -10,6 +10,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+
 // services and config
 import { TransactionReportStoreService } from '../transaction-report-store.service';
 import { TransactionReportService } from '../transaction-report.service';
@@ -29,6 +31,7 @@ import { CommonWalletComponent } from 'src/app/shared/components/common-wallet';
     MatIconModule,
     LoaderComponent,
     CommonWalletComponent,
+    TranslateModule,
   ],
 })
 export class BatchListComponent implements OnInit, OnDestroy {
@@ -60,7 +63,7 @@ export class BatchListComponent implements OnInit, OnDestroy {
             this.farmersCount = source_batches[0].total_farmers;
           } else {
             this.farmersCount = source_batches.reduce(
-              (a: any, b: any) => a.total_farmers + b.total_farmers,
+              (total: number, item: any) => total + item.total_farmers,
               0
             );
           }

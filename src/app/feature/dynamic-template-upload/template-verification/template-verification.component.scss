@@ -88,7 +88,7 @@
 }
 
 .header-bar {
-  background-color: var(--color-primary-3);
+  background-color: var(--color-filter-active);
   height: 40px;
   border-bottom: 1px solid var(--border-color);
 }
@@ -113,4 +113,9 @@
       padding-right: 20px;
     }
   }
+}
+
+
+::ng-deep .mdc-tooltip__surface {
+  background-color: var(--font-color) !important;
 }

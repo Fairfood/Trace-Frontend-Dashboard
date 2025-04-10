@@ -14,30 +14,29 @@ export const stockRoutes: Routes = [
       },
       {
         path: 'receive',
-        loadChildren: () =>
-          import('./process-stock/process-stock.module').then(
-            m => m.ProcessStockModule
-          ),
+        loadComponent: () =>
+          import('./process-stock').then(p => p.ProcessStockComponent),
       },
       {
         path: 'stock-send',
-        loadChildren: () =>
-          import('./process-stock/process-stock.module').then(
-            m => m.ProcessStockModule
-          ),
+        loadComponent: () =>
+          import('./process-stock').then(p => p.ProcessStockComponent),
       },
       {
         path: 'process-convert',
-        loadChildren: () =>
-          import('./process-stock/process-stock.module').then(
-            m => m.ProcessStockModule
-          ),
+        loadComponent: () =>
+          import('./process-stock').then(p => p.ProcessStockComponent),
       },
       {
         path: 'process-merge',
-        loadChildren: () =>
-          import('./process-stock/process-stock.module').then(
-            m => m.ProcessStockModule
+        loadComponent: () =>
+          import('./process-stock').then(p => p.ProcessStockComponent),
+      },
+      {
+        path: 'archive-stocks',
+        loadComponent: () =>
+          import('./listing/archive-stocks').then(
+            p => p.ArchiveStocksComponent
           ),
       },
     ],

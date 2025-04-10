@@ -4,47 +4,145 @@
     </h4>
     <mat-icon class="pointer" (click)="close()">close</mat-icon>
 </section>
-<section class="main-div" *ngIf="!loading">
-    <mat-radio-group id="selectAllOptions" aria-label="Select an option">
+<section class="main-div" *ngIf="dataLoaded">
+    <div class="mb-20">
+        <mat-radio-group id="selectAllOptions" aria-label="Select an option">
         <mat-radio-button value="page" class="font-1-normal text-xs text-blue radio-items"
-            (change)="radioButtonChanged($event)" [value]="'supplier'" [checked]="selectingOptions==='supplier'">
+            (change)="radioButtonChanged($event)" value="supplier" [checked]="selectedInformationType==='supplier'">
             Request to map suppliers
 
         </mat-radio-button>
         <mat-radio-button value="all" class="font-1-normal text-xs text-blue radio-items"
-            [checked]="selectingOptions==='info'" [value]="'info'" (change)="radioButtonChanged($event)">
+            [checked]="selectedInformationType==='info'" value="info" (change)="radioButtonChanged($event)">
             Request supplier information
         </mat-radio-button>
-    </mat-radio-group>
+        </mat-radio-group>
+    </div>
 
-    <form [formGroup]="mapSupplierForm">
+    <form *ngIf="selectedInformationType==='supplier'" [formGroup]="mapSupplierForm">
         <article class="receive-row-item mb-20 m-r-0">
-            <app-ff-dropdown label="Supply chain" [defaultValue]="fcontrol.supplyChain.value"
+            <app-ff-dropdown label="Supply chain*" [defaultValue]="fcontrol.supplyChain.value"
                 [dropdownOptions]="supplyChainList" inputClass="profile" (selectionChange)="setSupplyChain($event)">
             </app-ff-dropdown>
         </article>
-        <article class="mb-20 flex-column">
+        <article *ngIf="supplyChainSelected" class="mb-20 flex-column">
             <label class="has-float-label custom-input"
                 [ngClass]="{'has-error': fcontrol.supplier.invalid && fcontrol.supplier.touched }">
-                <input placeholder=" " formControlName="supplier" type="text" class="stock"
+                <input placeholder=" " (input)="loadCompany(fcontrol.supplier.value)" formControlName="supplier" type="text" class="stock"
                     [matAutocomplete]="sendRequestTo" />
                 <span class="label">Send request to*</span>
                 <mat-icon>keyboard_arrow_down</mat-icon>
             </label>
-            <mat-autocomplete #sendRequestTo="matAutocomplete">
+            <mat-autocomplete #sendRequestTo="matAutocomplete" (optionSelected)="onSupplierSelected($event)">
                 <aside class=" inside-container" aria-label="">
-                    <ng-container *ngFor="let item of filteredOptionsSupplier$ | async">
+                    <ng-container *ngFor="let item of companies">
                         <mat-option [value]="item.name">
                             {{ item?.name }}
                         </mat-option>
                     </ng-container>
                 </aside>
             </mat-autocomplete>
+            <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'supplier'}">
+            </ng-container>
            
         </article>
+        <article class="flex-column w-100 mb-20">
+            <app-ff-input label="Note" [parentFormGroup]="mapSupplierForm" [controlName]="'note'"
+                inputSize="profile" [isTextarea]="true" class="form-items w-100">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:'note'}">
+            </ng-container>
+        </article>
+        <section aria-label class="button-wrapper ff-flex-end">
+            <app-buttons buttonType="stroked" (buttonClicked)="close()">
+                Cancel
+            </app-buttons>
+            <app-buttons buttonType="fill" [isDisabled]="mapSupplierForm.invalid || creatingRequest"
+                (buttonClicked)="createRequestMapSuppliers()">
+                Send request
+            </app-buttons>
+        </section>
     </form>
 
-    <form [formGroup]="informationForm">
-
+    <form *ngIf="selectedInformationType==='info'" [formGroup]="informationForm">
+        <article class="mb-20 flex-column">
+            <label class="has-float-label custom-input"
+                [ngClass]="{'has-error': infocontrol.supplier.invalid && infocontrol.supplier.touched }">
+                <input placeholder=" " (input)="loadCompany(infocontrol.supplier.value)" formControlName="supplier" type="text" class="stock"
+                    [matAutocomplete]="sendRequestTo" />
+                <span class="label">Send request to*</span>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+            </label>
+            <mat-autocomplete #sendRequestTo="matAutocomplete" (optionSelected)="onSupplierSelected($event)">
+                <aside class=" inside-container" aria-label="">
+                    <ng-container *ngFor="let item of companies">
+                        <mat-option [value]="item.name">
+                            {{ item?.name }}
+                        </mat-option>
+                    </ng-container>
+                </aside>
+            </mat-autocomplete>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+            [ngTemplateOutletContext]="{formcontrol:'supplier'}">
+            </ng-container>
+        </article>
+        <article *ngIf="companySelected" class="mb-20 flex-column">
+            <label class="has-float-label custom-input"
+                [ngClass]="{'has-error': infocontrol.claim.invalid && infocontrol.claim.touched }">
+                <input placeholder=" " (input)="getCompanyClaims(infocontrol.claim.value)" formControlName="claim" type="text" class="stock"
+                    [matAutocomplete]="claim" />
+                <span class="label">Select claim*</span>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+            </label>
+            <mat-autocomplete #claim="matAutocomplete">
+                <aside class=" inside-container" aria-label="">
+                    <ng-container *ngFor="let item of companyClaims">
+                        <mat-option [value]="item.name">
+                            {{ item?.name }}
+                        </mat-option>
+                    </ng-container>
+                </aside>
+            </mat-autocomplete>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+            [ngTemplateOutletContext]="{formcontrol:'claim'}">
+            </ng-container>
+           
+        </article>
+        <article class="flex-column w-100 mb-20">
+            <app-ff-input label="Note" [parentFormGroup]="informationForm" [controlName]="'note'"
+                inputSize="profile" [isTextarea]="true" class="form-items w-100">
+            </app-ff-input>
+            <ng-container [ngTemplateOutlet]="formErrorMessages"
+                [ngTemplateOutletContext]="{formcontrol:'note'}">
+            </ng-container>
+        </article>
+        <section aria-label class="button-wrapper ff-flex-end">
+            <app-buttons buttonType="stroked" (buttonClicked)="close()">
+                Cancel
+            </app-buttons>
+            <app-buttons buttonType="fill" [isDisabled]="informationForm.invalid || creatingRequest"
+                (buttonClicked)="createRequestInfo()">
+                Send request
+            </app-buttons>
+        </section>
     </form>
 </section>
+
+<ng-template let-formcontrol="formcontrol" #formErrorMessages>
+    <span class="error-message"
+        *ngIf="fcontrol[formcontrol]?.errors?.required && (fcontrol[formcontrol]?.touched)">
+        {{'formValidation.commonValidationError'|translate}}
+    </span>
+
+    <span class="error-message"
+        *ngIf="infocontrol[formcontrol]?.errors?.required && (infocontrol[formcontrol]?.touched)">
+        {{'formValidation.commonValidationError'|translate}}
+    </span>
+</ng-template>
+
+<!-- Loader  -->
+<section class="min-h-300" *ngIf="!dataLoaded">
+    <app-loader loaderText="Loading Data" [loaderType]="'type1'"></app-loader>
+</section>
+<!-- Loader end -->

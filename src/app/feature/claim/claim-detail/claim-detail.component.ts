@@ -25,6 +25,8 @@ import { CLAIM_IMPORTS } from './claim-detail.config';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
 // services
 import { ClaimService } from '../claim.service';
+import { ClaimsEvidenceComponent } from '../claims-evidence';
+import { notOnlyWhitespace } from 'src/app/shared/configs/app.methods';
 
 const EXTERNAL_VERIFIER = 2;
 
@@ -49,7 +51,7 @@ export class ClaimDetailComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<ClaimDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialog: MatDialog,
+    public dialog: MatDialog,
     private claimService: ClaimService,
     private fb: FormBuilder
   ) {}
@@ -80,7 +82,6 @@ export class ClaimDetailComponent implements OnInit {
     }
   }
 
-  /* istanbul ignore next */
   initVerifierAutoComplete(): void {
     this.verifierFilterOptions =
       this.evidenceForm.controls.verifier.valueChanges.pipe(
@@ -89,8 +90,8 @@ export class ClaimDetailComponent implements OnInit {
         startWith(this.evidenceForm.controls.verifier.value),
         map(val => val ?? ''),
         switchMap((value: string) => {
-          if (value !== this.evidenceForm.controls.verifierObj?.value?.name) {
-            this.evidenceForm.controls.verifierObj.setValue(null);
+          if (value !== this.evidenceForm.controls?.verifierObj?.value?.name) {
+            this.evidenceForm.controls.verifierObj?.setValue(null);
           }
           return this.getVeriferList(value);
         })
@@ -127,7 +128,12 @@ export class ClaimDetailComponent implements OnInit {
         }
       }
 
-      formObj[field.id] = [controlValue, Validators.required];
+      const validators = [Validators.required];
+      if (type === 1) {
+        validators.push(notOnlyWhitespace());
+      }
+
+      formObj[field.id] = [controlValue, validators];
     });
   }
 
@@ -136,13 +142,13 @@ export class ClaimDetailComponent implements OnInit {
     return this.claimService.getVerifiers(this.data.id, event);
   }
 
+  /* istanbul ignore next */
   setVerifier(value: any): void {
     this.data.verifier = value;
     this.data.verifierAssigned = true;
     this.evidenceForm.controls.verifierObj?.setValue(value);
   }
 
-  /* istanbul ignore next */
   close(): void {
     if (this.data.isEdit) {
       this.data = this.savedData;
@@ -152,7 +158,6 @@ export class ClaimDetailComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  /* istanbul ignore next */
   dataResetIfAny(): void {
     this.data.criteria?.map((criteria: any) => {
       criteria.fields.map((field: any) => {
@@ -167,13 +172,13 @@ export class ClaimDetailComponent implements OnInit {
   // method to view inheritable claims data (file)
   /* istanbul ignore next */
   viewFiles(field: any): void {
-    // const dialogRef = this.dialog.open(ClaimsEvidenceComponent, {
-    //   disableClose: true,
-    //   width: '750px',
-    //   height: 'auto',
-    //   data: field,
-    //   panelClass: 'custom-modalbox',
-    // });
+    const dialogRef = this.dialog.open(ClaimsEvidenceComponent, {
+      disableClose: true,
+      width: '750px',
+      height: 'auto',
+      data: field,
+      panelClass: 'custom-modalbox',
+    });
   }
 
   /**
@@ -194,12 +199,11 @@ export class ClaimDetailComponent implements OnInit {
     item.value = params;
   }
 
-  /* istanbul ignore next */
   removeClaimFile(field: any): void {
     field.file = false;
     delete field.value;
     delete field.fileName;
-    this.evidenceForm.controls[field.id].setValue(null);
+    this.evidenceForm.controls[field.id]?.setValue(null);
   }
 
   /**

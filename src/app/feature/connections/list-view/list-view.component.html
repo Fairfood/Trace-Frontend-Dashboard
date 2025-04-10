@@ -3,21 +3,21 @@
     </app-ff-custom-tab>
 
     <aside class="search-wrap ff-flex-align-center">
-        <app-search-box [placeholder]="'searchText'|translate" [hideOptions]="false" [searchByOptions]="searchOptions"
-            (searchText)="searchFilter($event)" class="search-item"></app-search-box>
+        <app-search-box [placeholder]="'misc.searchText'|translate" [hideOptions]="false"
+            [searchByOptions]="searchOptions" (searchText)="searchFilter($event)" class="search-item" (searchByOptionChange)="handleSearchByOptionChange($event)"></app-search-box>
 
-        <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
+        <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()" customId="filterButton">
             <ng-container *ngIf="toggleFilter">
                 <mat-icon class="clear-icon">close</mat-icon>
-                <span class="button-text">{{'clearFilterText'|translate}}</span>
+                <span class="button-text">{{'misc.clearFilterText'|translate}}</span>
             </ng-container>
             <ng-container *ngIf="!toggleFilter">
                 <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
-                <span class="button-text">{{'filterText'|translate}}</span>
+                <span class="button-text">{{'misc.filterText'|translate}}</span>
             </ng-container>
         </app-buttons>
 
-        <app-buttons buttonType="fill" [isDisabled]="!fullDataLoaded" [matMenuTriggerFor]="moreButtonOptions">
+        <app-buttons buttonType="fill" [isDisabled]="!fullDataLoaded" [matMenuTriggerFor]="moreButtonOptions" customId="addDropButton">
             {{'connections.addConnection'|translate}}
             <svg width="8" height="6" class="m-l-10" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L4 4L7 1" stroke="white" stroke-width="2" stroke-linecap="round" />
@@ -26,13 +26,13 @@
         <mat-menu class="mat-menu more-button-receive" #moreButtonOptions="matMenu" xPosition="before">
             <ul class="button-action">
                 <li class="font-1-medium text-blue pointer" (click)="farmerConnection()" id="singleFarmer">
-                    Add single farmer
+                    {{'connections.addSingle'|translate}}
                 </li>
-                <li class="font-1-medium text-blue pointer" (click)="bulkUpload()" id="bulkUpload">
-                    Add multiple farmers <span class="new-chip">Excel</span>
+                <li class="font-1-medium text-blue pointer" (click)="bulkUpload()" id="bulkUpload"
+                    [innerHtml]="'connections.addMultiple'|translate">
                 </li>
                 <li class="font-1-medium text-blue pointer" (click)="addNewConnection()" id="addCompany">
-                    Add connection as company
+                    {{'connections.addCompany'|translate}}
                 </li>
             </ul>
         </mat-menu>
@@ -43,31 +43,52 @@
 
 <section *ngIf="toggleFilter && !loader" class="active-filter ff-flex-start">
     <ng-container *ngIf="activeTab === 'company'">
-        <app-ff-filter-box-wrapper label="{{'connections.filterRelationship'|translate}}"
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'connections.filterRelationship'|translate}}"
             [filterMasterData]="filterValues?.relationship"
             [hideSearch]="filterValues?.relationship.length <= 4 ?true: false"
             [defaultValue]="appliedFilters.relationship" (selectionChange)="filterItems($event, 'relationship')">
         </app-ff-filter-box-wrapper>
 
-        <app-ff-filter-box-wrapper label="{{'connections.typeText'|translate}}"
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'connections.typeText'|translate}}"
             [filterMasterData]="filterValues?.operationsList"
             [hideSearch]="filterValues?.operationsList.length <= 4 ?true: false"
             [defaultValue]="appliedFilters.primaryOperation"
             (selectionChange)="filterItems($event, 'primaryOperation')">
         </app-ff-filter-box-wrapper>
 
-        <app-ff-filter-box-wrapper label="{{'companyProfile.claim.th3'|translate}}"
-            [filterMasterData]="filterValues.status" [hideSearch]="true" [defaultValue]="appliedFilters.status"
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'claim.statusText'|translate}}" [filterMasterData]="filterValues.status"
+            [hideSearch]="true" [defaultValue]="appliedFilters.status"
             (selectionChange)="filterItems($event, 'status')">
         </app-ff-filter-box-wrapper>
     </ng-container>
 
     <ng-container *ngIf="activeTab === 'farmer'">
-        <app-ff-filter-box-wrapper label="{{'connections.fType'|translate}}"
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'connections.fType'|translate}}"
             [defaultValue]="appliedFilters.primaryOperation"
             [hideSearch]="filterValues?.operationsList.length <= 4 ?true: false"
             [filterMasterData]="filterValues?.operationsList"
             (selectionChange)="filterItems($event, 'primaryOperation')">
+        </app-ff-filter-box-wrapper>
+
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'connections.locationType'|translate}}"
+            [filterMasterData]="locationTypeList"
+            [hideSearch]="true"
+            [defaultValue]="appliedFilters.location_type"
+            (selectionChange)="filterItems($event, 'location_type')">
+        </app-ff-filter-box-wrapper>
+
+        <app-ff-filter-box-wrapper class="mx-4" label="{{'company.country'|translate}}"
+            [defaultValue]="appliedFilters.country"
+            [hideSearch]="false"
+            [filterMasterData]="countryList"
+            (selectionChange)="filterItems($event, 'country')">
+        </app-ff-filter-box-wrapper>
+
+        <app-ff-filter-box-wrapper *ngIf="stateList.length>0" class="mx-4" label="{{'company.province'|translate}}"
+            [defaultValue]="appliedFilters.province"
+            [hideSearch]="false"
+            [filterMasterData]="stateList"
+            (selectionChange)="filterItems($event, 'province')">
         </app-ff-filter-box-wrapper>
     </ng-container>
 </section>
@@ -78,7 +99,7 @@
             <tr>
                 <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
                     <article class="ff-flex-start pointer">
-                        {{item.name}}
+                        {{item.name|translate}}
                     </article>
                 </th>
             </tr>
@@ -93,29 +114,29 @@
                 </td>
                 <td class="mat-cell normal-column" (click)="viewDetails(item)">
                     T{{item?.connection_details?.tier | toPositive}}-{{item?.connection_details.connection_type === 2 ?
-                    'Supplier' : 'Buyer'}}
+                    ('types.supplier'|translate) : ('types.buyer'|translate)}}
                 </td>
                 <td class="mat-cell normal-column" (click)="viewDetails(item)">
                     <span *ngIf="item?.connection_details?.status === 201">
-                        {{'connections.sVerified'|translate}}
+                        {{'status.verified'|translate}}
                     </span>
                     <span *ngIf="item?.connection_details?.status === 101 && item?.email_sent">
-                        {{'connections.sInvited'|translate}}
+                        {{'status.invited'|translate}}
                     </span>
                     <span *ngIf="item?.connection_details?.status === 101 && !item?.email_sent">
-                        {{'connections.sMapped'|translate}}
+                        {{'status.mapped'|translate}}
                     </span>
                 </td>
                 <td class="mat-cell normal-column" *ngIf="item.type === 1">
 
                     <ng-container *ngIf="item.can_manage">
                         <app-buttons buttonType="secondary" *ngIf="item?.connection_details.tier < 0"
-                            (buttonClicked)="addCompanyPopup(item)">
-                            Add&nbsp;{{'connections.buyer'|translate}}
+                            (buttonClicked)="addCompanyPopup(item)" customId="addBuyerButton">
+                            {{'button.addBuyer'|translate}}
                         </app-buttons>
                         <app-buttons buttonType="secondary" *ngIf="item?.connection_details.tier > 0"
-                            [matMenuTriggerFor]="moreSuppliers">
-                            Add&nbsp;{{'connections.supplier'|translate}}
+                            [matMenuTriggerFor]="moreSuppliers" customId="addSupplierButton">
+                            {{'button.addSupplier'|translate}}
                             <svg width="8" height="6" class="m-l-10" viewBox="0 0 8 6" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1 1L4 4L7 1" stroke="black" stroke-width="2" stroke-linecap="round" />
@@ -123,11 +144,13 @@
                         </app-buttons>
                         <mat-menu class="mat-menu more-button-receive" #moreSuppliers="matMenu" xPosition="after">
                             <ul class="button-action">
-                                <li class="font-1-medium text-blue pointer" (click)="farmerConnection(item)" id="addFarmerPopup">
-                                    Add farmer
+                                <li class="font-1-medium text-blue pointer" (click)="farmerConnection(item)"
+                                    id="addFarmerPopup">
+                                    {{'button.addFarmer'|translate}}
                                 </li>
-                                <li class="font-1-medium text-blue pointer" (click)="addCompanyPopup(item)" id="addCompanyPopup">
-                                    Add company
+                                <li class="font-1-medium text-blue pointer" (click)="addCompanyPopup(item)"
+                                    id="addCompanyPopup">
+                                    {{'button.addCompany'|translate}}
                                 </li>
                             </ul>
                         </mat-menu>
@@ -135,22 +158,22 @@
 
                 </td>
                 <td class="mat-cell options-column">
-                    <span [matMenuTriggerFor]="beforeMenu" class="pointer">
+                    <span [matMenuTriggerFor]="beforeMenu" class="pointer" id="moreOptions">
                         <mat-icon>more_vert</mat-icon>
                     </span>
                     <mat-menu class="mat-menu connection-option" #beforeMenu="matMenu" xPosition="before">
-                        <span (click)="viewDetails(item)" class="text-xs text-blue" mat-menu-item>
-                            {{'companyProfile.claim.viewButton'|translate}}
+                        <span (click)="viewDetails(item)" id="viewDetails" class="text-xs text-blue" mat-menu-item>
+                            {{'button.viewButton'|translate}}
                         </span>
-                        <span (click)="mapSuppliers(item)" class="text-xs text-blue" mat-menu-item>
-                            {{'requests.type4'|translate}}
+                        <span (click)="mapSuppliers(item)" id="mapSuppliers" class="text-xs text-blue" mat-menu-item>
+                            {{'button.mapSuppliers'|translate}}
                         </span>
                         <span class="text-xs text-blue" mat-menu-item>
-                            <span (click)="resentInvite(item.id)" *ngIf="item.email_sent">
-                                {{'companyProfile.team.resendInvite'|translate}}
+                            <span (click)="resentInvite(item?.id)" id="resentInvite" *ngIf="item.email_sent">
+                                {{'button.resendInvite'|translate}}
                             </span>
-                            <span (click)="sentInvite(item.id)" *ngIf="!item.email_sent">
-                                {{'connections.opSend'|translate}}
+                            <span (click)="sentInvite(item?.id)" id="sentInvite" *ngIf="!item.email_sent">
+                                {{'button.sendInvite'|translate}}
                             </span>
                         </span>
                     </mat-menu>
@@ -159,13 +182,15 @@
         </tbody>
     </table>
     <section class="no-data w-100" *ngIf="!loader && dataSource.length === 0">
-        No data found
+        {{'connections.noData'|translate}}
     </section>
 </section>
 
-<app-ff-pagination [totalCount]="dataCount" [customPageSize]="appliedFilters"
-    (paginationAction)="paginatorEvent($event)" [ngClass]="loader?'hide':'show'"></app-ff-pagination>
+<!-- <app-ff-pagination [totalCount]="dataCount" [customPageSize]="appliedFilters"
+    (paginationAction)="paginatorEvent($event)" [ngClass]="loader?'hide':'show'"></app-ff-pagination> -->
+    <app-ff-custom-pagination *ngIf="!loader" [totalCount]="dataCount" [customPage]="customPageSize" (paginationAction)="paginatorEvent($event)" [ngClass]="loader?'hide':'show'"></app-ff-custom-pagination>
 
 
-<app-loader [loaderText]="'Loading connection list'" [loaderType]="'type1'" *ngIf="loader"
+<app-loader [loaderText]="'loaderText.connections'|translate" loaderType="type1" *ngIf="loader"
     class="min-h-300"></app-loader>
+    

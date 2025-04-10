@@ -1,6 +1,6 @@
 <section class="supply-chain-table-tab flex-column">
     <div class="header ff-flex-between mb-10">
-        <h3>{{supplyChainCount}} active supply chains</h3>
+        <h3>{{supplyChainCount}} {{'supplyChain.active'|translate}}</h3>
     </div>
     <section class="ff-table-container w-100">
         <table aria-label="Supply chain table">
@@ -32,12 +32,13 @@
         </table>
 
         <div class="no-data w-100" aria-label="" *ngIf="supplyChainCount === 0" [hidden]="loader">
-            No supply chain found
+            {{'supplyChain.noSupply'|translate}}
         </div>
 
-        <app-loader [loaderText]="'Loading supply chain'" [loaderType]="'type1'" *ngIf="loader"
+        <app-loader [loaderText]="'loaderText.supplyChain'|translate" loaderType="type1" *ngIf="loader"
             class="min-h-300"></app-loader>
     </section>
-    <app-ff-pagination [totalCount]="supplyChainCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+    <!-- <app-ff-pagination [totalCount]="supplyChainCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+    <app-ff-custom-pagination [totalCount]="supplyChainCount" (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
 
 </section>

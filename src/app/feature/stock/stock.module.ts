@@ -8,6 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { ExportIconComponent } from 'src/app/shared/components/export-icon';
 import { StockComponent } from './stock.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { ButtonsComponent } from 'fairfood-utils';
 
 @NgModule({
   declarations: [StockComponent],
@@ -16,6 +18,8 @@ import { StockComponent } from './stock.component';
     RouterModule.forChild(stockRoutes),
     MatIconModule,
     ExportIconComponent,
+    TranslateModule,
+    ButtonsComponent,
   ],
 })
 export class StockModule {}

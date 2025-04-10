@@ -1,7 +1,7 @@
 <div class="page-container" *ngIf="dataLoaded">
     <section class="heading-section">
         <h1 class="page-heading">
-            Company profile
+            {{'companyProfile.heading' | translate}}
         </h1>
     </section>
 
@@ -16,7 +16,7 @@
             </article>
             <article *ngIf="companyProfileData?.identification_no" class="ff-flex-start" id="regNo">
                 <span class="label-tr text-sm">
-                    Registration number:
+                    {{'companyProfile.regNo' | translate}}:
                 </span>
                 <span class="value-tr text-sm" id="identificationNumber">&nbsp;{{companyProfileData?.identification_no}}</span>
             </article>
@@ -59,5 +59,5 @@
 
 <!-- loader section -->
 <section class="loader-wrapper ff-flex-center" *ngIf="!dataLoaded">
-    <app-loader loaderText="Loading profile data" [loaderType]="'type1'"></app-loader>
+    <app-loader loaderText="{{'loaderText.profile' | translate}}" loaderType="type1"></app-loader>
 </section>

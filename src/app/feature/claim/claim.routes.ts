@@ -1,6 +1,5 @@
-/* istanbul ignore file */
 import { Routes } from '@angular/router';
-
+/* istanbul ignore next */
 export const clRoutes: Routes = [
   {
     path: '',

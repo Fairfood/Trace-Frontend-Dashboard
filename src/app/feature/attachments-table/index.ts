@@ -1,1 +1,1 @@
-export { AttachementsTableModule } from './attachments-table.module';
+export { AttachementsTableComponent } from './attachments-table.component';

@@ -8,7 +8,7 @@
                 You didn't add any claims yet, please add claims from below list !
             </p>
             <ul class="claim-listing" *ngIf="selectedClaims.length > 0">
-                <li *ngFor="let claim of selectedClaims" class="pointer selected ff-flex-between"
+                <li *ngFor="let claim of selectedClaims;let j = index" [id]="j+'_claim'" class="pointer selected ff-flex-between"
                     (click)="addClaimToTransaction(claim, true)">
                     <aside class="left-side ff-flex-align-center" aria-label="Claim details">
                         <mat-icon>verified_user</mat-icon>
@@ -24,7 +24,7 @@
                     </aside>
                     <ng-container *ngIf="!claim.disabled && (claim.inherited || claim.selected)">
 
-                        <span class="cursor-pointer ff-flex-align-center text-xs font-1-normal"
+                        <span [id]="j+'_removeBtn'" class="cursor-pointer ff-flex-align-center text-xs font-1-normal"
                             (click)="removeClaimFromTransaction($event, claim)">
                             <svg width="20" height="20" viewBox="0 0 9 12" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@
             </p>
         </aside>
         <ul class="claim-listing" *ngIf="availableClaims?.length > 0">
-            <li class="ff-flex-between" *ngFor="let claim of availableClaims">
+            <li class="ff-flex-between" *ngFor="let claim of availableClaims; let i = index">
                 <aside class="left-side ff-flex-align-center" aria-label="Available claim details">
                     <!-- default claim icon  -->
                     <mat-icon>verified_user</mat-icon>
@@ -66,7 +66,7 @@
                     </article>
                 </aside>
                 <!-- add plus custom icon  -->
-                <svg class="pointer" (click)="addClaimToTransaction(claim, false)" width="32" height="32"
+                <svg [id]="i+'_Btn'" class="pointer" (click)="addClaimToTransaction(claim, false)" width="32" height="32"
                     viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M23.499 11.731C23.499 17.7206 18.5677 22.5889 12.4688 22.5889C6.36977 22.5889 1.43848 17.7206 1.43848 11.731C1.43848 5.74138 6.36977 0.873047 12.4688 0.873047C18.5677 0.873047 23.499 5.74138 23.499 11.731Z"

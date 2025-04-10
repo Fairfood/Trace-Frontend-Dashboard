@@ -8,13 +8,14 @@ import {
   MatDialogModule,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-claims-evidence',
   templateUrl: './claims-evidence.component.html',
   styleUrls: ['./claims-evidence.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatIconModule],
+  imports: [CommonModule, MatDialogModule, MatIconModule, TranslateModule],
 })
 export class ClaimsEvidenceComponent implements OnInit {
   table: boolean;
@@ -37,14 +38,18 @@ export class ClaimsEvidenceComponent implements OnInit {
   }
 
   checkFilesIncluded(): void {
-    this.data.map((responseData: any) => {
+    this.data?.map((responseData: any) => {
       responseData?.node_responses?.map((e: any) => {
-        e.responses.map((f: any) => {
+        e.responses?.map((f: any) => {
           if (f.field_response.type == 3) {
             responseData.table = true;
           }
         });
       });
     });
+  }
+
+  trackByFn(index: number): number {
+    return index;
   }
 }

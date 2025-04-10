@@ -1,40 +1,47 @@
 <div class="page-container">
     <section class="heading-section">
         <h1 class="page-heading">
-            Claims
+            {{ 'claim.heading' | translate }}
         </h1>
     </section>
-    <section class="utils ff-flex-between flex-column" *ngIf="!dataLoading">
-        <app-search-box [placeholder]="'Search here'" [hideOptions]="true" (searchText)="searchFilter($event)"
-            class="search-item"></app-search-box>
 
-        <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
-            <ng-container *ngIf="toggleFilter">
-                <mat-icon class="clear-icon">close</mat-icon>
-                <span class="button-text">Clear filters</span>
-            </ng-container>
-            <ng-container *ngIf="!toggleFilter">
-                <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
-                <span class="button-text">Filters</span>
-            </ng-container>
-        </app-buttons>
+    <section class="utils ff-flex-between flex-column">
+        <app-ff-custom-tab [tabGroupItems]="claimTabs" [activeTabId]="activeClaimTab"
+            (tabChanged)="changeTab($event)"></app-ff-custom-tab>
+        <aside class="search-wrap ff-flex-align-center" aria-label="Right side action">
+            <app-search-box placeholder="{{'misc.searchText' | translate}}" [hideOptions]="true" [searchString]="appliedFilterValues?.searchString"
+                (searchText)="searchFilter($event)" class="search-item">
+            </app-search-box>
+
+            <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
+                <ng-container *ngIf="toggleFilter">
+                    <mat-icon class="clear-icon">close</mat-icon>
+                    <span class="button-text">{{'misc.clearFilterText' | translate }}</span>
+                </ng-container>
+                <ng-container *ngIf="!toggleFilter">
+                    <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+                    <span class="button-text">{{'misc.filterText' | translate}}</span>
+                </ng-container>
+            </app-buttons>
+        </aside>
     </section>
 
     <section *ngIf="toggleFilter" class="active-filter ff-flex-start">
-        <app-ff-filter-box-wrapper label="Claims" [defaultValue]="appliedFilterValues.selectedClaim"
+        <app-ff-filter-box-wrapper class="mx-4" label="Claims" [defaultValue]="appliedFilterValues.selectedClaim"
             [filterMasterData]="claimListOptions?.claimsData" (selectionChange)="filterClaims($event, 'claim')">
         </app-ff-filter-box-wrapper>
 
-        <app-ff-filter-box-wrapper label="Status" [defaultValue]="appliedFilterValues.status"
+        <app-ff-filter-box-wrapper class="mx-4" label="Status" [defaultValue]="appliedFilterValues.status"
             [filterMasterData]="statusFilter" [hideSearch]="true" (selectionChange)="filterClaims($event, 'status')">
         </app-ff-filter-box-wrapper>
 
-        <app-ff-filter-box-wrapper label="Product" [defaultValue]="appliedFilterValues.selectedProduct"
+        <app-ff-filter-box-wrapper class="mx-4" label="Product" [defaultValue]="appliedFilterValues.selectedProduct"
             [filterMasterData]="claimListOptions?.productData" (selectionChange)="filterClaims($event, 'product')">
         </app-ff-filter-box-wrapper>
 
-        <ng-container *ngIf="claimListOptions?.assignorData.length > 0">
-            <app-ff-filter-box-wrapper label="Assigned to" [defaultValue]="appliedFilterValues.selectedAssignor"
+        <ng-container *ngIf="claimListOptions?.assignorData.length > 0 && activeClaimTab === 'mine'">
+            <app-ff-filter-box-wrapper class="mx-4" label="Assigned to"
+                [defaultValue]="appliedFilterValues.selectedAssignor"
                 [filterMasterData]="claimListOptions?.assignorData"
                 (selectionChange)="filterClaims($event, 'assignor')">
             </app-ff-filter-box-wrapper>
@@ -47,19 +54,20 @@
             <thead>
                 <tr>
                     <th class="large-column">
-                        Claim
+                        {{'claim.claim' | translate }}
                     </th>
                     <th class="normal-column">
-                        Assigned to
+                        {{ activeClaimTab === 'mine'? ('claim.assignedTo' | translate):
+                        ('claim.assignedBy' | translate) }}
                     </th>
                     <th class="normal-column">
-                        Stock ID
+                        {{'stocks.id' | translate }}
                     </th>
                     <th class="large-column">
-                        Product
+                        {{'transactions.product' | translate }}
                     </th>
                     <th class="smaller-column">
-                        Status
+                        {{'claim.statusText' | translate }}
                     </th>
                     <th class="options-column">
 
@@ -67,12 +75,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let element of dataSource" class="pointer" (click)="viewDetails(element.id)">
+                <tr *ngFor="let element of dataSource; trackBy: trackByFn" class="pointer"
+                    (click)="viewDetails(element.id)" id="{{element.batch_number}}">
                     <td class="mat-cell large-column">
                         {{element.claim.name}}
                     </td>
                     <td class="mat-cell normal-column">
-                        {{element.verifier ? element.verifier?.name : '-'}}
+
+                        <ng-container *ngIf="activeClaimTab === 'mine'">
+                            {{element.verifier ? element.verifier?.name : '-'}}
+                        </ng-container>
+                        <ng-container *ngIf="activeClaimTab === 'toVerify'">
+                            {{element.attached_by ? element.attached_by?.name : '-'}}
+                        </ng-container>
                     </td>
                     <td class="mat-cell normal-column">
                         {{element.batch_number}}
@@ -82,19 +97,20 @@
                     </td>
                     <td class="mat-cell smaller-column">
                         <ng-container [ngSwitch]="element.status">
-                            <span *ngSwitchCase="1">Pending</span>
-                            <span *ngSwitchCase="2">Verified</span>
-                            <span *ngSwitchCase="3">Rejected</span>
-                            <span *ngSwitchDefault>Pending</span>
+                            <span *ngSwitchCase="1">{{'status.pending' | translate }}</span>
+                            <span *ngSwitchCase="2">{{'status.verified' | translate }}</span>
+                            <span *ngSwitchCase="3">{{'status.rejected' | translate }}</span>
+                            <span *ngSwitchDefault>{{'status.pending' | translate }}</span>
                         </ng-container>
                     </td>
                     <td class="mat-cell options-column" (click)="$event.stopPropagation()">
-                        <span class="pointer" [matMenuTriggerFor]="moreOptionsClaimList">
+                        <span class="pointer" [matMenuTriggerFor]="moreOptionsClaimList" id="moreMenu">
                             <mat-icon>more_vert</mat-icon>
                         </span>
                         <mat-menu class="mat-menu more-options" #moreOptionsClaimList="matMenu" xPosition="before">
-                            <button class="text-xs text-blue" (click)="viewDetails(element.id)" mat-menu-item id="viewDetails">
-                                View details
+                            <button class="text-xs text-blue" (click)="viewDetails(element.id)" mat-menu-item
+                                id="viewDetails">
+                                {{'button.viewButton' | translate }}
                             </button>
                         </mat-menu>
                     </td>
@@ -102,13 +118,18 @@
             </tbody>
         </table>
 
-        <div class="no-data w-100" aria-label="" *ngIf="tableLength === 0" [hidden]="dataLoading">
-            No records found
+        <div class="no-data w-100 flex-column" aria-label="no records" *ngIf="tableLength === 0" [hidden]="dataLoading">
+            <div>
+                <img class="no-data-image" src="../../../../assets/images/no_claims.svg" alt="">
+            </div>
+            <span>{{'claim.noRecors' | translate }}</span>
         </div>
 
-        <app-loader [loaderText]="'Loading claim data'" [loaderType]="'type1'" *ngIf="dataLoading"
+        <app-loader loaderText="{{'loaderText.claimRecords' | translate }}" loaderType="type1" *ngIf="dataLoading"
             class="min-h-300"></app-loader>
     </section>
 
-    <app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+    <!-- <app-ff-pagination [customPageSize]="paginationReset" [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+    <app-ff-custom-pagination  *ngIf="!dataLoading" [totalCount]="tableLength" [customPage]="customPageSize"
+        (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
 </div>

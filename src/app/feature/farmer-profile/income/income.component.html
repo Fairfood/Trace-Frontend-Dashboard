@@ -2,30 +2,30 @@
     <article class="widget col-4">
         <ng-container [ngTemplateOutlet]="commonWidgetItem" [ngTemplateOutletContext]="{
             valueVar:  farmerData?.income?.total || 0,
-            heading: 'Total Transactions',
+            heading: ('farmer.totalTr' | translate),
             imageUrl: 'transaction.svg',
             title: ''
         }">
         </ng-container>
     </article>
-    <article class="widget col d-flex ml-20 justify-content-between">
+    <article class="widget col d-flex ml-20 ff-flex-between">
         <ng-container [ngTemplateOutlet]="commonWidgetItem" [ngTemplateOutletContext]="{
             valueVar:  farmerData?.income?.product || 0 ,
-            heading: 'Income from products',
+            heading: ('farmer.incomePro' | translate),
             imageUrl: 'money.svg',
             title: ''
         }">
         </ng-container>
         <ng-container [ngTemplateOutlet]="commonWidgetItem" [ngTemplateOutletContext]="{
             valueVar:  farmerData?.income?.premium || 0,
-            heading: 'Income from premium',
+            heading: ('farmer.premiumIncome' | translate),
             imageUrl: 'star.svg',
             title: ''
         }">
         </ng-container>
         <ng-container [ngTemplateOutlet]="commonWidgetItem" [ngTemplateOutletContext]="{
             valueVar:  farmerData?.income?.others || 0,
-            heading: 'Income from other',
+            heading: ('farmer.otherIncome' | translate),
             imageUrl: 'star.svg',
             title: 'test'
         }">
@@ -34,9 +34,11 @@
 </section>
 
 <section class="head-section ff-flex-between">
-    <h3 class="text-md font-1-bold">Payments</h3>
+    <h3 class="text-md font-1-bold">
+        {{'newPlot.payments'|translate}}
+    </h3>
     <aside class="utils" aria-label="Search section wrapper">
-        <app-search-box [placeholder]="'Search here'" [searchByOptions]="optionsArray"
+        <app-search-box [placeholder]="'misc.searchText'|translate" [searchByOptions]="optionsArray"
             (searchText)="searchFilter($event)" class="search-item"></app-search-box>
         <app-export-icon></app-export-icon>
     </aside>
@@ -45,7 +47,7 @@
     <table mat-table [dataSource]="dataSource" class="col-12" aria-label="Income listing table">
         <ng-container matColumnDef="references">
             <th mat-header-cell class="normal-column no-border-left" *matHeaderCellDef>
-                References
+                {{'newPlot.reference'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 {{ element.id }}
@@ -54,7 +56,7 @@
 
         <ng-container matColumnDef="source">
             <th mat-header-cell class="normal-column" *matHeaderCellDef>
-                Source
+                {{'trReport.source'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 {{ element?.source_details?.full_name }}
@@ -63,33 +65,41 @@
 
         <ng-container matColumnDef="payment">
             <th mat-header-cell class="normal-column" *matHeaderCellDef>
-                Payment type
+                {{'newPlot.paymentType'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 <ng-container [ngSwitch]="element.payment_type">
-                    <ng-container *ngSwitchCase="'TRANSACTION'">Base price</ng-container>
-                    <ng-container *ngSwitchCase="'PREMIUM'">Premium</ng-container>
-                    <ng-container *ngSwitchDefault>Premium</ng-container>
+                    <ng-container *ngSwitchCase="'TRANSACTION'">
+                        {{'newPlot.basePrice'|translate}}
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'PREMIUM'">{{'newPlot.premium'|translate}}</ng-container>
+                    <ng-container *ngSwitchDefault>{{'newPlot.premium'|translate}}</ng-container>
                 </ng-container>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="verification">
             <th mat-header-cell class="normal-column" *matHeaderCellDef>
-                Verification type
+                {{'newPlot.verType'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 <ng-container [ngSwitch]="element.method">
-                    <ng-container *ngSwitchCase="'CARD'">Card</ng-container>
-                    <ng-container *ngSwitchCase="'INVOICE'">Invoice</ng-container>
-                    <ng-container *ngSwitchDefault>Not verified</ng-container>
+                    <ng-container *ngSwitchCase="'CARD'">
+                        {{'newPlot.card'|translate}}
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'INVOICE'">
+                        {{'newPlot.invoice'|translate}}
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
+                        {{'newPlot.notVerified'|translate}}
+                    </ng-container>
                 </ng-container>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="date">
             <th mat-header-cell class="normal-column" *matHeaderCellDef>
-                Date
+                {{'misc.date'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 {{element?.created_on * 1000 | date: 'dd MMMM y' }}
@@ -98,7 +108,7 @@
 
         <ng-container matColumnDef="amount">
             <th mat-header-cell class="normal-column" *matHeaderCellDef>
-                Amount
+                {{'misc.amount'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="normal-column">
                 {{element?.amount.toFixed(2).toLocaleString('en-US')}} {{element?.currency}}
@@ -106,7 +116,7 @@
         </ng-container>
         <ng-container matColumnDef="receipt">
             <th mat-header-cell class="large-column" *matHeaderCellDef>
-                Receipt
+                {{'transactions.receipt'|translate}}
             </th>
             <td mat-cell *matCellDef="let element" class="large-column">
                 <ng-container *ngIf="element?.invoice">
@@ -138,17 +148,18 @@
     </table>
 
     <div class="col-12" *ngIf="incomeData.loading">
-        <app-loader loaderText="Loading income" [loaderType]="'type1'"></app-loader>
+        <app-loader loaderText="{{'loaderText.income'|translate}}" loaderType="type1"></app-loader>
     </div>
 
     <section class="col-12 text-center text-blue font-1-medium no-data"
         *ngIf="!incomeData.loading && incomeData.count === 0">
-        No data
+        {{'connections.noData'|translate}}
     </section>
 
 </section>
 <div class="col-12 mt-10">
-    <app-ff-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+    <!-- <app-ff-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+    <app-ff-custom-pagination [totalCount]="tableCount" (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
 </div>
 
 <ng-template #commonWidgetItem let-imageUrl="imageUrl" let-heading="heading" let-valueVar="valueVar" let-title="title">

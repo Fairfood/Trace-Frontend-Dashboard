@@ -29,3 +29,25 @@
     cursor: pointer;
   }
 }
+
+.ml-10{
+  margin-left: 10px;
+}
+
+.right-section{
+  margin-right: 0px;
+}
+
+.heading-section {
+  display: block;
+  @include devices(mobile) {
+    display: flex;
+  }
+}
+
+.title{
+  margin-top: 10px;
+  @include devices(mobile) {
+    margin-top: 0px;
+  }
+}

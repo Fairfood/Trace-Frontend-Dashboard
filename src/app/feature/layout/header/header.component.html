@@ -1,20 +1,20 @@
-<header *ngIf="dataLoaded" class="ff-flex-between" [ngStyle]="{top: viewingAsAdmin?'30px': '0'}">
+<header *ngIf="dataLoaded" class="ff-flex-between" [ngStyle]="{top: viewingAsAdmin?'29px': '0'}">
 
-    <div class="ff-flex-start">
+    <div class="ff-flex-start supply-container">
         <img class="brand-img pointer" [src]="nodeDetails?.brandLogo || '../../../../assets/images/Logo.svg'"
             alt="Fairfood Brand" (click)="gotoHome()">
-        <app-ff-dropdown [dropdownOptions]="filteredSupplyChain" [defaultValue]="selectedSupplyChain.id"
+        <app-ff-dropdown [dropdownOptions]="filteredSupplyChain" [defaultValue]="selectedSupplyChain?.id"
             label="Supply chain" [hideSearch]="filteredSupplyChain?.length>5?false: true" [hideFooter]="true"
-            (selectionChange)="changeSupplychain($event)" class="supply navbar-collapse"
+            (selectionChange)="changeSupplychain($event)" class="supply "
             *ngIf="!hideDropdown && selectedSupplyChain"></app-ff-dropdown>
     </div>
 
-    <aside class="ff-flex-start navbar-collapse" aria-label="right side of the header">
+    <aside class="ff-flex-start " aria-label="right side of the header">
         <app-notification-widget (supplyChainUpdate)="notificationChange($event)"
             (switchCompany)="notificationSwitchCompany($event)"></app-notification-widget>
-        <app-downloads class="downloads"></app-downloads>
-        <aside class="user-details-new ff-flex-align-center" aria-label="user avatar and details section"
-            *ngIf="userData" [matMenuTriggerFor]="menuProfile">
+        <app-downloads class="downloads navbar-collapse"></app-downloads>
+        <aside class="user-details-new ff-flex-align-center navbar-collapse" id="userProfile"
+            aria-label="user avatar and details section" *ngIf="userData" [matMenuTriggerFor]="menuProfile">
             <img class="user-pic" [src]="userData?.image" alt="" *ngIf="userData?.image">
             <span class="avatar-round" *ngIf="!userData?.image">
                 {{userData|avatarPipe}}
@@ -30,24 +30,25 @@
             </article>
             <mat-icon class="down-arrow">keyboard_arrow_down</mat-icon>
         </aside>
-        <mat-menu class="profile-dropdown" #menuProfile="matMenu" xPosition="before">
+        <mat-menu class="profile-dropdown navbar-collapse" #menuProfile="matMenu" xPosition="before">
             <ng-container *ngIf="!viewingAsAdmin">
                 <a *ngFor="let item of userData.nodes; trackBy: trackById; let i=index" class="pl-0 pr-0"
-                    (click)="changeCompany(item.id, i)" class="dropdown-item ff-flex-align-center companies">
-                    <span class="c-circle" [ngClass]="nodeDetails?.id == item.id ? 'active' : ''"></span>
+                    (click)="changeCompany(item?.id, i)" class="dropdown-item ff-flex-align-center companies"
+                    id="company{{i}}">
+                    <span class="c-circle" [ngClass]="nodeDetails?.id == item?.id ? 'active' : ''"></span>
                     <span>
                         {{ (item.name.length> 20)? (item.name | slice:0:21) + '..' : (item.name) }}
                     </span>
                 </a>
             </ng-container>
 
-            <a [routerLink]="['/user-profile']" class="dropdown-item" *ngIf="!viewingAsAdmin">
+            <a [routerLink]="['/user-profile']" class="dropdown-item" *ngIf="!viewingAsAdmin" id="myProfile">
                 My profile
             </a>
-            <a class="dropdown-item" (click)="backtoAdmin()" *ngIf="viewingAsAdmin">
+            <a class="dropdown-item" (click)="backtoAdmin()" *ngIf="viewingAsAdmin" id="goBackToAdmin">
                 Go back to admin
             </a>
-            <a class="dropdown-item" (click)="onLoggedout()" *ngIf="!viewingAsAdmin">
+            <a class="dropdown-item" (click)="onLoggedout()" *ngIf="!viewingAsAdmin" id="logoutButton">
                 Log Out
             </a>
         </mat-menu>

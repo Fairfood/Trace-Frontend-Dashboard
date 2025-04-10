@@ -32,8 +32,8 @@ export interface ITransactionData {
   id: string;
   quantity: number;
   buyer_ref_number: string;
-  connection: ITransactionConnection;
-  creator: ITransactionCreator;
+  connection?: ITransactionConnection;
+  creator?: ITransactionCreator;
   currency: string;
   date: number;
   number: number;
@@ -66,6 +66,7 @@ export interface IAppliedFilterTransaction {
   dateTo: string;
   dateFrom: string;
   creator: string;
+  archived: boolean;
 }
 
 export interface IStockActionTable {
@@ -79,4 +80,19 @@ export interface IStockActionTable {
   destinationProduct?: string;
   quantity?: number;
   removedStockId?: string;
+}
+
+export interface FilterParams {
+  type?: number;
+  date_from: string;
+  date_to: string;
+  date_on: string;
+  search: string;
+  creator: string;
+  quantity_from: string;
+  quantity_to: string;
+  product?: string;
+  node?: string;
+  destination_product?: string;
+  source_product?: string;
 }

@@ -1,13 +1,21 @@
+/* istanbul ignore file */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { ButtonsComponent } from 'fairfood-utils';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-lose-data-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, ButtonsComponent, MatIconModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    ButtonsComponent,
+    MatIconModule,
+    TranslateModule,
+  ],
   templateUrl: './lose-data-dialog.component.html',
   styleUrls: ['./lose-data-dialog.component.scss'],
 })

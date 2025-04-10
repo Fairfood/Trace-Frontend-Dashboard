@@ -3,13 +3,13 @@
         <app-search-box placeholder="Search here" [hideOptions]="true" class="search" *ngIf="!addMemberScreenVisible"
             (searchText)="searchFilter($event)">
         </app-search-box>
-        <h3 *ngIf="addMemberScreenVisible">Add team member</h3>
+        <h3 *ngIf="addMemberScreenVisible">{{'team.addButton'|translate}}</h3>
         <aside class="ff-flex-start" aria-label="Team member">
             <app-buttons buttonType="stroked" *ngIf="asAdmin" (buttonClicked)="toggleAddMember()">
-                {{!addMemberScreenVisible?'Add team member':'Cancel'}}
+                {{!addMemberScreenVisible?('team.addButton'|translate):('button.cancel'|translate)}}
             </app-buttons>
             <app-buttons buttonType="fill" *ngIf="addMemberScreenVisible" (buttonClicked)="addTeamMember()">
-                Send invite
+                {{'button.opSend'|translate}}
             </app-buttons>
         </aside>
 
@@ -39,9 +39,9 @@
                     </td>
                     <td class="mat-cell normal-column">
                         <ng-container [ngSwitch]="item.type">
-                            <span *ngSwitchCase="1">Admin</span>
-                            <span *ngSwitchCase="2">Member</span>
-                            <span *ngSwitchCase="3">Viewer</span>
+                            <span *ngSwitchCase="1">{{'roles.admin'|translate}}</span>
+                            <span *ngSwitchCase="2">{{'roles.member'|translate}}</span>
+                            <span *ngSwitchCase="3">{{'roles.viewer'|translate}}</span>
                         </ng-container>
                     </td>
                     <td class="mat-cell normal-column">
@@ -51,7 +51,7 @@
                         {{item?.phone?.dial_code || '-'}} {{item?.phone?.phone}}
                     </td>
                     <td class="mat-cell smaller-column">
-                        {{item?.active?'Active': 'Inactive'}}
+                        {{item?.active?('status.active'|translate): ('status.inactive'|translate)}}
                     </td>
                     <td class="mat-cell options-column" (click)="$event.stopPropagation()">
                         <span class="pointer" [matMenuTriggerFor]="moreOptionsTeam">
@@ -59,23 +59,24 @@
                         </span>
                         <mat-menu class="mat-menu" #moreOptionsTeam="matMenu" xPosition="before">
                             <button *ngIf="asAdmin && item.type != 1" class="text-xs text-blue"
-                                (click)="changeMemberRole(item, 'admin')" mat-menu-item id="makeAdmin">Make admin
+                                (click)="changeMemberRole(item, 'admin')" mat-menu-item id="makeAdmin">
+                                {{'button.makeAdmin'|translate}}
                             </button>
                             <button *ngIf="asAdmin && item.type != 2" class="text-xs text-blue"
                                 (click)="changeMemberRole(item, 'member')" mat-menu-item id="makeMember">
-                                Make member
+                                {{'button.makeMember'|translate}}
                             </button>
                             <button *ngIf="asAdmin && item.type != 3" class="text-xs text-blue"
                                 (click)="changeMemberRole(item, 'viewer')" mat-menu-item id="makeViewer">
-                                Make viewer
+                                {{'button.makeViewer'|translate}}
                             </button>
                             <button *ngIf="!item.active" class="text-xs text-blue" (click)="resendInvite(item)"
                                 mat-menu-item id="resend">
-                                Resend invite
+                                {{'button.resendInvite'|translate}}
                             </button>
                             <button *ngIf="asAdmin" class="text-xs text-blue" (click)="openTeammemberDeleteDialog(item)"
                                 mat-menu-item id="remove">
-                                Remove
+                                {{'button.remove'|translate}}
                             </button>
                         </mat-menu>
                     </td>
@@ -84,15 +85,16 @@
         </table>
 
         <div class="no-data w-100" aria-label="" *ngIf="teamMembers?.length === 0" [hidden]="dataLoading">
-            No team member found
+            {{'team.none'|translate}}
         </div>
 
-        <app-loader [loaderText]="'Loading member list'" [loaderType]="'type1'" *ngIf="dataLoading"
+        <app-loader [loaderText]="'loaderText.team'|translate" loaderType="type1" *ngIf="dataLoading"
             class="min-h-300"></app-loader>
     </section>
 
-    <app-ff-pagination [totalCount]="teamMembersCount" (paginationAction)="paginatorEvent($event)"
-        *ngIf="!addMemberScreenVisible"></app-ff-pagination>
+    <!-- <app-ff-pagination [totalCount]="teamMembersCount" (paginationAction)="paginatorEvent($event)"
+        *ngIf="!addMemberScreenVisible"></app-ff-pagination> -->
+        <app-ff-custom-pagination [totalCount]="teamMembersCount" (paginationAction)="paginatorEvent($event)" *ngIf="!addMemberScreenVisible"></app-ff-custom-pagination>
 
     <section class="add-member-form row-md" *ngIf="addMemberScreenVisible" [formGroup]="teamMemberForm">
         <ng-container *ngIf="!dataLoading">
@@ -101,7 +103,7 @@
                     [ngClass]="{'has-error': teamMemberForm.controls['email'].invalid && teamMemberForm.controls['email'].touched }">
                     <input placeholder=" " type="text" formControlName="email" class="stock"
                         [matAutocomplete]="inputAutoComplete" id="emailField" />
-                    <span class="label">Email</span>
+                    <span class="label">{{'user.email'|translate}}</span>
                 </label>
                 <mat-autocomplete #inputAutoComplete="matAutocomplete" (optionSelected)="optionsSelected($event)">
                     <mat-option class="text-xs font-1-normal text-blue name-wrap ff-flex-align-center"
@@ -122,7 +124,7 @@
             </aside>
             <ng-container *ngIf="showAdditional">
                 <article class="flex-column col-md-4">
-                    <app-ff-input label="First name *" [parentFormGroup]="teamMemberForm" controlName="firstName"
+                    <app-ff-input label="{{'user.firstName'|translate}} *" [parentFormGroup]="teamMemberForm" controlName="firstName"
                         inputSize="full" inputType="text" class="item">
                     </app-ff-input>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
@@ -130,7 +132,7 @@
                     </ng-container>
                 </article>
                 <article class="flex-column col-md-4">
-                    <app-ff-input label="Last name *" [parentFormGroup]="teamMemberForm" controlName="lastName"
+                    <app-ff-input label="{{'user.lastName'|translate}} *" [parentFormGroup]="teamMemberForm" controlName="lastName"
                         inputSize="full" inputType="text" class="item">
                     </app-ff-input>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
@@ -138,7 +140,7 @@
                     </ng-container>
                 </article>
                 <article class="flex-column col-md-4">
-                    <app-ff-dropdown label="Role *" [dropdownOptions]="roles" [hideSearch]="true"
+                    <app-ff-dropdown label="{{'user.role'|translate}} *" [dropdownOptions]="roles" [hideSearch]="true"
                         [defaultValue]="teamMemberForm?.controls?.role?.value" inputClass="full"
                         (selectionChange)="roleSelected($event)"></app-ff-dropdown>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
@@ -149,7 +151,7 @@
         </ng-container>
 
         <div class="col-12" *ngIf="dataLoading">
-            <app-loader loaderText="Inviting member. Please wait" [loaderType]="'type1'"></app-loader>
+            <app-loader loaderText="{{'loaderText.invite'|translate}}" loaderType="type1"></app-loader>
         </div>
     </section>
 
@@ -162,18 +164,17 @@
     <!-- showing required error message  -->
     <span class="error-message"
         *ngIf="teamMemberForm.controls[formcontrol]?.errors?.required && (submitted || teamMemberForm.controls[formcontrol]?.touched)">
-        This field is required *
+        {{'formValidation.commonValidationError'|translate}}
     </span>
     <!-- specific condition for email  -->
-    <ng-container *ngIf="formcontrol === 'email'">
+    <ng-container *ngIf="formcontrol === 'email' && (submitted || teamMemberForm.controls['email']?.touched)">
         <span class="error-message"
-            *ngIf="teamMemberForm.controls['email']?.errors?.pattern && (submitted || teamMemberForm.controls['email']?.touched)">
-            Invalid email
+            *ngIf="teamMemberForm.controls['email']?.errors?.pattern">
+            {{'formValidation.invalidEmail'|translate}}
         </span>
         <span class="error-message"
-            *ngIf="teamMemberForm.controls['email']?.errors?.incorrect && (submitted || teamMemberForm.controls['email']?.touched)">
-            User is already a team member
+            *ngIf="teamMemberForm.controls['email']?.errors?.incorrect">
+            {{'formValidation.userFound'|translate}}
         </span>
     </ng-container>
-
 </ng-template>

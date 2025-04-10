@@ -14,10 +14,12 @@ import {
   LoaderComponent,
   ButtonsComponent,
   FfPaginationComponent,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 // config
 import { ITableColumnHeader } from 'src/app/shared/configs/app.model';
 import { AvatarPipe } from '../../layout/header/header.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const IMPORTS: any = [
@@ -34,6 +36,8 @@ export const IMPORTS: any = [
   FfPaginationComponent,
   AvatarPipe,
   FfDropdownComponent,
+  TranslateModule,
+  FfCustomPaginationComponent,
 ];
 
 export const MEMBER_COLUMNS: ITableColumnHeader[] = [

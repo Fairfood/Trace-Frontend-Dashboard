@@ -1,6 +1,8 @@
 /* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+
 // material modules
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -18,4 +20,5 @@ export const CLAIM_IMPORTS = [
   MatAutocompleteModule,
   ButtonsComponent,
   FfDropdownComponent,
+  TranslateModule,
 ];

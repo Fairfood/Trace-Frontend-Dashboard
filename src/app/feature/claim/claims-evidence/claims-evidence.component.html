@@ -1,7 +1,7 @@
 <div id="stock-evidence" class="row p-0 m-0">
   <aside class="pop-header ff-flex-between">
     <h4>
-      Evidences
+      {{'claim.evidenceTextPlural'|translate}}
     </h4>
     <mat-icon class="pointer" (click)="close()" id="closeButton">close</mat-icon>
   </aside>
@@ -11,15 +11,18 @@
     <div class="row mx-0 text-left align-mid" mat-dialog-content>
 
       <ng-container *ngFor="let evidence of data">
-        <div class="col-12 px-0 claim-item line-margin" *ngFor="let item of evidence.node_responses">
-          <h6 class="text-xs text-off-blue font-1-normal">Uploaded by</h6>
+        <div class="col-12 px-0 claim-item line-margin"
+          *ngFor="let item of evidence.node_responses; trackBy: trackByFn">
+          <h6 class="text-xs text-off-blue font-1-normal">{{'claim.uploadedBy'|translate}}</h6>
           <h5 class="text-sm text-blue font-1-medium line-margin">{{ item.added_by.name }}</h5>
-          <h5 *ngIf="table" class="text-sm text-blue font-1-medium line-margin">{{ 'Documents' }}</h5>
+          <h5 *ngIf="table" class="text-sm text-blue font-1-medium line-margin">
+            {{ 'claim.documentsHeading'|translate }}
+          </h5>
           <table *ngIf="evidence.table" class="table table-bordered" aria-label="Claim evidence">
             <thead>
               <tr>
-                <th class="text-xs text-blue font-1-normal" scope="col">Sl No.</th>
-                <th class="text-xs text-blue font-1-normal" scope="col">File name</th>
+                <th class="text-xs text-blue font-1-normal" scope="col">{{'claim.slNo'|translate}}</th>
+                <th class="text-xs text-blue font-1-normal" scope="col">{{'claim.file'|translate}}</th>
                 <th class="text-xs text-blue font-1-normal" scope="col"></th>
               </tr>
             </thead>
@@ -29,7 +32,9 @@
                   <td class="text-xs text-blue font-1-normal">{{ i + 1 }}</td>
                   <td class="text-xs text-blue font-1-normal">{{ field.field_response.title }}</td>
                   <td class="text-right">
-                    <button (click)="viewFile(field)" class="tab-btn text-xs text-red" id="viewFile">View file</button>
+                    <button (click)="viewFile(field)" class="tab-btn text-xs text-red" id="viewFile">
+                      {{'claim.viewFile'|translate}}
+                    </button>
                   </td>
                 </tr>
               </ng-container>

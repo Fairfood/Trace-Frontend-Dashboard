@@ -1,6 +1,4 @@
 variables:
-  SLACK_CHANNEL: "logs-fairtrace-v2"
-
   DEV_BUCKET: "trace-dev.fairfood.nl"
   DEV_CLOUDFRONT_ID: "EQCFXHXFFC20N"
 
@@ -38,13 +36,6 @@ build_dev:
   variables:
     ENVIRONMENT: "Development"
     EXIT_STATUS: $?
-  after_script:
-    - . .slacknotifier.sh
-    # Send failed slack notification (if success continue to next job)
-    - |
-      if [ $? == 1 ]; then
-        share_slack_update
-      fi
   only: ["development"]
 
 # Job Two for deploy build to S3 in development
@@ -60,10 +51,6 @@ deploy_dev:
   variables:
     ENVIRONMENT: "Development"
     EXIT_STATUS: $?
-  after_script:
-    # Send slack notification
-    - . .slacknotifier.sh
-    - share_slack_update
   only: ["development"]
 #######################
 
@@ -77,13 +64,6 @@ build_staging:
   variables:
     ENVIRONMENT: "Staging"
     EXIT_STATUS: $?
-  after_script:
-    # Send failed slack notification (if success continue to next job)
-    - . .slacknotifier.sh
-    - |
-      if [ $? == 1 ]; then
-        share_slack_update
-      fi
   only: ["staging"]
 
 # Job Two for deploy build to S3 in staging
@@ -99,10 +79,6 @@ deploy_staging:
   variables:
     ENVIRONMENT: "Staging"
     EXIT_STATUS: $?
-  after_script:
-    # Send slack notification
-    - . .slacknotifier.sh
-    - share_slack_update
   only: ["staging"]
 ########
 
@@ -116,13 +92,6 @@ build_demo:
   variables:
     ENVIRONMENT: "Demo"
     EXIT_STATUS: $?
-  after_script:
-    # Send failed slack notification (if success continue to next job)
-    - . .slacknotifier.sh
-    - |
-      if [ $? == 1 ]; then
-        share_slack_update
-      fi
   only: ["demo"]
 
 # Job Two for deploy build to S3 in demo
@@ -155,13 +124,6 @@ build_prod:
   variables:
     ENVIRONMENT: "Production"
     EXIT_STATUS: $?
-  after_script:
-    # Send failed slack notification (if success continue to next job)
-    - . .slacknotifier.sh
-    - |
-      if [ $? == 1 ]; then
-        share_slack_update
-      fi
   only: ["production"]
 
 # Job Two for deploy build to S3 in production
@@ -178,9 +140,5 @@ deploy_prod:
   variables:
     ENVIRONMENT: "Production"
     EXIT_STATUS: $?
-  after_script:
-    # Send slack notification
-    - . .slacknotifier.sh
-    - share_slack_update
   only: ["production"]
 ########

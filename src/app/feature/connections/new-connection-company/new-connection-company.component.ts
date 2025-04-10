@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 // components
 import { NewConnectionCommonComponent } from '../new-connection-common';
 // services
 import { NewConnectionCompanyService } from './new-connection-company.service';
-import { GlobalStoreService } from 'src/app/shared/store';
-import { UtilService } from 'src/app/shared/service';
 // configs
 import { CONNECTION_TABS, IMPORTS } from './new-connection-company.config';
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-connection-company',
@@ -25,23 +25,23 @@ export class NewConnectionCompanyComponent
     limit: 10,
     offset: 0,
   };
+  typeLabel: string;
+  connectionType: string;
+
   constructor(
     private service: NewConnectionCompanyService,
-    globalStore: GlobalStoreService,
-    utils: UtilService
+    private router: Router
   ) {
-    super(utils, globalStore);
+    super();
   }
 
   ngOnInit(): void {
-    const impersonate = localStorage.getItem('impersonate');
-    this.viewingAsAdmin = impersonate === 'true' ? true : false;
+    this.initData();
     this.tabGroup = JSON.parse(JSON.stringify(CONNECTION_TABS) as any);
     this.detailsForm = this.service.createBasicDetailsForm();
     this.addressForm = this.service.createAddressForm();
     this.miscForm = this.service.createMiscForm();
     this.stepOne();
-    this.setLoaderText('Loading connection information');
     this.watchFormChanges();
     const sub = this.service.connectionInfo$.subscribe(data => {
       if (data) {
@@ -55,6 +55,7 @@ export class NewConnectionCompanyComponent
       this.getCountries();
     });
     this.pageApis.push(sub);
+    this.initLabelAndType();
   }
 
   companyNameCheck(): void {
@@ -185,6 +186,7 @@ export class NewConnectionCompanyComponent
     this.miscForm.updateValueAndValidity();
     this.supplySelection = [];
     this.getConnectionList();
+    this.initLabelAndType();
   }
 
   buttonAction(data: string): void {
@@ -221,34 +223,40 @@ export class NewConnectionCompanyComponent
     this.loading = true;
     let reqObj: any;
     if (this.incomingData.stockInvite) {
-      this.setLoaderText('Inviting connection');
+      this.setLoaderText(this.translate.instant('loaderText.inviteCompany'));
     } else {
-      this.loaderText = 'Creating connection';
-      reqObj = this.service.createConnectionObject(
-        this.detailsForm.value,
-        this.addressForm.value,
-        this.miscForm.value
-      );
-      if (this.incomingData.addConnection) {
-        const { relation } = this.miscForm.value;
-        if (relation == 1) {
-          if (this.selectAll) {
-            reqObj.map_all_supplers = true;
-          } else {
-            reqObj.map_all_supplers = false;
-          }
-          reqObj.supplier_for = this.fetchTaggedItems();
-        } else {
-          if (this.selectAll) {
-            reqObj.map_all_buyers = true;
-          } else {
-            reqObj.map_all_buyers = false;
-          }
-          reqObj.buyer_for = this.fetchTaggedItems();
-        }
-      }
+      reqObj = this.setRequestObject();
     }
     this.createConnectionApi(reqObj);
+  }
+
+  setRequestObject(): any {
+    this.setLoaderText(this.translate.instant('loaderText.createConnection'));
+    const reqObj = this.service.createConnectionObject(
+      this.detailsForm.value,
+      this.addressForm.value,
+      this.miscForm.value
+    );
+    if (this.incomingData.addConnection) {
+      const { relation } = this.miscForm.value;
+      if (relation == 1) {
+        if (this.selectAll) {
+          reqObj.map_all_supplers = true;
+        } else {
+          reqObj.map_all_supplers = false;
+        }
+        reqObj.supplier_for = this.fetchTaggedItems();
+      } else {
+        if (this.selectAll) {
+          reqObj.map_all_buyers = true;
+        } else {
+          reqObj.map_all_buyers = false;
+        }
+        reqObj.buyer_for = this.fetchTaggedItems();
+      }
+    }
+
+    return reqObj;
   }
 
   createConnectionApi(reqObj: any): void {
@@ -256,7 +264,13 @@ export class NewConnectionCompanyComponent
       .inviteCompany(this.incomingData.nodeId, reqObj)
       .subscribe({
         next: () => {
-          const message = `Added ${reqObj.name} to the ${this.incomingData.chainName} supply chain.`;
+          const message = this.translate.instant(
+            'connections.connectionSuccess',
+            {
+              name: reqObj.name,
+              chainName: this.incomingData.chainName,
+            }
+          );
           this.showSuccess(message);
           this.service.connectionInfo$.next(null);
           this.loading = false;
@@ -265,6 +279,11 @@ export class NewConnectionCompanyComponent
           } else {
             this.service.backToConnections();
           }
+          this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd) {
+              window.location.reload();
+            }
+          });
         },
         error: (exception: any) => {
           this.inviteError(exception);
@@ -279,7 +298,7 @@ export class NewConnectionCompanyComponent
     if (errors.detail) {
       message = errors.detail.detail;
     } else {
-      message = 'Error adding supply chain';
+      message = this.translate.instant('misc.errorSupplychain');
     }
     this.showError(message);
   }
@@ -288,6 +307,17 @@ export class NewConnectionCompanyComponent
     this.additionalLoader = true;
     this.buyerReq.offset += 10;
     this.getConnectionList();
+  }
+
+  initLabelAndType(): void {
+    this.typeLabel =
+      this.incomingData?.connectionType === 'buyer'
+        ? `${this.translate.instant('company.buyer')}*`
+        : `${this.translate.instant('company.supplier')}*`;
+    this.connectionType =
+      this.incomingData?.connectionType === 'buyer'
+        ? `${this.translate.instant('company.buyerType')}*`
+        : `${this.translate.instant('company.supplierType')}*`;
   }
 
   ngOnDestroy(): void {

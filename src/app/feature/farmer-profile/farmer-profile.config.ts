@@ -1,6 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ICommonObj, ITabItem } from 'src/app/shared/configs/app.model';
+import { CommonModule } from '@angular/common';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { FairFoodCustomTabComponent, LoaderComponent } from 'fairfood-utils';
+import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { ListDetailComponent } from './list-detail';
+import {
+  FarmerDetailsComponent,
+  TransformDropdownOptions,
+} from './farmer-details';
+import { FarmComponent } from './farm/farm.component';
+import { AddReferenceComponent } from './add-reference';
+import { DocsComponent } from './docs';
+import { FarmerActivitiesComponent } from './farmer-activities';
+import { IncomeComponent } from './income';
+import { ProfileAvatarComponent } from 'src/app/shared/components/profile-avatar';
 
 interface IAmount {
   amount: string;
@@ -50,6 +65,7 @@ export interface IFarmerDetails {
   is_editable: boolean;
   countryFlag?: string;
   updated_on?: any;
+  otherApiCall: boolean;
 }
 export interface IReference {
   count: number;
@@ -93,153 +109,34 @@ export const PROFILE_TABS: ICommonObj[] = [
     name: 'Logs',
   },
 ];
-
-export const CONTACT_DETAILS = [
-  {
-    key: 'street',
-    label: 'Street name',
-    controlName: 'street',
-    type: 'text',
-  },
-  {
-    key: 'city',
-    label: 'City/Village',
-    controlName: 'city',
-    type: 'text',
-  },
-  {
-    key: 'country',
-    label: 'Country',
-    controlName: 'country',
-    type: 'dropdown',
-    optionName: 'countryList',
-    defaultValue: 'country',
-    hideSearch: false,
-  },
-  {
-    key: 'province',
-    label: 'Province',
-    controlName: 'province',
-    type: 'dropdown',
-    optionName: 'stateList',
-    defaultValue: 'province',
-    hideSearch: false,
-  },
-
-  {
-    key: 'zipcode',
-    label: 'Postal code',
-    controlName: 'zipCode',
-    type: 'text',
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    controlName: 'email',
-    type: 'text',
-  },
-  {
-    key: 'dialCode',
-    label: 'Code',
-    controlName: 'dialCode',
-    type: 'dropdown',
-    optionName: 'countryCodes',
-    defaultValue: 'dialCode',
-    hideSearch: false,
-  },
-  {
-    key: 'phoneNumber',
-    label: 'Phone',
-    controlName: 'phoneNumber',
-    type: 'text',
-  },
-];
-export const BASIC_DETAILS = [
-  {
-    key: 'first_name',
-    label: 'First Name',
-    controlName: 'firstName',
-    type: 'text',
-  },
-  {
-    key: 'last_name',
-    label: 'Last name',
-    controlName: 'lastName',
-    type: 'text',
-  },
-  {
-    key: 'type',
-    label: 'Type',
-    controlName: 'type',
-    type: 'dropdown',
-    optionName: 'operations',
-    defaultValue: 'type',
-    hideSearch: true,
-    hideClear: true,
-  },
-  {
-    key: 'cStatus',
-    label: 'Conscent',
-    controlName: 'cStatus',
-    type: 'dropdown',
-    optionName: 'consentStatus',
-    defaultValue: 'cStatus',
-    hideSearch: true,
-    hideClear: true,
-  },
+export const FARMER_PROFILE_IMPORTS = [
+  CommonModule,
+  MatIconModule,
+  MatDialogModule,
+  LoaderComponent,
+  FairFoodCustomTabComponent,
+  ListDetailComponent,
+  ProfileAvatarComponent,
+  TransformDropdownOptions,
+  FarmComponent,
+  AddReferenceComponent,
+  DocsComponent,
+  FarmerActivitiesComponent,
+  IncomeComponent,
+  FarmerDetailsComponent,
 ];
 
-export const PERSONAL_DETAILS = [
+export const PLOT_TYPES: ICommonObj[] = [
   {
-    key: 'gender',
-    label: 'Gender',
-    controlName: 'gender',
-    type: 'dropdown',
-    optionName: 'genders',
-    defaultValue: 'gender',
-    hideSearch: true,
+    id: 'APPROXIMATE',
+    name: 'newPlot.approximate',
   },
   {
-    key: 'dob',
-    label: 'Date of birth',
-    controlName: 'dob',
-    type: 'date',
+    id: 'ACCURATE',
+    name: 'newPlot.accurate',
   },
   {
-    key: 'familyMembers',
-    label: 'House hold size',
-    controlName: 'familyMembers',
-    type: 'text',
+    id: 'POLYGON',
+    name: 'newPlot.geo',
   },
 ];
-export const GENDERS: ICommonObj[] = [
-  {
-    id: 'Male',
-    name: 'Male',
-  },
-  {
-    id: 'Female',
-    name: 'Female',
-  },
-  {
-    id: 'Other',
-    name: 'Other',
-  },
-];
-
-export const PLOT_TABS: ITabItem[] = [
-  {
-    id: 'basic',
-    name: 'Address details',
-    description: 'Add address details',
-    active: true,
-  },
-  {
-    id: 'plot',
-    name: 'Plot details',
-    description: 'Add plot details',
-    active: false,
-  },
-];
-
-export const INIT_TABLE: any = { count: 0, results: [], loading: true };

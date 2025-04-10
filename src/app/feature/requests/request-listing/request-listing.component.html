@@ -16,6 +16,9 @@
                     <li class="font-1-medium text-blue pointer" (click)="createRequest()">
                         Request for stock
                     </li>
+                    <li class="font-1-medium text-blue pointer" (click)="createRequestInfo()">
+                        Request for information
+                    </li>
                 </ul>
             </mat-menu>
         </aside>
@@ -103,7 +106,7 @@
                             </span>
                         </section>
                         <section class="flex-column" aria-label="row 2">
-                            <p class="text-24 text-blue font-1-bold mb-0 pb-3 mt-2">
+                            <p class="text-22 text-blue font-1-bold mb-0 pb-3 mt-2">
                                 <ng-container *ngIf="requestDetails.request_type == 4">
                                     {{'requests.type4'|translate}}
                                 </ng-container>
@@ -170,7 +173,7 @@
                                 <div *ngIf="requestDetails.request_type == 2 || requestDetails.request_type == 3"
                                     class="col-md-6">
                                     <p class="text-xs text-off-blue font-1-normal mb-1">
-                                        {{'verification.subheading'|translate}}</p>
+                                        {{'claim.claim'|translate}}</p>
                                     <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
                                 </div>
                             </div>
@@ -191,7 +194,7 @@
 
                             <div class="bg-grey" *ngIf="requestDetails.request_type == 3 && requestDetails.status == 2">
                                 <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
-                                    {{'requests.evidenceText'|translate}}
+                                    {{'claim.evidenceText'|translate}}
                                 </h6>
 
                                 <ng-container [ngTemplateOutlet]="claimDetailSection">
@@ -251,7 +254,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <p class="text-xs text-off-blue font-1-normal mb-1">
-                                        {{'home.products.thProduct'|translate}}
+                                        {{'transactions.product' | translate}}
                                     </p>
                                     <p class="text-sm text-blue font-1-normal">{{requestDetails.product.name}}</p>
                                 </div>
@@ -259,7 +262,7 @@
                             <div class="row-md">
                                 <div class="col-md-6">
                                     <p class="text-xs text-off-blue font-1-normal mb-1">
-                                        {{'home.products.thQty'|translate}}
+                                        {{'transactions.product' | translate}}
                                     </p>
                                     <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} Kg</p>
                                 </div>
@@ -291,7 +294,7 @@
                                     {{'requests.declineButton'|translate}}
                                 </app-buttons>
                                 <app-buttons buttonType="fill" (buttonClicked)="sendStock()">
-                                    {{'sendStockButton'|translate}}
+                                    {{'button.sendStock'|translate}}
                                 </app-buttons>
                             </div>
                             <ng-container *ngIf="requestDetails.status == 2;then transactionDetails"></ng-container>
@@ -331,7 +334,7 @@
                         </ng-container>
 
                         <section class="flex-column" aria-label="row 2">
-                            <p class="text-24 text-blue font-1-bold mb-0 pb-3 mt-2">
+                            <p class="text-22 text-blue font-1-bold mb-0 pb-3 mt-2">
                                 <ng-container *ngIf="requestDetails.request_type == 4">
                                     {{'requests.type4'|translate}}
                                 </ng-container>
@@ -386,7 +389,7 @@
                                         *ngIf="requestDetails.request_type == 2 || requestDetails.request_type == 3"
                                         class="col">
                                         <p class="text-xs text-off-blue font-1-normal mb-1">
-                                            {{'verification.subheading'|translate}}
+                                            {{'claim.claim'|translate}}
                                         </p>
                                         <p class="text-sm text-blue font-1-normal">{{requestDetails.claim.name}}</p>
                                     </article>
@@ -424,14 +427,15 @@
                                     </article>
                                     <article class="col-md-6">
                                         <p class="text-xs text-off-blue font-1-normal mb-1">
-                                            {{'home.products.thProduct'|translate}}</p>
+                                            {{'transactions.product' | translate}}
+                                        </p>
                                         <p class="text-sm text-blue font-1-normal">{{requestDetails.product.name}}</p>
                                     </article>
                                 </section>
                                 <section class="row-md">
                                     <article class="col-md-6">
                                         <p class="text-xs text-off-blue font-1-normal mb-1">
-                                            {{'home.products.thQty'|translate}}
+                                            {{'transactions.product' | translate}}
                                         </p>
                                         <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} kg</p>
                                     </article>
@@ -469,7 +473,7 @@
                                 </p>
                                 <section *ngIf="requestDetails.status == 3">
                                     <p class="text-xs text-blue font-1-bold">
-                                        {{'companyProfile.tab.details'|translate}}
+                                        {{'misc.details'|translate}}
                                     </p>
                                     <p class="text-xs text-off-blue font-1-normal mb-1">
                                         {{'requests.reasonForRejection'|translate}}</p>
@@ -486,7 +490,7 @@
                                 </p>
                                 <section>
                                     <p class="text-xs text-blue font-1-bold">
-                                        {{'companyProfile.tab.details'|translate}}
+                                        {{'misc.details'|translate}}
                                     </p>
 
                                     <p class="text-sm text-blue font-1-bold mb-1">
@@ -533,7 +537,8 @@
                                     </article>
                                     <article class="col-md-6">
                                         <p class="text-xs text-off-blue font-1-normal mb-1">
-                                            {{'home.products.thProduct'|translate}}</p>
+                                            {{'transactions.product' | translate}}
+                                        </p>
                                         <p class="text-sm text-blue font-1-normal">{{requestDetails.product?.name}}
                                         </p>
                                     </article>
@@ -541,7 +546,8 @@
                                 <div class="row-md">
                                     <div class="col-md-6">
                                         <p class="text-xs text-off-blue font-1-normal mb-1">
-                                            {{'home.products.thQty'|translate}}</p>
+                                            {{'transactions.qty' | translate}}
+                                        </p>
                                         <p class="text-sm text-blue font-1-normal">{{requestDetails.quantity}} Kg
                                         </p>
                                     </div>
@@ -575,7 +581,7 @@
 
                                 <div class="mx-86 border-grey p-20px">
                                     <p class="text-xs text-blue font-1-bold">
-                                        {{'companyProfile.tab.details'|translate}}
+                                        {{'misc.details'|translate}}
                                     </p>
 
                                     <p class="text-sm text-blue font-1-bold mb-1">
@@ -593,7 +599,7 @@
 
                                     <div *ngIf="requestDetails.status == 2">
                                         <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
-                                            {{'requests.evidenceText'|translate}}
+                                            {{'claim.evidenceText'|translate}}
                                         </h6>
 
                                         <ng-container [ngTemplateOutlet]="claimDetailSection">
@@ -602,7 +608,7 @@
 
                                     <div *ngIf="requestDetails.status == 4 && memberType != 3">
                                         <h6 class="heading text-sm text-blue font-1-bold criteria-heading">
-                                            {{'requests.evidenceText'|translate}}
+                                            {{'claim.evidenceText'|translate}}
                                         </h6>
 
                                         <ng-container>
@@ -648,7 +654,7 @@
                                                                                 value=""
                                                                                 (change)="claimsFile($event, field)"
                                                                                 class="input-file"
-                                                                                placeholder="{{'themeSettings.noFile'|translate}}"
+                                                                                placeholder="{{'misc.noFile'|translate}}"
                                                                                 hidden
                                                                                 accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
                                                                             <button *ngIf="field.file" class="h-100"
@@ -770,7 +776,8 @@
                                 </div>
 
                                 <div class="mx-86 border-grey p-20px">
-                                    <p class="text-xs text-blue font-1-bold">{{'companyProfile.tab.details'|translate}}
+                                    <p class="text-xs text-blue font-1-bold">
+                                        {{'misc.details'|translate}}
                                     </p>
 
                                     <p class="text-sm text-blue font-1-bold mb-1">{{'requests.companyClaim'|translate}}
@@ -787,7 +794,7 @@
 
                                     <div *ngIf="requestDetails.status == 2">
                                         <h6 class="heading text-sm text-blue font-1-bold mb-3 criteria-heading">
-                                            {{'requests.evidenceText'|translate}}</h6>
+                                            {{'claim.evidenceText'|translate}}</h6>
 
                                         <ng-container [ngTemplateOutlet]="claimDetailSection">
                                         </ng-container>
@@ -795,7 +802,7 @@
 
                                     <div *ngIf="requestDetails.status == 4 && memberType != 3">
                                         <h6 class="heading text-sm text-blue font-1-bold criteria-heading">
-                                            {{'requests.evidenceText'|translate}}</h6>
+                                            {{'claim.evidenceText'|translate}}</h6>
 
                                         <ng-container>
                                             <div class="col-12 px-0 mat-expansion-panel-inner">
@@ -840,7 +847,7 @@
                                                                                 value=""
                                                                                 (change)="claimsFile($event, field)"
                                                                                 class="input-file"
-                                                                                placeholder="{{'themeSettings.noFile'|translate}}"
+                                                                                placeholder="{{'misc.noFile'|translate}}"
                                                                                 hidden
                                                                                 accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
                                                                             <button *ngIf="field.file" class="h-100"
@@ -980,11 +987,11 @@
 </ng-template>
 
 <ng-template let-status="status" #statusText>
-    {{'companyProfile.claim.th3'|translate}}:
-    <span *ngIf="status == 1">{{'companyProfile.claim.status1'|translate}}</span>
-    <span *ngIf="status == 2">{{'requests.status2'|translate}}</span>
-    <span *ngIf="status == 3">{{'requests.status3'|translate}}</span>
-    <span *ngIf="status == 4">{{'requests.status4'|translate}}</span>
+    {{'claim.statusText'|translate}}:
+    <span *ngIf="status == 1">{{'status.pending'|translate}}</span>
+    <span *ngIf="status == 2">{{'status.completed'|translate}}</span>
+    <span *ngIf="status == 3">{{'status.declined'|translate}}</span>
+    <span *ngIf="status == 4">{{'status.ack'|translate}}</span>
 </ng-template>
 
 <ng-template #claimsAttached>

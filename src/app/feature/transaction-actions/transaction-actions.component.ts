@@ -15,11 +15,15 @@ import {
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
+// components
 import { ButtonsComponent } from 'fairfood-utils';
 import { FairFoodInputComponent } from 'fairfood-form-components';
 
 import { TransactionActionsService } from './transaction-actions.service';
+import { UtilService } from 'src/app/shared/service';
+import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
 
 @Component({
   selector: 'app-transaction-actions',
@@ -34,6 +38,7 @@ import { TransactionActionsService } from './transaction-actions.service';
     FairFoodInputComponent,
     ButtonsComponent,
     MatIconModule,
+    TranslateModule,
   ],
 })
 export class TransactionActionsComponent implements OnDestroy {
@@ -47,7 +52,8 @@ export class TransactionActionsComponent implements OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private service: TransactionActionsService,
     public dialogRef: MatDialogRef<TransactionActionsComponent>,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private utils: UtilService
   ) {}
 
   close(): void {
@@ -71,12 +77,24 @@ export class TransactionActionsComponent implements OnDestroy {
         next: (res: any) => {
           if (res.success) {
             this.loading = false;
+            this.utils.customSnackBar(
+              'Stock was successfully removed',
+              ACTION_TYPE.SUCCESS
+            );
             this.dialogRef.close(true);
           } else {
+            this.utils.customSnackBar(
+              'Failed to remove stocks',
+              ACTION_TYPE.FAILED
+            );
             this.loading = false;
           }
         },
         error: () => {
+          this.utils.customSnackBar(
+            'Failed to remove stocks',
+            ACTION_TYPE.FAILED
+          );
           this.loading = false;
         },
       });

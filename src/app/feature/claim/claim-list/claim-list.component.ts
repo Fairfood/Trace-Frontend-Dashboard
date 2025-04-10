@@ -2,13 +2,15 @@
 /* istanbul ignore file */
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ICommonIdName } from 'src/app/shared/configs/app.model';
-import { Subscription } from 'rxjs';
+import { ICommonIdName, ICommonObj } from 'src/app/shared/configs/app.model';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { RouterService, UtilService } from 'src/app/shared/service';
-import { CLAIM_IMPORT } from './claim-list.config';
+import { CLAIM_IMPORT, CLAIM_TABS } from './claim-list.config';
 import { ClaimService } from '../claim.service';
 import { GlobalStoreService } from 'src/app/shared/store';
 import { IPaginator } from 'fairfood-utils';
+import { TranslateService } from '@ngx-translate/core';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-claim-list',
@@ -20,9 +22,9 @@ import { IPaginator } from 'fairfood-utils';
 export class ClaimListComponent implements OnInit, OnDestroy {
   // default verificaton status
   statusFilter: ICommonIdName[] = [
-    { id: 1, name: 'Pending' },
-    { id: 2, name: 'Verified' },
-    { id: 3, name: 'Rejected' },
+    { id: 1, name: this.translate.instant('status.pending') },
+    { id: 2, name: this.translate.instant('status.verified') },
+    { id: 3, name: this.translate.instant('status.rejected') },
   ];
 
   toggleFilter: boolean;
@@ -34,36 +36,60 @@ export class ClaimListComponent implements OnInit, OnDestroy {
   claimListOptions: any;
   tableLength: any;
   supplyChainId = localStorage.getItem('supplyChainId');
+  claimTabs: ICommonObj[] = CLAIM_TABS;
+  activeClaimTab: string;
+  paginationReset: IPaginator;
+  subscription: Subscription;
+  customPageSize: { limit: any; offset: any };
+  routerSubscription!: Subscription;
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(
     private utils: UtilService,
     private routerService: RouterService,
     private claimService: ClaimService,
-    private global: GlobalStoreService
+    private global: GlobalStoreService,
+    private translate: TranslateService,
+    public router: Router
   ) {
     this.claimListOptions = {
       productData: [],
       assignorData: [],
       claimsData: [],
     };
-    this.appliedFilterValues = {
-      selectedProduct: '',
-      selectedClaim: '',
-      selectedAssignor: '',
-      searchString: '',
-      limit: 6,
-      offset: 0,
-      status: '',
-    };
+    this.subscription = this.claimService.paginationState$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(state => {
+        this.appliedFilterValues = state;
+        this.customPageSize = {
+          limit: this.appliedFilterValues?.limit,
+          offset: this.appliedFilterValues?.offset,
+        };
+        this.toggleFilter = this.checkToggleFilter();
+      });
+
+    this.routerSubscription = this.router.events
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(event => {
+        if (event instanceof NavigationStart) {
+          const nextRoute = event.url;
+          if (
+            nextRoute !== '/claims' &&
+            !nextRoute.startsWith('/claims/details')
+          ) {
+            this.claimService.resetPaginationState();
+            this.claimService.selectedTab = 0;
+          }
+        }
+      });
   }
 
   ngOnInit(): void {
-    this.resetFilter();
+    this.activeClaimTab = CLAIM_TABS[this.claimService.selectedTab]?.id;
     this.getAllProductsList();
     const supplyChainIdSub = this.utils.supplyChainData$.subscribe(res => {
       if (res && res !== this.supplyChainId) {
         this.supplyChainId = res;
-        this.resetFilter();
         this.getAllProductsList();
       }
     });
@@ -124,8 +150,9 @@ export class ClaimListComponent implements OnInit, OnDestroy {
   getVerificationList(): void {
     this.dataLoading = true;
     this.dataSource = [];
+    const isReceived = this.claimService.selectedTab == 1 ? true : false;
     const api = this.claimService
-      .veriticationRequests(this.appliedFilterValues)
+      .veriticationRequests(this.appliedFilterValues, isReceived)
       .subscribe((res: any) => {
         const { results, count } = res;
         this.tableLength = count;
@@ -145,18 +172,15 @@ export class ClaimListComponent implements OnInit, OnDestroy {
 
   // View claim details
   viewDetails(id: string): void {
+    this.claimService.setPaginationState(this.appliedFilterValues);
     this.routerService.navigateArray(['claims/details', id]);
   }
 
   resetFilter(): void {
-    this.appliedFilterValues = {
-      selectedProduct: '',
-      selectedClaim: '',
-      selectedAssignor: '',
-      searchString: '',
-      limit: 10,
-      offset: 0,
-      status: '',
+    this.claimService.resetPaginationState();
+    this.customPageSize = {
+      limit: this.appliedFilterValues?.limit,
+      offset: this.appliedFilterValues?.offset,
     };
   }
 
@@ -177,7 +201,10 @@ export class ClaimListComponent implements OnInit, OnDestroy {
 
   filterClaims(selectedObj: any, label: string): void {
     this.appliedFilterValues.offset = 0;
-    this.appliedFilterValues.limit = 0;
+    this.customPageSize = {
+      limit: this.appliedFilterValues?.limit,
+      offset: this.appliedFilterValues?.offset,
+    };
     const selectedValue = selectedObj.id === 'All' ? '' : selectedObj.id;
     if (label === 'product') {
       this.appliedFilterValues.selectedProduct = selectedValue;
@@ -195,10 +222,46 @@ export class ClaimListComponent implements OnInit, OnDestroy {
     const { limit, offset } = data;
     this.appliedFilterValues.limit = limit;
     this.appliedFilterValues.offset = offset;
+    this.customPageSize = {
+      limit: this.appliedFilterValues?.limit,
+      offset: this.appliedFilterValues?.offset,
+    };
     this.getVerificationList();
+  }
+
+  trackByFn(index: number): number {
+    return index;
+  }
+
+  changeTab(tab: ICommonObj): void {
+    this.activeClaimTab = tab.id;
+    this.toggleFilter = false;
+    this.paginationReset = {
+      limit: 10,
+      offset: 0,
+    };
+    this.resetFilter();
+    if (tab.id === CLAIM_TABS[1].id) {
+      this.claimService.selectedTab = 1;
+      this.getVerificationList();
+    } else {
+      this.claimService.selectedTab = 0;
+      this.getVerificationList();
+    }
+  }
+
+  private checkToggleFilter(): boolean {
+    return !!(
+      this.appliedFilterValues.selectedClaim ||
+      this.appliedFilterValues.selectedAssignor ||
+      this.appliedFilterValues.status ||
+      this.appliedFilterValues.selectedProduct
+    );
   }
 
   ngOnDestroy(): void {
     this.pageApis?.forEach(a => a.unsubscribe());
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }

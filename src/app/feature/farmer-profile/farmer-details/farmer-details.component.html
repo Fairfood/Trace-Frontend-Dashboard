@@ -1,6 +1,6 @@
 <section [formGroup]="detailsForm">
     <ng-container *ngIf="isEditing">
-        <h3 class="font-1-bold">Basic details</h3>
+        <h3 class="font-1-bold">{{'newPlot.basic'|translate}}</h3>
         <section class="w-100 d-flex">
             <aside aria-label="list item wrapping" class="d-flex item-wrapper"
                 [ngClass]="isEditing? 'editing': 'not-editing'">
@@ -9,18 +9,18 @@
                     </ng-container>
                 </ng-container>
             </aside>
-            <app-profile-avatar [imageUrl]="farmerPic" [avatar]="profileData?.avatar" [isEditing]="true"
+            <app-profile-avatar [imageUrl]="farmerPic" [avatar]="profileData?.avatar" [isEditing]="true" [label]="true"
                 (itemClicked)="openImageUpload($event)" class="avatar-box"></app-profile-avatar>
         </section>
         <article class="underline"></article>
     </ng-container>
 
     <aside aria-label="content header" class="ff-flex-between">
-        <h3 class="font-1-bold">Contact details</h3>
+        <h3 class="font-1-bold">{{'companyProfile.subHeading'|translate}}</h3>
         <ng-container *ngIf="profileData?.is_editable">
             <span class="ff-flex-align-center pointer text-blue" *ngIf="!isEditing && countryDataLoaded"
                 (click)="editBasicDetails()" id="editDetails">
-                <mat-icon class="edit">edit</mat-icon> Edit
+                <mat-icon class="edit">edit</mat-icon> {{'misc.edit'|translate}}
             </span>
         </ng-container>
     </aside>
@@ -29,9 +29,9 @@
             <ng-container *ngIf="!isEditing">
                 <ng-container *ngIf="item.key !=='dialCode' && item.key !=='phoneNumber'">
                     <article class="item">
-                        <span class="key">{{item?.label}}</span>
+                        <span class="key">{{item?.label | translate}}</span>
                         <span class="value">
-                            {{profileData[item.key] || '-'}}
+                            {{profileData?.[item.key] || '-'}}
                         </span>
                     </article>
                 </ng-container>
@@ -44,22 +44,22 @@
         </ng-container>
         <ng-container *ngIf="!isEditing">
             <article class="item">
-                <span class="key">Contact number</span>
+                <span class="key">{{'user.contact'|translate}}</span>
                 <span class="value">
-                    {{profileData.dialCode }} {{profileData.phoneNumber || '-'}}
+                    {{profileData?.dialCode }} {{profileData?.phoneNumber || '-'}}
                 </span>
             </article>
         </ng-container>
     </aside>
     <article class="underline"></article>
-    <h3 class="font-1-bold">Personal details</h3>
+    <h3 class="font-1-bold">{{'farmer.personal'|translate}}</h3>
     <aside aria-label="list item wrapping" class="d-flex item-wrapper" [ngClass]="isEditing? 'editing': 'not-editing'">
         <ng-container *ngFor="let item of personalDetails">
             <ng-container *ngIf="!isEditing">
                 <article class="item">
-                    <span class="key">{{item?.label}}</span>
+                    <span class="key">{{item?.label | translate}}</span>
                     <span class="value">
-                        {{profileData[item.key] || '-'}}
+                        {{profileData?.[item.key] || '-'}}
                     </span>
                 </article>
             </ng-container>
@@ -88,10 +88,10 @@
 
     <aside class="ff-flex-center action" aria-label="action buttons" *ngIf="isEditing">
         <app-buttons buttonType="stroked" (buttonClicked)="buttonAction('cancel')" id="cancelButton">
-            Cancel
+            {{'button.cancel'|translate}}
         </app-buttons>
         <app-buttons buttonType="fill" (buttonClicked)="buttonAction('submit')">
-            Save changes
+            {{'button.saveChanges'|translate}}
         </app-buttons>
     </aside>
 
@@ -99,24 +99,24 @@
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message"
         *ngIf="formControlsFarmer[formcontrol]?.errors?.required && (submitted || formControlsFarmer[formcontrol]?.touched)">
-        This field shouldn't be empty *
+        {{'formValidation.commonValidationError'|translate}}
     </span>
     <ng-container *ngIf="formcontrol === 'phoneNumber'">
         <span class="error-message"
             *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
-            Phone number is invalid
+            {{'formValidation.invalidMobile'|translate}}
         </span>
     </ng-container>
     <ng-container *ngIf="formcontrol === 'familyMembers'">
         <span class="error-message"
             *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
-            Please enter correct value
+            {{'formValidation.correctValue'|translate}}
         </span>
     </ng-container>
     <ng-container *ngIf="formcontrol === 'email'">
         <span class="error-message"
             *ngIf="formControlsFarmer[formcontrol]?.errors  && (submitted || formControlsFarmer[formcontrol]?.touched)">
-            Invalid email
+            {{'formValidation.invalidEmail'|translate}}
         </span>
     </ng-container>
 </ng-template>
@@ -125,7 +125,7 @@
 
     <ng-container *ngIf="item.type === 'text'">
         <article class="flex-column">
-            <app-ff-input [label]="item?.label" [parentFormGroup]="detailsForm" [controlName]="item.controlName"
+            <app-ff-input [label]="item?.label | translate" [parentFormGroup]="detailsForm" [controlName]="item.controlName"
                 inputSize="profile" inputType="text" class="form-items">
             </app-ff-input>
             <ng-container [ngTemplateOutlet]="formErrorMessages"
@@ -135,8 +135,8 @@
     </ng-container>
 
     <ng-container *ngIf="item.type === 'dropdown'">
-        <article class="flex-column">
-            <app-ff-dropdown [label]="item?.label" [dropdownOptions]="item?.optionName | transformOptions:this"
+        <article class="flex-column" *ngIf="dropdownVisible">
+            <app-ff-dropdown [label]="item?.label | translate" [dropdownOptions]="item?.optionName | transformOptions:this"
                 inputClass="profile" [defaultValue]="formControlsFarmer[item.controlName].value"
                 [hideSearch]="item.hideSearch" [hideFooter]="item.hideClear"
                 [showRedBorder]="formControlsFarmer[item.controlName].errors && submitted" class="form-items"

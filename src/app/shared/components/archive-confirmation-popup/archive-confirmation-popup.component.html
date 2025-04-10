@@ -1,0 +1,24 @@
+<section class="pop-header ff-flex-between">
+    <h4 id="popupHeading">{{data?.title}} ?</h4>
+    <mat-icon class="pointer" (click)="closePopup()">close</mat-icon>
+</section>
+<section class="pop-content flex-column" id="popupContent">
+    <p>{{data?.text}}</p>
+    <p class="label-text">{{data?.label}}</p>
+    <div class="ff-flex-between" id="popupAction">
+        <app-buttons buttonType="stroked" (buttonClicked)="closePopup()">{{'button.cancel'|translate}}</app-buttons>
+        <ng-container *ngIf="data?.type=='stock'">
+            <app-buttons (buttonClicked)="updateArchiveStatusStock()" buttonType="fill">
+                <span *ngIf="data?.title=='Move to archive'"> {{'button.moveToArchive'|translate}}</span>
+                <span *ngIf="data?.title=='Move back to Stock list'"> {{'button.moveToStockList'|translate}}</span>
+            </app-buttons>
+        </ng-container>
+        <ng-container *ngIf="data?.type=='transactions'">
+            <app-buttons (buttonClicked)="updateArchiveStatusTrans()" buttonType="fill">
+                <span *ngIf="data?.title=='Move to archive'"> {{'button.moveToArchive'|translate}}</span>
+                <span *ngIf="data?.title=='Move to transaction history'">
+                    {{'button.moveToTransactionHistory'|translate}}</span>
+            </app-buttons>
+        </ng-container>
+    </div>
+</section>

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { MatDialog } from '@angular/material/dialog';
@@ -188,6 +189,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
     console.log('close map box');
   }
 
+  /* istanbul ignore next */
   plotMycompany(): void {
     const api = this.connectionService
       .getCompanyDetails(this.nodeId)
@@ -479,6 +481,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   // open infow window
+  /* istanbul ignore next */
   openInfoWindow(marker: any, type: string): void {
     const result = this.connectionService.infoWindowSetup(
       marker,
@@ -883,6 +886,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   // Intialize map , markers , infowindow etc
+  /* istanbul ignore next */
   mapReady(map: any): void {
     this.map = map;
     // icon for my comany

@@ -1,3 +1,5 @@
+@import 'src/styles/toggle_switch';
+
 .m50 {
   margin-top: 50px;
 }
@@ -16,8 +18,6 @@
   margin: 8px;
   padding: 5px 10px;
   color: var(--color-white);
-  display: flex;
-  align-items: center;
   font-size: 14px;
   &.inactive {
     background-color: var(--color-chip-inactive);
@@ -39,4 +39,8 @@
 
 .p10 {
   padding: 10px 0;
+}
+
+.switch {
+  margin-left: 10px;
 }

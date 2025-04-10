@@ -10,6 +10,7 @@ import {
 } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 // component
 import { ButtonsComponent } from 'fairfood-utils';
 // services
@@ -29,6 +30,7 @@ import { ListViewService } from '../list-view/list-view.service';
     MatDialogModule,
     ReactiveFormsModule,
     ButtonsComponent,
+    TranslateModule,
   ],
   templateUrl: './connection-type-selection.component.html',
   styleUrls: ['./connection-type-selection.component.scss'],

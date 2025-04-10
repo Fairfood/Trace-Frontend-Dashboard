@@ -1,5 +1,5 @@
 <div class="header mb-10">
-    <h3>Company claims</h3>
+    <h3>{{'companyProfile.claimHeading'|translate}}</h3>
 </div>
 
 <section class="ff-table-container w-100" id="companyClaimTable">
@@ -19,21 +19,22 @@
                     {{element.name}}
                 </td>
                 <td class="mat-cell normal-column">
-                    {{element.verifier ? element.verifier?.name : 'Self verified'}}
+                    {{element.verifier ? element.verifier?.name : 'status.selfVerified'|translate}}
                 </td>
                 <td class="mat-cell normal-column">
-                    <span *ngIf="element.status == 1">Pending</span>
-                    <span *ngIf="element.status == 2">Verified</span>
-                    <span *ngIf="element.status == 3">Rejected</span>
+                    <span *ngIf="element.status == 1">{{'status.pending'|translate}}</span>
+                    <span *ngIf="element.status == 2">{{'status.verified'|translate}}</span>
+                    <span *ngIf="element.status == 3">{{'status.rejected'|translate}}</span>
                 </td>
             </tr>
         </tbody>
     </table>
     <div class="no-data w-100" aria-label="" *ngIf="companyClaimsCount === 0" [hidden]="loader">
-        No company claims found
+        {{'companyProfile.noClaims'|translate}}
     </div>
 
-    <app-loader [loaderText]="'Loading company claims'" [loaderType]="'type1'" *ngIf="loader"
+    <app-loader [loaderText]="'loaderText.claimRecords'|translate" loaderType="type1" *ngIf="loader"
         class="min-h-300"></app-loader>
 </section>
-<app-ff-pagination [totalCount]="companyClaimsCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+<!-- <app-ff-pagination [totalCount]="companyClaimsCount" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+<app-ff-custom-pagination [totalCount]="companyClaimsCount" (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>

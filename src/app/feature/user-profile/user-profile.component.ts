@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component } from '@angular/core';
 import { Subscription, tap } from 'rxjs';
 // services
@@ -19,40 +18,20 @@ import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
   styleUrls: ['./user-profile.component.scss'],
 })
 export class UserProfileComponent {
-  // Loading indicator for the component
   loading = false;
-
-  // User data fetched from the API
   userData: Partial<IUserData>;
-
-  // Array to store subscriptions for cleanup
   pageApis: Subscription[] = [];
-
   // Flag to determine if the user is in edit mode
   isEdit: boolean;
-
-  // Tabs for the user profile
   tabGroup = PROFILE_TABS;
-
-  // Active tab ID
   activeTabId = PROFILE_TABS[0].id;
-
   // Form for user details
   detailsForm = this.service.profileForm();
-
   // Flag indicating whether the form has been submitted
   submitted: boolean;
-
-  // List of country codes
   countryCodeList: any[];
-
-  // User profile picture
   userPic: any;
-
-  // Current user image data
   currentImageData: any;
-
-  // Flag indicating whether the user image has been updated
   imageUpdated: boolean;
 
   constructor(
@@ -96,7 +75,7 @@ export class UserProfileComponent {
   // Method to get user details from DataService
   getUser(): void {
     const data = JSON.parse(localStorage.getItem('userData'));
-    const api = this.util.getUserDetails(data.id).subscribe((res: any) => {
+    const api = this.util.getUserDetails(data?.id).subscribe((res: any) => {
       this.global.updateUserData(res);
     });
     this.pageApis.push(api);

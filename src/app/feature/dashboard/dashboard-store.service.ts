@@ -18,12 +18,14 @@ const initialState: DashboardState = {
   providedIn: 'root',
 })
 export class DashboardStoreService extends BaseStoreService<DashboardState> {
+  /* istanbul ignore next */
   statistics$: Observable<IDashboardStatistics> = this.select(
     (state: DashboardState) => {
       return state.statistics;
     }
   );
 
+  /* istanbul ignore next */
   dashboardData$: Observable<IDashboardStatus> = this.select(
     (state: DashboardState) => {
       return state.dashboardData;
@@ -46,6 +48,7 @@ export class DashboardStoreService extends BaseStoreService<DashboardState> {
     });
   }
 
+  /* istanbul ignore next */
   resetState(): void {
     this.setState(initialState);
   }

@@ -10,13 +10,13 @@
         <table *ngIf="!loading" aria-label="attachment table">
             <thead>
                 <tr>
-                    <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
+                    <th *ngFor="let item of displayedColumns;trackBy: trackByFn;" class="{{item?.class}}">
                         {{item.name}}
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let element of dataSource" class="pointer">
+                <tr *ngFor="let element of dataSource;trackBy: trackByFn;" class="pointer">
                     <td class="mat-cell normal-column">
                         {{element.addedBy}}
                     </td>
@@ -55,11 +55,12 @@
         <app-loader loaderText="Loading attachments" loaderType="type1" class="no-data" *ngIf="loading">
         </app-loader>
         <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="!loading && tableLength === 0">
-            No attachments found
+            {{'attachmentsTable.noAttachments' | translate}}
         </section>
     </section>
     <div class="col-12 mt-10">
-        <app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination>
+        <!-- <app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-pagination> -->
+        <app-ff-custom-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
     </div>
 </div>
 

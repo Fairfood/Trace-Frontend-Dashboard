@@ -1,27 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { headerOptions } from 'fairfood-utils';
 import { Observable, map } from 'rxjs';
 import {
   BASE_URL,
   HTTP_OPTION_3,
   HTTP_OPTION_4,
 } from 'src/app/shared/configs/app.constants';
-import { headerOptions, mapResults } from 'src/app/shared/configs/app.methods';
+import { mapResults } from 'src/app/shared/configs/app.methods';
+import { StorageService } from 'src/app/shared/service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StockService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private storage: StorageService) {}
 
   supplyChainData(): any {
-    return localStorage.getItem('supplyChainId');
+    return this.storage.retrieveStoredData('supplyChainId');
   }
 
+  /* istanbul ignore next */
   searchConnectedCompany(val: string, connected: boolean): Observable<any> {
-    const supplyChainId = this.supplyChainData();
+    const supplyChainId = this.storage.retrieveStoredData('supplyChainId');
     return this.http
       .get(
         BASE_URL +
@@ -41,6 +43,7 @@ export class StockService {
    * @param params any
    * @returns Observable<any>
    */
+  /* istanbul ignore next */
   createTransaction(params: any): Observable<any> {
     return this.http.post(
       BASE_URL + '/transactions/external/',
@@ -50,6 +53,7 @@ export class StockService {
   }
 
   // Merge Transaction
+  /* istanbul ignore next */
   mergeStock(params: any): Observable<any> {
     return this.http.post(
       BASE_URL + '/transactions/internal/',
@@ -58,8 +62,9 @@ export class StockService {
     );
   }
 
+  /* istanbul ignore next */
   searchFarmer(val: string): Observable<any> {
-    const supplyChainId = this.supplyChainData();
+    const supplyChainId = this.storage.retrieveStoredData('supplyChainId');
     return this.http
       .get(
         BASE_URL +
@@ -72,12 +77,20 @@ export class StockService {
       .pipe(map(mapResults));
   }
 
+  /* istanbul ignore next */
   createProductBulk(params: any): Observable<any> {
-    return this.http.post(
-      BASE_URL + '/products/bulk/',
-      params,
-      headerOptions(HTTP_OPTION_4)
-    );
+    return this.http
+      .post(BASE_URL + '/products/bulk/', params, headerOptions(HTTP_OPTION_4))
+      .pipe(
+        map((res: any) => {
+          const { success, data } = res;
+          if (success) {
+            return data;
+          } else {
+            return null;
+          }
+        })
+      );
   }
 
   /**
@@ -86,22 +99,31 @@ export class StockService {
    * @param name | string
    * @returns Observable<any>
    */
+  /* istanbul ignore next */
   createProduct(name: string): Observable<any> {
-    const supply_chain = this.supplyChainData();
+    const supply_chain = this.storage.retrieveStoredData('supplyChainId');
     const params = {
       supply_chain,
       name,
     };
-    return this.http.post(
-      BASE_URL + '/products/',
-      params,
-      headerOptions(HTTP_OPTION_4)
-    );
+    return this.http
+      .post(BASE_URL + '/products/', params, headerOptions(HTTP_OPTION_4))
+      .pipe(
+        map((res: any) => {
+          const { success, data } = res;
+          if (success) {
+            return data;
+          } else {
+            return null;
+          }
+        })
+      );
   }
 
   // getting all the products in supply chain
+  /* istanbul ignore next */
   searchProduct(val: string): Observable<any> {
-    const supplyChainId = this.supplyChainData();
+    const supplyChainId = this.storage.retrieveStoredData('supplyChainId');
     return this.http
       .get(
         BASE_URL +

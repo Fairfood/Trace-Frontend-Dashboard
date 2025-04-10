@@ -1,13 +1,30 @@
-<div class="page-container" *ngIf="!pageLoader" >
-    <section class="heading-section" >
-        <h1 class="page-heading">
-            Transaction report: TR {{transactionData?.number}}
-        </h1>
-        <aside class="right-section" aria-label="story telling navigation"
-            *ngIf="transactionData?.badgeText !== 'Stock loss'">
-            <span class="need-help story-telling" (click)="openStoryTelling()" id="openStoryTelling">
-                <mat-icon class="ff-flex-align-center">remove_red_eye</mat-icon>View Storytelling
-            </span>
+<div class="page-container" *ngIf="!pageLoader">
+    <section class="heading-section">
+        <article class="ff-flex-align-center">
+            <h1 class="page-heading">
+                {{'trReport.heading'|translate}}: TR {{transactionData?.number}}
+            </h1>
+            <span *ngIf="transactionData?.archived" class="chip">Archive</span>
+        </article>
+        <aside class="ff-flex-end btns" aria-label="story telling navigation">
+            <article *ngIf="transactionData?.archived" class="ff-flex-end pointer"  (click)="updateArchiveStatus('transaction-list')">
+                <img src="../../../../assets/images/unarchive_icon.svg" alt="icon">
+                <span class="archive-title">Move back to transaction list</span>
+            </article>
+            <article *ngIf="!transactionData?.archived" class="ff-flex-end pointer" (click)="updateArchiveStatus('archive')">
+                <img src="../../../../assets/images/archive_icon.svg" alt="icon">
+                <span class="archive-title">Move to archive</span>
+            </article>
+            <article *ngIf="transactionData?.badgeText !== 'Stock loss'" class="ff-flex-end right-section">
+                <span class="mb-3">|</span>
+                <span class="need-help story-telling mb-3" (click)="openStoryTelling()" id="openStoryTelling">
+                    <mat-icon class="ff-flex-align-center">remove_red_eye</mat-icon>{{'trReport.view'|translate}}
+                </span>
+            </article>
+            <article class="ff-flex-end">
+                <app-buttons buttonType="fill" buttonSize="medium" *ngIf="!gtinNumber" (click)="updateGs1Info('add')">{{'trReport.addGs1' | translate}}</app-buttons>
+                <app-buttons buttonType="stroked" *ngIf="gtinNumber" buttonSize="medium" (click)="updateGs1Info('remove')">{{'trReport.removeGs1' | translate}}</app-buttons>
+            </article>
         </aside>
     </section>
     <section class="reject ff-flex-between" *ngIf="transactionData?.rejectable && memberType !== 3">
@@ -25,11 +42,12 @@
                     fill="#F9F6F9" />
             </svg>
             <span class="value-tr">
-                You can reject this transaction if the provided details are incorrect.
+                {{'transaction.detailIncorrect'|translate}}
             </span>
         </article>
-        <app-buttons buttonType="stroked" buttonSize="medium" (buttonClicked)="rejectTransactionDialog()" id="rejectTransaction">
-            Reject transaction
+        <app-buttons buttonType="stroked" buttonSize="medium" (buttonClicked)="rejectTransactionDialog()"
+            id="rejectTransaction">
+            {{'trReport.reject'|translate}}
         </app-buttons>
     </section>
     <section class="col-12 top-box d-flex" aria-label="top box">
@@ -51,7 +69,7 @@
                 </ul>
             </ng-container>
             <article class="m-20 d-flex">
-                <span class="label-tr text-sm">Transaction hash:&nbsp;</span>
+                <span class="label-tr text-sm">{{'transaction.hash'|translate}}:&nbsp;</span>
                 <span class="value-tr">
                     <app-common-wallet [type]="transactionData?.wallet_type" [url]="transactionData?.explorer_url"
                         [wallet]="transactionData?.blockchain_address">
@@ -60,14 +78,14 @@
             </article>
             <article class="d-flex m-20">
                 <span class="label-tr text-sm">
-                    Transaction date:&nbsp;
+                    {{'requests.transactionDate'|translate}}:&nbsp;
                 </span>
                 <span class="value-tr">
                     {{ transactionData?.date * 1000 | date: 'dd MMMM y' }}
                 </span>
                 <ng-container [ngTemplateOutlet]="dotIcon"></ng-container>
                 <span class="label-tr text-sm">
-                    Logged date:&nbsp;
+                    {{'trReport.logged'|translate}}:&nbsp;
                 </span>
                 <span class="value-tr">
                     {{ transactionData?.logged_time * 1000 | date: 'dd MMMM y' }}
@@ -76,7 +94,7 @@
         </aside>
         <aside aria-label="qr code wrapper" class="qr-code ff-flex-start"
             *ngIf="transactionData?.badgeText !== 'Stock loss'">
-            <app-qr-code-generator [storyTellingUrl]="storyTellingUrl" [qrCodeValue]="qrCodeValue">
+            <app-qr-code-generator [storyTellingUrl]="storyTellingUrl" [qrCodeValue]="qrCodeValue" [gtinNumber]="gtinNumber">
             </app-qr-code-generator>
         </aside>
     </section>
@@ -88,7 +106,7 @@
 
         <ng-container *ngIf="activeTab === 'basic'">
             <app-basic-details></app-basic-details>
-            <ng-container *ngIf="transactionData.transaction == 'external'">
+            <ng-container *ngIf="transactionData?.transaction == 'external'">
                 <app-batch-list (navigateToTrace)="gotoTraceTab($event)"></app-batch-list>
             </ng-container>
         </ng-container>
@@ -105,10 +123,10 @@
         </ng-container>
     </section>
 
-   
+
 </div>
 <section class="loader-container ff-flex-center" *ngIf="pageLoader">
-    <app-loader [loaderText]="'Fetching transaction details'" [loaderType]="'type1'"></app-loader>
+    <app-loader [loaderText]="'trReport.loaderText'|translate" loaderType="type1"></app-loader>
 </section>
 
 
@@ -119,5 +137,5 @@
 </ng-template>
 <ng-template #claimIconTemplate let-imageUrl="imageUrl">
     <mat-icon *ngIf="!imageUrl" class="claim-icon ff-flex-center">verified_user</mat-icon>
-    <img src="imageUrl" class="claim-icon" alt="c-ic" *ngIf="imageUrl">
+    <img [src]="imageUrl" class="claim-icon" alt="c-ic" *ngIf="imageUrl">
 </ng-template>

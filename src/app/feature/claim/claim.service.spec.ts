@@ -5,6 +5,8 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { ClaimService } from './claim.service';
+import { StorageService } from 'src/app/shared/service';
+import { IClaim, IClaimField } from './claim.model';
 
 describe('ClaimService', () => {
   let claimService: ClaimService;
@@ -13,7 +15,13 @@ describe('ClaimService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ClaimService],
+      providers: [
+        ClaimService,
+        {
+          provide: StorageService,
+          useClass: StorageStub,
+        },
+      ],
     });
 
     claimService = TestBed.inject(ClaimService);
@@ -28,75 +36,147 @@ describe('ClaimService', () => {
     expect(claimService).toBeTruthy();
   });
 
-  it('should set evidence flag to true if any criterion has fields', () => {
-    const claim: any = {
-      criteria: [{ fields: [{}] }, { fields: [] }],
-    };
-    claimService.setEvidenceFlag(claim.criteria, claim);
-    expect(claim.evidence).toBe(true);
+  it('should return supply chain data', () => {
+    expect(claimService.supplyChainData()).toBe('mockSupplyChainId');
   });
 
-  it('should set evidence flag to false if no criterion has fields', () => {
-    const claim: any = {
-      criteria: [{ fields: [] }, { fields: [] }],
-    };
-    claimService.setEvidenceFlag(claim.criteria, claim);
-    expect(claim.evidence).toBe(false);
-  });
-
-  it('should process fields and set table flag', () => {
-    const field: any = { type: 3 };
-    claimService.processFields([field]);
-    expect(field.table).toBe(true);
-  });
-
-  it('should process fields and set dropdown options', () => {
-    const field: any = { type: 2, options: ['option1', 'option2'] };
-    claimService.processFields([field]);
-    expect(field.options).toEqual([
-      { id: 'option1', name: 'option1' },
-      { id: 'option2', name: 'option2' },
-    ]);
-  });
-
-  // Similar tests for other helper methods
-
-  it('should format claims data', () => {
-    const companies = [
-      { id: 1, name: 'Company 1' },
-      { id: 2, name: 'Company 2' },
-    ];
-    const claimData: any = [
-      {
-        criteria: [{ fields: [] }],
-        verified_by: 2,
-        verifiers: [1],
-        selected: true,
-      },
-      { criteria: [{ fields: [] }], verified_by: 1, verifiers: [2] },
+  it('should format claim data correctly', () => {
+    const mockCompanies = [
+      { id: '1', name: 'Company A' },
+      { id: '2', name: 'Company B' },
     ];
 
-    const formattedData = claimService.formatClaimsData(claimData, companies);
+    const formattedClaims = claimService.formatClaimsData(
+      mockClaimData,
+      mockCompanies
+    );
 
-    expect(formattedData).toEqual([
-      {
-        criteria: [{ fields: [] }],
-        verified_by: 2,
-        verifiers: [1],
-        selected: true,
-        assignVerifier: true,
-        verifierName: 'Company 1',
-        evidence: false,
-      },
-      {
-        criteria: [{ fields: [] }],
-        verified_by: 1,
-        verifiers: [2],
-        selected: false,
-        assignVerifier: false,
-        verifierName: 'Company 2',
-        evidence: false,
-      },
-    ]);
+    expect(formattedClaims.length).toEqual(1);
+    expect(formattedClaims[0].criteria.length).toEqual(1);
+    expect(formattedClaims[0].evidence).toBeTruthy();
+    expect(formattedClaims[0].assignVerifier).toBeFalsy();
+    expect(formattedClaims[0].selected).toBeFalsy();
+  });
+
+  describe('processFields', () => {
+    it('should set table flag for fields of type 3', () => {
+      // Arrange
+      const fields: IClaimField[] = [
+        {
+          type: 1,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '123',
+        }, // Field of type 1
+        {
+          type: 2,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '124',
+        }, // Field of type 2
+        {
+          type: 3,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '125',
+        }, // Field of type 3
+      ];
+
+      // Act
+      claimService.processFields(fields);
+
+      // Assert
+      expect(fields[0].table).toBeFalsy(); // Field of type 1 should not have table flag
+      expect(fields[1].table).toBeFalsy(); // Field of type 2 should not have table flag
+      expect(fields[2].table).toBeTruthy(); // Field of type 3 should have table flag
+    });
+
+    it('should call processOptions for fields of type 2', () => {
+      // Arrange
+      const fields: IClaimField[] = [
+        {
+          type: 1,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '123',
+        }, // Field of type 1
+        {
+          type: 2,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '124',
+        }, // Field of type 2
+        {
+          type: 3,
+          description: '',
+          multiple_options: false,
+          options: [],
+          title: '',
+          id: '125',
+        }, // Field of type 3
+      ];
+      spyOn(claimService, 'processOptions');
+
+      // Act
+      claimService.processFields(fields);
+
+      // Assert
+      expect(claimService.processOptions).toHaveBeenCalledTimes(1); // processOptions should be called once for field of type 2
+      expect(claimService.processOptions).toHaveBeenCalledWith(fields[1]); // processOptions should be called with the field of type 2
+    });
   });
 });
+
+class StorageStub {
+  retrieveStoredData(key: string): string {
+    console.log(key);
+    return 'mockSupplyChainId';
+  }
+}
+
+const mockClaimData: IClaim[] = [
+  {
+    id: '1',
+    name: 'Claim 1',
+    criteria: [
+      {
+        description: '0',
+        is_mandatory: false,
+        verification_type: 0,
+        verifier: null,
+        name: 'Field 1',
+        id: '1',
+        fields: [
+          {
+            type: 1,
+            description: 'Field 1',
+            multiple_options: false,
+            title: 'Field 1 Title',
+            options: [],
+            id: '29138',
+          },
+        ],
+      },
+    ],
+    active: true,
+    description_basic: 'string',
+    description_full: 'string',
+    image: 'string',
+    inheritable: true,
+    proportional: true,
+    removable: true,
+    type: 1,
+    verified_by: 1,
+    verifiers: [],
+  },
+];

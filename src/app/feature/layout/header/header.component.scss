@@ -11,7 +11,7 @@ header {
 
   .brand-img {
     max-width: 200px;
-    max-height: 65px;
+    max-height: 60px;
     -o-object-fit: contain;
     object-fit: contain;
   }
@@ -102,14 +102,27 @@ header {
   margin-right: 25px;
 }
 .supply {
-  margin-left: 20px;
-  width: 260px;
+  margin-left: 10px;
+  margin-top: 10px;
+  width: 160px;
+  @include devices(tablet) {
+    width: 260px;
+    margin-top: 0px;
+  }
 }
 
 .navbar-menu {
   display: block;
+  flex-shrink: 0;
+  position: relative;
+  bottom: 30px;
+  right: 11px;
   @include devices(tablet-md) {
     display: none;
+  }
+  @include devices(mobile) {
+    bottom: 0px;
+    right: 0px;
   }
 }
 .navbar-collapse {
@@ -117,4 +130,8 @@ header {
   @include devices(tablet-md) {
     display: flex;
   }
+}
+
+.supply-container {
+  @include flex-wrap(wrap)
 }

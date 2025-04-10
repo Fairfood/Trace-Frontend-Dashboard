@@ -1,1 +1,1 @@
-export { DocumentationModule } from './documentation.module';
+export { DocumentsTabComponent } from './documents-tab';

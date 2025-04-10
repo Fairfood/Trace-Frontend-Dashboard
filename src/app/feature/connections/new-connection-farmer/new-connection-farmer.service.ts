@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import {
+  notOnlyWhitespace,
   removeSpaces,
   successFormatter,
 } from 'src/app/shared/configs/app.methods';
@@ -11,6 +12,7 @@ import { BASE_URL } from 'src/app/shared/configs/app.constants';
 
 import { RouterService, StorageService } from 'src/app/shared/service';
 import { ConnectionService } from '../connections.service';
+import { HTTP_OPTION_3, headerOptions } from 'fairfood-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -28,8 +30,8 @@ export class NewConnectionFarmerService {
 
   createBasicDetailsForm(): FormGroup {
     return this.fb.group({
-      firstName: ['', [Validators.required, removeSpaces]],
-      lastName: ['', [Validators.required, removeSpaces]],
+      firstName: ['', [Validators.required, removeSpaces, notOnlyWhitespace()]],
+      lastName: ['', [Validators.required, removeSpaces, notOnlyWhitespace()]],
       primaryOperation: ['', Validators.required],
       identificationNo: [''],
     });
@@ -49,7 +51,7 @@ export class NewConnectionFarmerService {
   createAddressForm(): FormGroup {
     return this.fb.group({
       street: [''],
-      city: ['', [Validators.required, removeSpaces]],
+      city: ['', [Validators.required, removeSpaces, notOnlyWhitespace()]],
       province: ['', Validators.required],
       country: ['', Validators.required],
       latitude: [
@@ -122,7 +124,7 @@ export class NewConnectionFarmerService {
       .post(
         BASE_URL + '/supply-chain/invite/farmer/',
         params,
-        this.connectionService.options(id)
+        headerOptions(HTTP_OPTION_3)
       )
       .pipe(map(successFormatter));
   }

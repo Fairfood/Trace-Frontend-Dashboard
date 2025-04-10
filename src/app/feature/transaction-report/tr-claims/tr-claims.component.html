@@ -1,28 +1,30 @@
 <section class="wrapper d-flex new-wrapper">
     <app-loader [loaderText]="loaderText" [loaderType]="'type1'" *ngIf="loading" class="w-50"></app-loader>
     <section class="col px-0 left w-50" *ngIf="!loading">
-        <aside aria-label="" class="">
+        <aside aria-label="claim section">
             <h3 class="text-sm text-blue font-1-bold header-wrap">
-                Selected claim ({{selectedClaims.length}})
+                {{'trReport.claim'|translate}} ({{selectedClaims.length}})
             </h3>
             <p class="text-off-blue" *ngIf="selectedClaims.length === 0">
                 <ng-container *ngIf="isReversal">
-                    You cannot add any claims to this reversed transacton.
+                    {{'trReport.reversed'|translate}}
                 </ng-container>
                 <ng-container *ngIf="!isReversal">
-                    You didn't add any claims yet, please add claims from below list!
+                    {{'trReport.noClaims'|translate}}
                 </ng-container>
             </p>
 
             <ul class="claim-listing" *ngIf="selectedClaims.length > 0">
-                <li *ngFor="let claim of selectedClaims" class="pointer"
+                <li *ngFor="let claim of selectedClaims;let i=index" class="pointer" [id]="i+'_claim'"
                     [ngClass]="{'selected': currentClaim?.id === claim?.id }" (click)="showDetails(claim)">
                     <aside class="left-side" aria-label="Claim details">
                         <mat-icon>verified_user</mat-icon>
                         <article class="content-claim">
                             <article class="ff-flex-align-center">
                                 <span class="font-1-bold text-blue">{{claim?.name}}</span>
-                                <span *ngIf="claim.status === 2" class="inherited-label ff-flex-align-center">Inherited claim</span>
+                                <span *ngIf="claim.status === 2" class="inherited-label ff-flex-align-center">
+                                    {{'claimDetails.inheritedClaimText'|translate}}
+                                </span>
                             </article>
                             <span class="font-1-normal desc text-overflow">{{claim.description_basic}}</span>
                         </article>
@@ -30,12 +32,14 @@
                     <article class="ff-flex-align-center">
                         <span class="label-tr">
                             <ng-container *ngIf="claim.status == 1">
-                                Pending
+                                {{'status.pending'|translate}}
                             </ng-container>
                             <ng-container *ngIf="claim.status == 2">
-                                {{ claim.verification_percentage }}% verified
+                                {{ claim.verification_percentage }}% {{'status.verified'|translate}}
                             </ng-container>
-                            <ng-container *ngIf="claim.status == 3">Rejected</ng-container>
+                            <ng-container *ngIf="claim.status == 3">
+                                {{'status.rejected'|translate}}
+                            </ng-container>
                         </span>
 
                         <mat-icon class="ff-flex-center arrow-icon">keyboard_arrow_right</mat-icon>
@@ -43,13 +47,13 @@
                 </li>
             </ul>
             <p class="text-off-blue" *ngIf="selectedClaims.length && isReversal">
-                You cannot add any claims to this reversed transacton.
+                {{'trReport.reversed'|translate}}
             </p>
         </aside>
         <ng-container *ngIf="!isReversal">
-            <aside aria-label="" class="">
+            <aside aria-label="add button">
                 <h3 class="text-sm text-blue font-1-bold header-wrap" *ngIf="availableClaims?.length > 0">
-                    Add claims
+                    {{'claim.addButton'|translate}}
                 </h3>
             </aside>
             <ul class="claim-listing" *ngIf="availableClaims?.length > 0">
@@ -82,23 +86,25 @@
 
             <article class="ff-flex-between">
                 <span class="label-tr">
-                    Description
+                    {{'misc.desc'|translate}}
                 </span>
                 <span class="text-xs text-off-blue font-1-normal m-0 pt-1">
-                    <span *ngIf="currentClaim.status == 1">Pending</span>
-                    <span *ngIf="currentClaim.status == 2">{{ currentClaim.verification_percentage }}% verified</span>
-                    <span *ngIf="currentClaim.status == 3">Rejected</span>
+                    <span *ngIf="currentClaim.status == 1">{{'status.pending'|translate}}</span>
+                    <span *ngIf="currentClaim.status == 2">
+                        {{ currentClaim.verification_percentage }}% {{'status.verified'|translate}}
+                    </span>
+                    <span *ngIf="currentClaim.status == 3">{{'status.rejected'|translate}}</span>
                 </span>
             </article>
-            <p class="value-tr m-t-10" [class.bb]="currentClaim.criteria[0].field_responses.length">
+            <p class="value-tr m-t-10" [class.bb]="currentClaim.criteria[0]?.field_responses.length">
                 {{currentClaim?.description_full }}
             </p>
-            <article class="d-flex evidence-section" *ngIf="currentClaim.criteria[0].field_responses.length">
+            <article class="d-flex evidence-section" *ngIf="currentClaim.criteria[0]?.field_responses.length">
                 <span class="label-tr">
-                    Evidence
+                    {{'claim.evidenceText'|translate}}
                 </span>
                 <ul>
-                    <ng-container *ngFor="let field of currentClaim.criteria[0].field_responses">
+                    <ng-container *ngFor="let field of currentClaim.criteria[0]?.field_responses">
                         <li>
                             <ng-container *ngIf="field.type === 3">
                                 <article class="ff-flex-between">
@@ -112,7 +118,8 @@
                                             <path
                                                 d="M11.3233 9.74984H1.07415C0.729759 9.74984 0.449219 9.4693 0.449219 9.12491V8.87493C0.449219 8.53054 0.729759 8.25 1.07415 8.25H11.3233C11.6677 8.25 11.9483 8.53054 11.9483 8.87493V9.12491C11.9483 9.4693 11.6677 9.74984 11.3233 9.74984Z"
                                                 fill="#003A60" stroke="#003A60" stroke-width="0.5" />
-                                        </svg>Download
+                                        </svg>
+                                        {{'button.downloadButton'|translate}}
                                     </span>
                                 </article>
                             </ng-container>

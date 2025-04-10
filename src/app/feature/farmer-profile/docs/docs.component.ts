@@ -1,42 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
+// services
 import { FarmerProfileStoreService } from '../farmer-profile-store.service';
 import { UtilService } from 'src/app/shared/service';
+// configs
 import { IReference } from '../farmer-profile.config';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
-const TABLE_COLUMNS: any[] = [
-  {
-    name: 'Added by',
-    class: 'normal-column',
-  },
-  {
-    name: 'Added on',
-    class: 'normal-column',
-  },
-  {
-    name: 'Description',
-    class: 'large-column',
-  },
-  {
-    name: 'Uploader',
-    class: 'normal-column',
-  },
-  {
-    name: 'File',
-    class: 'large-column',
-  },
-];
+// component
+import { AttachementsTableComponent } from '../../attachments-table';
 @Component({
   selector: 'app-docs',
   templateUrl: './docs.component.html',
+  standalone: true,
+  imports: [CommonModule, AttachementsTableComponent, TranslateModule],
 })
 export class DocsComponent implements OnInit {
   @Input() farmerId: string;
   @Input() isEditable: boolean;
 
-  displayedColumns: any[] = TABLE_COLUMNS;
+  displayedColumns: any[] = [
+    {
+      name: this.translate.instant('newPlot.addedBy'),
+      class: 'normal-column',
+    },
+    {
+      name: this.translate.instant('newPlot.addedOn'),
+      class: 'normal-column',
+    },
+    {
+      name: this.translate.instant('misc.desc'),
+      class: 'large-column',
+    },
+    {
+      name: this.translate.instant('newPlot.uploader'),
+      class: 'normal-column',
+    },
+    {
+      name: this.translate.instant('claim.fileHeading'),
+      class: 'large-column',
+    },
+  ];
   dataSource: any;
   pageApis: Subscription[] = [];
   tableLength: number;
@@ -45,7 +52,8 @@ export class DocsComponent implements OnInit {
 
   constructor(
     private store: FarmerProfileStoreService,
-    private dataService: UtilService
+    public dataService: UtilService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +79,8 @@ export class DocsComponent implements OnInit {
 
   filterApplied(param: { limit: number; offset: number }): void {
     this.loading = true;
-    this.store.fetchFarmerAttachments(this.farmerId, param.offset, param.limit);
+    const { limit, offset } = param;
+    this.store.fetchFarmerAttachments(this.farmerId, offset, limit);
   }
 
   fileUploadStarted(data: { file: any; fileName: string }): void {
@@ -87,7 +96,7 @@ export class DocsComponent implements OnInit {
         .subscribe((result: any) => {
           if (result) {
             this.dataService.customSnackBar(
-              'Receipt successfully uploaded',
+              this.translate.instant('transactions.receiptUploaded'),
               ACTION_TYPE.SUCCESS
             );
             this.filterApplied({

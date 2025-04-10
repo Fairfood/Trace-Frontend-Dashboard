@@ -89,7 +89,7 @@ export class TemplateProductComponent implements OnInit, OnDestroy {
     this.productFilterOptions$ = this.productControl.valueChanges.pipe(
       debounceTime(600),
       startWith(''),
-      map(val => (val ? val : '')),
+      map(val => val || ''),
       switchMap((value: string) => {
         return this.productFilter(value);
       })

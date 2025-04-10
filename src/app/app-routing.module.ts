@@ -1,12 +1,12 @@
 /* istanbul ignore file */
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { authGuard } from './shared/guard';
 
-const AppRoutes: Routes = [
+export const AppRoutes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./feature/layout').then(m => m.LayoutModule),
+    loadChildren: () => import('./feature/layout').then(l => l.layout),
     canActivate: [authGuard],
   },
   {
@@ -36,7 +36,9 @@ const AppRoutes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(AppRoutes)],
+  imports: [
+    RouterModule.forRoot(AppRoutes, { preloadingStrategy: PreloadAllModules }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

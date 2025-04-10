@@ -7,7 +7,7 @@ import { DynamicTemplateUploadService } from '../dynamic-template-upload.service
 import { DynamicTemplateStore } from '../dynamic-template-upload-store.service';
 // components
 import { FfColumnMappingBoxComponent } from '../ff-column-mapping-box';
-import { MapColumnNamePipe } from './mappint-table.pipe';
+import { MapColumnNamePipe } from './mapping-table.pipe';
 
 @Component({
   selector: 'app-mapping-table',
@@ -115,10 +115,8 @@ export class MappingTableComponent implements OnInit, OnDestroy {
     if (isMapped > -1) {
       data[isMapped].selected = false;
       data[isMapped].columnIndex = -1;
-      this.updateSchemaValue(data, item.id, index);
-    } else {
-      this.updateSchemaValue(data, item.id, index);
     }
+    this.updateSchemaValue(data, item.id, index);
   }
 
   /**

@@ -1,24 +1,32 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 // services
 import { DashboardStoreService } from '../dashboard-store.service';
 // config
+import { IDashboardStatus, ISupplyChainOverview } from '../dashboard.model';
 import { ITableColumnHeader } from 'src/app/shared/configs/app.model';
 import { SUPPLY_CHAIN_COLUMNS } from '../dashboard.config';
-import { IDashboardStatus, ISupplyChainOverview } from '../dashboard.model';
 // components
 import {
   FfPaginationComponent,
   IPaginator,
   LoaderComponent,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 
 @Component({
   selector: 'app-supply-chain-overview',
   templateUrl: './supply-chain-overview.component.html',
   styleUrls: ['./supply-chain-overview.component.scss'],
-  imports: [CommonModule, LoaderComponent, FfPaginationComponent],
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    FfPaginationComponent,
+    TranslateModule,
+    FfCustomPaginationComponent,
+  ],
   standalone: true,
 })
 export class SupplyChainOverviewComponent implements OnDestroy, OnInit {
@@ -69,6 +77,6 @@ export class SupplyChainOverviewComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.sub?.unsubscribe();
   }
 }

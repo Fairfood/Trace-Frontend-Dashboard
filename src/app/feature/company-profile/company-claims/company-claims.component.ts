@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-
+import { TranslateModule } from '@ngx-translate/core';
+// services
 import { CompanyProfileService } from '../company-profile.service';
+// configs, constants
 import { ITableColumnHeader } from 'src/app/shared/configs/app.model';
 import { CLAIM_COLUMNS } from './company-claim.config';
 // components
@@ -13,6 +14,7 @@ import {
   LoaderComponent,
   FfPaginationComponent,
   IPaginator,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 
 @Component({
@@ -23,6 +25,8 @@ import {
     MatDialogModule,
     FfPaginationComponent,
     LoaderComponent,
+    TranslateModule,
+    FfCustomPaginationComponent,
   ],
   templateUrl: './company-claims.component.html',
   styleUrls: ['./company-claims.component.scss'],
@@ -52,6 +56,7 @@ export class CompanyClaimsComponent implements OnInit, OnDestroy {
     this.getCompanyClaims();
   }
 
+  /* istanbul ignore next */
   getCompanyClaims(): void {
     const { limit, offset } = this.appliedFilter;
     const api = this.companyService

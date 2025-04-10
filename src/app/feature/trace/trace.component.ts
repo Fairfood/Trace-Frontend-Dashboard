@@ -1,15 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { NgIf } from '@angular/common';
 // services and configs
 import { TraceStoreService } from './trace-store.service';
 import { TAB, ItabItem, ITransactionList, IStage } from './trace.config';
 import { ICarousal, IWizardStep } from 'src/app/shared/configs/app.model';
+// components
+import { FairFoodCustomTabComponent, LoaderComponent } from 'fairfood-utils';
+import { FfFilterBoxWrapperComponent } from 'fairfood-form-components';
+import { WizardStepComponent } from 'src/app/shared/components/wizard-step';
+import { FfImageSliderComponent } from 'src/app/shared/components/ff-image-slider';
+import { TrActorsComponent } from './tr-actors';
+import { TrMapviewComponent } from './tr-mapview';
+import { TrTransactionsComponent } from './tr-transactions';
 
 @Component({
   selector: 'app-trace',
   templateUrl: './trace.component.html',
   styleUrls: ['./trace.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    FairFoodCustomTabComponent,
+    LoaderComponent,
+    FfFilterBoxWrapperComponent,
+    WizardStepComponent,
+    FfImageSliderComponent,
+    TrActorsComponent,
+    TrMapviewComponent,
+    TrTransactionsComponent,
+  ],
 })
 export class TraceComponent implements OnInit, OnDestroy {
   // actor and transacitons tab
@@ -44,10 +65,10 @@ export class TraceComponent implements OnInit, OnDestroy {
     const stageSub = this.store.transactionStages$.subscribe({
       next: (res: IStage) => {
         const { activeStage, stageList } = res;
-        if (stageList.length) {
+        if (stageList?.length) {
           this.stages = stageList;
           this.wizardData = stageList.map(a => {
-            const subtext = a.actors.length > 1 ? `(${a.actors.length})` : '';
+            const subtext = a.actors?.length > 1 ? `(${a.actors?.length})` : '';
             return {
               title: `${a.tittle} ${subtext}`,
               subTitle: a.actor_name,
@@ -73,7 +94,7 @@ export class TraceComponent implements OnInit, OnDestroy {
     const actorSub = this.store.actorsData$.subscribe({
       next: (res: any) => {
         this.selectedStageActors = res;
-        if (res.length) {
+        if (res?.length) {
           this.activeActor = 0;
           this.selectActor();
           this.constructImageSlider();
@@ -85,7 +106,7 @@ export class TraceComponent implements OnInit, OnDestroy {
     const trSub = this.store.tableData$.subscribe({
       next: (res: ITransactionList) => {
         const { count, transactions } = res;
-        if (transactions.length) {
+        if (transactions?.length) {
           this.currentActiveActor.count = count;
           this.transactionLoaded = true;
         } else {
@@ -194,6 +215,6 @@ export class TraceComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.pageApis.forEach(m => m.unsubscribe());
-    this.store.updateStages(this.stages.length - 1);
+    this.store.updateStages(this.stages?.length - 1);
   }
 }

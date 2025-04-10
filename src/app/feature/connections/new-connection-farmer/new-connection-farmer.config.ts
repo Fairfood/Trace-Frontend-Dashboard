@@ -1,5 +1,7 @@
+/* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 // standalne components
 import {
   FairFoodInputComponent,
@@ -11,7 +13,7 @@ import {
   FairFoodCustomTabComponent,
 } from 'fairfood-utils';
 import { ITabItem } from 'src/app/shared/configs/app.model';
-import { ShowRequiredErrorPipe } from 'src/app/shared/pipes';
+import { SafeHtmlPipe, ShowRequiredErrorPipe } from 'src/app/shared/pipes';
 import { ConnectionMappingComponent } from '../connection-mapping';
 
 export const IMPORTS = [
@@ -24,6 +26,8 @@ export const IMPORTS = [
   LoaderComponent,
   ShowRequiredErrorPipe,
   ConnectionMappingComponent,
+  TranslateModule,
+  SafeHtmlPipe,
 ];
 
 export const CONNECTION_TABS: ITabItem[] = [

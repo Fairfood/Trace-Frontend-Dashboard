@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
 // services
+import { TranslateService } from '@ngx-translate/core';
 import { UtilService } from 'src/app/shared/service';
-import { TeamMemberService } from './team-member.service';
-import { CompanyProfileStoreService } from '../company-profile-store.service';
+import { CompanyProfileStoreService } from '../';
+import { TeamMemberService } from './';
 // configs
 import { ACTION_TYPE, emailRegex } from 'src/app/shared/configs/app.constants';
 import { IMPORTS, MEMBER_COLUMNS } from './team-members.config';
@@ -17,9 +17,9 @@ import {
   ICommonObj,
   ITableColumnHeader,
 } from 'src/app/shared/configs/app.model';
+import { IPaginator } from 'fairfood-utils';
 // components
 import { ProfilePopupComponent } from '../profile-popup/profile-popup.component';
-import { IPaginator } from 'fairfood-utils';
 
 @Component({
   selector: 'app-team-members',
@@ -55,9 +55,10 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private util: UtilService,
+    public util: UtilService,
     private service: TeamMemberService,
-    private store: CompanyProfileStoreService
+    private store: CompanyProfileStoreService,
+    private translate: TranslateService
   ) {
     this.pageApis = [];
     this.filterOptions = {
@@ -120,6 +121,7 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
    * @param member any
    * @param text string
    */
+  /* istanbul ignore next */
   changeMemberRole(member: any, text: string): void {
     const dialogRef = this.dialog.open(ProfilePopupComponent, {
       width: '30vw',
@@ -134,32 +136,42 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         if (result === false) {
-          const message = 'Failed to update member role';
-          this.util.customSnackBar(message, ACTION_TYPE.FAILED);
+          this.util.customSnackBar(
+            this.translate.instant('team.memberRoleFailed'),
+            ACTION_TYPE.FAILED
+          );
         } else {
-          const message = 'Member role updated successfully';
-          this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+          this.util.customSnackBar(
+            this.translate.instant('team.memberRole'),
+            ACTION_TYPE.SUCCESS
+          );
           this.reloadMemberList();
         }
       }
     });
   }
 
+  /* istanbul ignore next */
   resendInvite(member: any): void {
     const formData = new FormData();
-    const api = this.service.resendMemberInvite(formData, member.id).subscribe(
-      () => {
-        const message = 'Resend invite send successfully';
-        this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+    const api = this.service.resendMemberInvite(formData, member.id).subscribe({
+      next: () => {
+        this.util.customSnackBar(
+          this.translate.instant('team.resendInvite'),
+          ACTION_TYPE.SUCCESS
+        );
       },
-      () => {
-        const message = 'Resend invite send failed';
-        this.util.customSnackBar(message, ACTION_TYPE.FAILED);
-      }
-    );
+      error: () => {
+        this.util.customSnackBar(
+          this.translate.instant('team.resendInviteFailed'),
+          ACTION_TYPE.FAILED
+        );
+      },
+    });
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   openTeammemberDeleteDialog(elem: any): void {
     const dialogRef = this.dialog.open(ProfilePopupComponent, {
       width: '400px',
@@ -174,11 +186,15 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         if (result === false) {
-          const message = 'Team member delete failed';
-          this.util.customSnackBar(message, ACTION_TYPE.FAILED);
+          this.util.customSnackBar(
+            this.translate.instant('team.teamMemberDeleteFailed'),
+            ACTION_TYPE.FAILED
+          );
         } else {
-          const message = 'Team member deleted successfully';
-          this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+          this.util.customSnackBar(
+            this.translate.instant('team.teamMemberDelete'),
+            ACTION_TYPE.SUCCESS
+          );
           this.reloadMemberList();
         }
       }
@@ -201,6 +217,7 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   initSearchEmail(): void {
     const { email } = this.teamMemberForm.controls;
     const api = email.valueChanges
@@ -269,27 +286,27 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
         formData.append('last_name', lastName);
         formData.append('type', role);
       }
-      const api = this.service.addTeam(formData).subscribe(
-        () => {
+      const api = this.service.addTeam(formData).subscribe({
+        next: () => {
           this.store.resetMembers();
           this.util.customSnackBar(
-            'Team member added successfully',
+            this.translate.instant('team.teamMemberAdd'),
             ACTION_TYPE.SUCCESS
           );
           this.toggleAddMember();
           this.reloadMemberList();
         },
-        (err: any) => {
+        error: (err: any) => {
           this.dataLoading = false;
           if (err.error.code === 400) {
             this.teamMemberForm.controls.email.setErrors({ incorrect: true });
           }
-        }
-      );
+        },
+      });
       this.pageApis.push(api);
     } else {
       this.util.customSnackBar(
-        'Please enter the required fields',
+        this.translate.instant('formValidation.required'),
         ACTION_TYPE.FAILED
       );
     }
@@ -308,6 +325,7 @@ export class TeamMembersComponent implements OnInit, OnDestroy {
     this.service.listTeamMembers(this.filterOptions);
   }
 
+  /* istanbul ignore next */
   trackByFn(index: number): any {
     return index;
   }

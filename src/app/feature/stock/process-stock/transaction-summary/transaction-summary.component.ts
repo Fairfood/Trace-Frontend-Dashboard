@@ -7,6 +7,9 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 import {
   ButtonNav,
   StepValues,
@@ -14,11 +17,20 @@ import {
   TransactionState,
 } from '../process-stock.config';
 import { StockProcessService } from '../stock-process.service';
+import { StockActionButtonComponent } from '../stock-action-button';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-transaction-summary',
   templateUrl: './transaction-summary.component.html',
   styleUrls: ['./transaction-summary.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    StockActionButtonComponent,
+    MatCheckboxModule,
+    FormsModule,
+  ],
 })
 export class TransactionSummaryComponent implements OnInit, OnDestroy {
   @Output() nextPage = new EventEmitter();
@@ -52,17 +64,18 @@ export class TransactionSummaryComponent implements OnInit, OnDestroy {
       this.currentAction = 'receive';
     }
     const listInfo = this.service.getListingInfo();
-    this.batchData = listInfo?.selectedStock?.map((st: any) => {
-      return `ST-${st.stockId} (${st.quantityAvailable} kg)`;
-    });
+    this.batchData = listInfo?.selectedStock?.map(
+      (st: any) => `ST-${st.stockId} (${st.quantityAvailable} kg)`
+    );
+
     this.subscriptionsInit();
   }
 
   subscriptionsInit(): void {
     const dataSub = this.service.currentClaimState().subscribe(result => {
-      if (result) {
-        this.claimList = [];
-        const { claimsList } = result;
+      this.claimList = [];
+      const { claimsList } = result || [];
+      if (claimsList) {
         this.claimList = claimsList
           .filter((c: any) => c.selected)
           .map((c: any) => c.name);
@@ -71,9 +84,8 @@ export class TransactionSummaryComponent implements OnInit, OnDestroy {
     const transactionSub = this.service
       .currentTransactionState()
       .subscribe((result: TransactionState) => {
-        if (result) {
-          this.formData = result.transactionDetails;
-        }
+        const { transactionDetails } = result;
+        this.formData = transactionDetails;
       });
     this.pageApis.push(transactionSub);
     this.pageApis.push(dataSub);
@@ -84,11 +96,7 @@ export class TransactionSummaryComponent implements OnInit, OnDestroy {
   }
 
   confirmTransaction(val: boolean): void {
-    if (val) {
-      this.nextButtonState.disabled = false;
-    } else {
-      this.nextButtonState.disabled = true;
-    }
+    this.nextButtonState.disabled = !val;
   }
 
   ngOnDestroy(): void {

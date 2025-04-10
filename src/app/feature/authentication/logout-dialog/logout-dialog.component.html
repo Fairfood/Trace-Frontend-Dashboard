@@ -1,18 +1,18 @@
 <section class="pop-header ff-flex-between">
   <h4>
-    User signed in
+    {{ 'logout.heading' | translate }}
   </h4>
 </section>
 <section class="pop-content flex-column">
   <p>
-    You appear to be signed in to another account already. Please sign out to proceed.
+    {{ 'logout.content' | translate }}
   </p>
   <article class="ff-flex-end">
-    <app-buttons buttonType="stroked" (buttonClicked)="close()">
-      Cancel
+    <app-buttons buttonType="stroked" (buttonClicked)="close()" customId="logoutCancel">
+      {{ 'button.cancel' | translate }}
     </app-buttons>
-    <app-buttons buttonType="fill" (buttonClicked)="logout()">
-      Logout
+    <app-buttons buttonType="fill" (buttonClicked)="logout()" customId="logoutYes">
+      {{ 'button.logout' | translate }}
     </app-buttons>
   </article>
 </section>

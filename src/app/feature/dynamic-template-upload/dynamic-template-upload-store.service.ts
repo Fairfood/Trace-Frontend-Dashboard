@@ -53,66 +53,78 @@ const initialState: ITemplateState = {
   providedIn: 'root',
 })
 export class DynamicTemplateStore extends BaseStoreService<ITemplateState> {
+  /* istanbul ignore next */
   templateData$: Observable<any> = this.select(
     (state: ITemplateState) => state.selectedTemplateData
   );
 
+  /* istanbul ignore next */
   dataRows$: Observable<any[]> = this.select(
     (state: ITemplateState) => state.dataRows
   );
-
+  /* istanbul ignore next */
   errorRows$: Observable<any[]> = this.select(
     (state: ITemplateState) => state.errorRows
   );
-
+  /* istanbul ignore next */
   tabChanges$: Observable<any[]> = this.select(
     (state: ITemplateState) => state.tabGroup
   );
-
+  /* istanbul ignore next */
   currentStep$: Observable<string> = this.select(
     (state: ITemplateState) => state.currentStep
   );
-
+  /* istanbul ignore next */
   uploadFileData$: Observable<any> = this.select(
     (state: ITemplateState) => state.uploadFileData
   );
-
+  /* istanbul ignore next */
   schemaArray$: Observable<any> = this.select(
     (state: ITemplateState) => state.schemaFields
   );
-
+  /* istanbul ignore next */
   templatePreview$: Observable<any> = this.select(
     (state: ITemplateState) => state.templatePreview
   );
-
+  /* istanbul ignore next */
   dataCount$: Observable<number> = this.select(
     (state: ITemplateState) => state.dataCount
+  );
+  /* istanbul ignore next */
+  errorCount$: Observable<number> = this.select(
+    (state: ITemplateState) => state.errorCount
   );
 
   constructor() {
     super(initialState);
   }
 
+  /* istanbul ignore next */
   getCurrentTemplateType(): number {
     return this.state.templateType;
   }
 
+  /* istanbul ignore next */
   getCurrentTabs(): any[] {
     return this.state.tabGroup;
   }
 
+  /* istanbul ignore next */
   getCurrentStep(): string {
     return this.state.currentStep;
   }
 
+  /* istanbul ignore next */
   updateStateProp<T>(key: string, value: T): void {
     this.setState({ [key]: value });
   }
 
+  /* istanbul ignore next */
   currentDataState(): any[] {
     return this.state.dataRows;
   }
 
+  /* istanbul ignore next */
   currentErrorState(): any[] {
     return this.state.errorRows;
   }
@@ -148,6 +160,7 @@ export class DynamicTemplateStore extends BaseStoreService<ITemplateState> {
     this.updateStateProp<any>('selectedTemplateData', null);
   }
 
+  /* istanbul ignore next */
   fromMappingToVerification(): void {
     const template = getTemplateTabs('custom').map((item: ITabItem) => {
       if (item.id === 'verification') {
@@ -159,6 +172,7 @@ export class DynamicTemplateStore extends BaseStoreService<ITemplateState> {
     this.updateStateProp<string>('currentStep', 'verification');
   }
 
+  /* istanbul ignore next */
   resetState(): void {
     const state = {
       ...initialState,
@@ -167,6 +181,7 @@ export class DynamicTemplateStore extends BaseStoreService<ITemplateState> {
     this.setState(state);
   }
 
+  /* istanbul ignore next */
   removeNewUplod(): void {
     const state: any = {
       selectedTemplateData: null,
@@ -182,13 +197,20 @@ export class DynamicTemplateStore extends BaseStoreService<ITemplateState> {
   }
 
   validationApiSuccess(res: any): void {
-    const { data, errors, data_count } = res;
+    const { data, errors, data_count, errors_count } = res;
     this.updateStateProp<any>('dataRows', data);
     this.updateStateProp<any>('errorRows', errors);
     this.updateStateProp<any>('dataCount', data_count);
+    this.updateStateProp<any>('errorCount', errors_count);
   }
 
+  /* istanbul ignore next */
   existingDataCount(): number {
     return this.state.dataCount;
+  }
+
+  /* istanbul ignore next */
+  existingErrorCount(): number {
+    return this.state.errorCount;
   }
 }

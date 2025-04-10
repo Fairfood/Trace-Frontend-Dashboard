@@ -7,6 +7,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialogModule,
 } from '@angular/material/dialog';
+import { TranslateModule } from '@ngx-translate/core';
 import { ButtonsComponent } from 'fairfood-utils';
 
 @Component({
@@ -14,7 +15,7 @@ import { ButtonsComponent } from 'fairfood-utils';
   templateUrl: './logout-dialog.component.html',
   styleUrls: ['./logout-dialog.component.scss'],
   standalone: true,
-  imports: [MatDialogModule, CommonModule, ButtonsComponent],
+  imports: [MatDialogModule, CommonModule, ButtonsComponent, TranslateModule],
 })
 export class LogoutDialogComponent {
   constructor(

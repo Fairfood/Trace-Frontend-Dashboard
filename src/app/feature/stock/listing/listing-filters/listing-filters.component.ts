@@ -15,12 +15,16 @@ import { FairFoodDropDateComponent } from 'src/app/shared/components/ff-drop-dat
 import { FairFoodDropQuantityComponent } from 'src/app/shared/components/ff-drop-quantity';
 // configs
 import {
+  IBatches,
   IFilterToggleItems,
   IStockFilter,
   IStockTableRow,
+  ITableFilterProps,
 } from '../listing.model';
 import { getAdditionalFilters } from 'src/app/shared/configs/app.methods';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { STOCK_TYPES_FILTER } from '../listing.constants';
+
 // services
 import { ListingStoreService } from '../listing-store.service';
 import { GlobalStoreService } from 'src/app/shared/store';
@@ -28,8 +32,6 @@ import { StorageService } from 'src/app/shared/service';
 // material
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ClaimService } from 'src/app/feature/claim';
-import { STOCK_TYPES_FILTER } from '../listing.constants';
 
 @Component({
   selector: 'app-listing-filters',
@@ -56,12 +58,17 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
   appliedFilterValues: IFilterToggleItems;
   availableFilters: any;
   createdFromList: ICommonObj[] = STOCK_TYPES_FILTER;
+  presetDate: {
+    selectedType: number;
+    selectedDate: Date;
+    start: Date;
+    end: Date;
+  };
 
   constructor(
     private store: ListingStoreService,
     private global: GlobalStoreService,
-    private storage: StorageService,
-    private claim: ClaimService
+    private storage: StorageService
   ) {
     this.stocklistFilter = {
       productData: [],
@@ -73,14 +80,70 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initData();
     this.loadProducts();
-    this.additionalFilterSetting();
+    // this.additionalFilterSetting();
   }
 
   initData(): void {
-    const sub1 = this.store.filterValues$.subscribe(filterValues => {
-      this.appliedFilterValues = filterValues;
+    const listingState = localStorage.getItem('listingState');
+    if (listingState) {
+      const parsedData = JSON.parse(listingState);
+      this.appliedFilterValues = {
+        ...parsedData.filters,
+        ...parsedData.tableProps, // Spread tableProps inside filters
+      };
+    } else {
+      const sub1 = this.store.filterValues$.subscribe(filterValues => {
+        this.appliedFilterValues = filterValues;
+      });
+      this.pageApis.push(sub1);
+    }
+    this.presetDate = {
+      selectedType: this.appliedFilterValues?.dateOn ? 2 : 1,
+      selectedDate: this.appliedFilterValues?.dateOn
+        ? this.convertToDate(this.appliedFilterValues.dateOn)
+        : undefined,
+      start: this.appliedFilterValues?.dateFrom
+        ? this.convertToDate(this.appliedFilterValues.dateFrom)
+        : undefined,
+      end: this.appliedFilterValues?.dateTo
+        ? this.convertToDate(this.appliedFilterValues.dateTo)
+        : undefined,
+    };
+
+    if (!this.availableFilters) {
+      this.additionalFilterSetting(); // Call this to set default filters
+    }
+
+    this.availableFilters = this.availableFilters.map((filter: any) => {
+      if (filter.id === 'date') {
+        filter.visible = !!(
+          this.appliedFilterValues?.dateOn ||
+          this.appliedFilterValues?.dateFrom ||
+          this.appliedFilterValues?.dateTo
+        );
+      } else if (filter.id === 'quantity') {
+        filter.visible = !!(
+          this.appliedFilterValues?.quantityFrom ||
+          this.appliedFilterValues?.quantityIs ||
+          this.appliedFilterValues?.quantityTo
+        );
+      } else if (filter.id === 'type') {
+        filter.visible = !!this.appliedFilterValues?.createdFrom;
+      }
+      return filter;
     });
-    this.pageApis.push(sub1);
+  }
+
+  convertToDate(dateStr: string): Date | undefined {
+    if (!dateStr) return undefined; // Return undefined if empty
+
+    const parts = dateStr.split('/'); // Split "20/11/2025" into ["20", "11", "2025"]
+    if (parts.length === 3) {
+      const [day, month, year] = parts.map(Number); // Convert to numbers
+      return new Date(year, month - 1, day); // Month is 0-based in JS
+    }
+
+    return undefined; // Return undefined if format is incorrect
   }
 
   loadProducts(): void {
@@ -98,7 +161,12 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
         id: this.storage.retrieveStoredData('companyID'),
         name: this.storage.retrieveStoredData('companyName'),
       };
-      this.stocklistFilter.supplierData = [company, ...suppliers];
+      const impersonate = this.storage.retrieveStoredData('impersonate');
+      if (!impersonate) {
+        this.stocklistFilter.supplierData = [company, ...suppliers];
+      } else {
+        this.stocklistFilter.supplierData = [...suppliers];
+      }
       this.loadClaims();
     });
 
@@ -130,6 +198,7 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
   filterStocklist(newValue: ICommonObj, type: string): void {
     this.resetOtherSections();
     const selectedFilterValue = newValue.id === 'All' ? '' : newValue.id;
+
     if (type === 'supplier') {
       this.store.updateStateProp<IFilterToggleItems>('filters', {
         ...this.store.getFilterValues(),
@@ -151,6 +220,7 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
         selectedClaim: selectedFilterValue,
       });
     }
+
     this.store.updateStateProp<string>('selectingOptions', null);
     this.filterChanged.emit();
   }
@@ -171,8 +241,14 @@ export class ListingFiltersComponent implements OnInit, OnDestroy {
 
   resetOtherSections(): void {
     this.store.updateStateProp<IStockTableRow[]>('selectedStocks', []);
+    this.store.updateStateProp<IBatches[]>('changedBatches', []);
+    this.store.updateStateProp<IBatches[]>('batches', []);
     this.store.updateStateProp<boolean>('selectAll', false);
     this.store.updateStateProp<boolean>('stockAction', false);
+    this.store.updateStateProp<ITableFilterProps>('tableProps', {
+      ...this.store.getTableProps(),
+      offset: 0,
+    });
   }
 
   /**

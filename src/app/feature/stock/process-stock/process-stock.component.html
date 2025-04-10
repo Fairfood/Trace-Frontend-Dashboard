@@ -5,16 +5,16 @@
     <ng-container [ngSwitch]="currentStep">
         <ng-container *ngSwitchCase="StepValues.TRANSACTION">
             <ng-container *ngIf="actionUrl === '/stock/stock-send'">
-                <app-stock-send (nextPage)="goToClaims($event)" (disableNextTab)="disableClaimTab($event)"></app-stock-send>
+                <app-stock-send (nextPage)="goToClaims()" (disableNextTab)="disableClaimTab($event)"></app-stock-send>
             </ng-container>
             <ng-container *ngIf="actionUrl === '/stock/receive'">
-                <app-receive-stock-single (nextPage)="goToClaims($event)"></app-receive-stock-single>
+                <app-receive-stock-single (nextPage)="goToClaims()"></app-receive-stock-single>
             </ng-container>
             <ng-container *ngIf="actionUrl === '/stock/process-convert'">
-                <app-stock-convert (nextPage)="goToClaims($event)"></app-stock-convert>
+                <app-stock-convert (nextPage)="goToClaims()"></app-stock-convert>
             </ng-container>
             <ng-container *ngIf="actionUrl === '/stock/process-merge'">
-                <app-stock-merge (nextPage)="mergeStockNavigation($event)"></app-stock-merge>
+                <app-stock-merge (nextPage)="mergeStockNavigation()"></app-stock-merge>
             </ng-container>
         </ng-container>
         <ng-container *ngSwitchCase="StepValues.CLAIMS">
@@ -27,5 +27,5 @@
     </ng-container>
 </ng-container>
 <section class="loader-wrap ff-flex-center" *ngIf="loading">
-    <app-loader [loaderText]="loaderText" [loaderType]="'type1'"></app-loader>
+    <app-loader [loaderText]="loaderText" loaderType="type1"></app-loader>
 </section>

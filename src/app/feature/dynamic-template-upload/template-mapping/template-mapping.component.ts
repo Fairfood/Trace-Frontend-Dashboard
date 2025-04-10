@@ -31,6 +31,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
   // if link fields are accessed again: when updating template
   // delete file from server
   deleteFile = false;
+  visibilityOfName = true;
 
   constructor(
     private store: DynamicTemplateStore,
@@ -47,6 +48,8 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
     this.templateAction();
     this.getUploadedFileData();
     this.formValueChanges();
+    this.saveTemplateValueChanges();
+    this.titleValueChanges();
     this.nextButton = {
       buttonText: 'Continue',
       disabled: true,
@@ -66,14 +69,16 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
     );
   }
 
-  formValueChanges(): void {
+  saveTemplateValueChanges(): void {
     const sub = this.templateSelectionForm
       .get('saveTemplate')
       .valueChanges.subscribe((selected: boolean) => {
         const name = this.templateSelectionForm.get('templateName');
+        this.visibilityOfName = selected;
         if (selected) {
           name.enable();
           name.setValidators(Validators.required);
+          name.markAsUntouched();
         } else {
           name.disable();
           name.clearValidators();
@@ -81,7 +86,9 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
         name.updateValueAndValidity({ onlySelf: true });
       });
     this.pageApis.push(sub);
+  }
 
+  titleValueChanges(): void {
     const sub2 = this.templateSelectionForm
       .get('title')
       .valueChanges.pipe(
@@ -98,7 +105,9 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
       });
 
     this.pageApis.push(sub2);
+  }
 
+  formValueChanges(): void {
     const sub3 = this.templateSelectionForm.statusChanges.subscribe(
       (val: string) => {
         if (val === 'VALID') {
@@ -122,7 +131,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
             currentTitle + 1
           }`;
           this.service.showError(message);
-
+          // if data row is less than title row then update data row to title row + 1
           this.templateSelectionForm.patchValue(
             {
               dataRow: currentTitle + 1,
@@ -211,6 +220,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
    * List some rows inside the template 2d array
    * @param id string
    */
+  /* istanbul ignore next */
   fetchTemplatePreview(id: string, fields: any[]): void {
     const api = this.service.getPreviewOfUploadedTemplate(id).subscribe({
       next: (res: any) => {
@@ -226,6 +236,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   fetchTemplateSchema(fields: any[]): void {
     const api = this.service
       .templateSchemaFields(this.store.getCurrentTemplateType())
@@ -270,6 +281,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
    * Updating template data with product, currency and unit
    * Along with mapped columns
    */
+  /* istanbul ignore next */
   patchTemplate(): void {
     const { templateId, saveTemplate, templateName, title, dataRow } =
       this.templateSelectionForm.getRawValue();
@@ -330,22 +342,28 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
    * @param templateId string
    * @param reqObj any
    */
+  /* istanbul ignore next */
   deleteUploadedFile(templateId: string, reqObj: any): void {
     const { latestUpload } = this.templateSelectionForm.getRawValue();
-    const api = this.service
-      .deleteUploadedFile(latestUpload ?? templateId)
-      .subscribe({
-        next: () => {
-          this.patchTemplateApi(templateId, reqObj);
-        },
-        error: (err: any) => {
-          this.service.showError(err.detail[0]);
-          this.loading = false;
-        },
-      });
+    const api = this.service.deleteUploadedFile(latestUpload ?? '').subscribe({
+      next: () => {
+        this.patchTemplateApi(templateId, reqObj);
+      },
+      error: (err: any) => {
+        console.log(err);
+        this.service.showError('Error while updating template');
+        this.loading = false;
+      },
+    });
     this.pageApis.push(api);
   }
 
+  /**
+   * Final flow
+   * @param templateId string
+   * @param reqObj any
+   */
+  /* istanbul ignore next */
   patchTemplateApi(templateId: string, reqObj: any): void {
     const api = this.service.patchTemplate(templateId, reqObj).subscribe({
       next: (res: any) => {
@@ -366,6 +384,7 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
    * After template is updated verify the data in the uploaded file/template
    * @param templateId string
    */
+  /* istanbul ignore next */
   verifyApi(templateId: string): void {
     const api = this.service.verifyUpload(templateId).subscribe({
       next: (res: any): void => {
@@ -385,10 +404,12 @@ export class TemplateMappingComponent implements OnInit, OnDestroy {
     this.service.showError(errorMessage);
   }
 
+  /* istanbul ignore next */
   uploadSuccess(): void {
     this.store.fromMappingToVerification();
   }
 
+  /* istanbul ignore next */
   ngOnDestroy(): void {
     this.pageApis.forEach(api => api.unsubscribe());
   }

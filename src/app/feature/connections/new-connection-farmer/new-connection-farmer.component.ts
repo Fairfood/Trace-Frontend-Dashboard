@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 // configs
 import { CONNECTION_TABS, IMPORTS } from './new-connection-farmer.config';
-
-// services
-import { NewConnectionFarmerService } from './new-connection-farmer.service';
-import { GlobalStoreService } from 'src/app/shared/store';
-import { UtilService } from 'src/app/shared/service';
+// components
 import { NewConnectionCommonComponent } from '../new-connection-common';
+// services
+import { NewConnectionFarmerService } from './';
 
 @Component({
   selector: 'app-new-connection-farmer',
@@ -26,24 +25,17 @@ export class NewConnectionFarmerComponent
     relationship: 2,
     type: 1,
   };
-  constructor(
-    private service: NewConnectionFarmerService,
-    globalStore: GlobalStoreService,
-    utils: UtilService
-  ) {
-    super(utils, globalStore);
+  constructor(private service: NewConnectionFarmerService) {
+    super();
   }
 
   ngOnInit(): void {
-    const impersonate = localStorage.getItem('impersonate');
-    this.viewingAsAdmin = impersonate === 'true';
+    this.initData();
     this.tabGroup = JSON.parse(JSON.stringify(CONNECTION_TABS) as any);
     this.detailsForm = this.service.createBasicDetailsForm();
     this.addressForm = this.service.createAddressForm();
     this.miscForm = this.service.createMiscForm();
     this.stepOne();
-    this.setLoaderText('Loading connection information');
-
     this.watchFormChanges();
     const sub = this.service.connectionInfo$.subscribe(data => {
       if (data) {
@@ -160,7 +152,7 @@ export class NewConnectionFarmerComponent
 
   addConnection(): void {
     this.loading = true;
-    this.setLoaderText('Inviting farmer');
+    this.setLoaderText(this.translate.instant('loaderText.inviteFarmer'));
     const reqObj = this.service.formatRequestData(
       this.detailsForm.value,
       this.addressForm.value,
@@ -194,7 +186,8 @@ export class NewConnectionFarmerComponent
         },
         error: (err: any) => {
           console.log(err);
-          this.showError(err.detail.detail);
+          this.showError(err.detail.detail || err.detail.number);
+          this.loading = false;
         },
       });
 

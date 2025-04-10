@@ -42,7 +42,7 @@ export const OPTIONS_NEEDED: IAddionalFilter[] = [
 export const ID: ITableColumnHeader[] = [
   {
     name: 'ID',
-    class: 'smaller-column',
+    class: 'smaller-column no-border-left',
     sortKey: 'number',
     isColumnVisible: true,
   },
@@ -64,6 +64,13 @@ export const TRANSACTION_TYPE_FILTER: ICommonIdName[] = [
 ];
 
 export const TRANSACTION_COLUMNS: ITableColumnHeader[] = [
+  {
+    name: 'selection',
+    class: 'selection-column',
+    sortKey: 'none',
+    hideSort: true,
+    isColumnVisible: true,
+  },
   ...ID,
   {
     name: 'Transaction type',
@@ -73,7 +80,7 @@ export const TRANSACTION_COLUMNS: ITableColumnHeader[] = [
   },
   {
     name: 'Connection',
-    class: 'normal-column',
+    class: 'large-column',
     sortKey: 'connection',
     isColumnVisible: true,
   },
@@ -111,7 +118,7 @@ export const TRANSACTION_COLUMNS: ITableColumnHeader[] = [
   {
     name: 'Blockchain log',
     class: 'large-column',
-    sortKey: 'log',
+    sortKey: 'blockChain',
     isColumnVisible: true,
   },
   {
@@ -129,7 +136,7 @@ const COMMON: ITableColumnHeader[] = [
     class: 'normal-column',
     sortKey: 'date',
     isColumnVisible: true,
-    hideSort: true,
+    hideSort: false,
   },
   {
     name: 'Created by',
@@ -146,6 +153,13 @@ const COMMON: ITableColumnHeader[] = [
   },
 ];
 export const STOCK_ACTIONS_PROCESSED: ITableColumnHeader[] = [
+  {
+    name: 'selection',
+    class: 'selection-column',
+    sortKey: 'none',
+    hideSort: true,
+    isColumnVisible: true,
+  },
   ...ID,
   {
     name: 'Source product',
@@ -155,7 +169,7 @@ export const STOCK_ACTIONS_PROCESSED: ITableColumnHeader[] = [
   },
   {
     name: 'Source quantity (kg)',
-    class: 'normal-column',
+    class: 'transaction-type-column',
     sortKey: 'source_quantity',
     isColumnVisible: true,
   },
@@ -169,6 +183,13 @@ export const STOCK_ACTIONS_PROCESSED: ITableColumnHeader[] = [
 ];
 
 export const STOCK_ACTIONS_MERGED: ITableColumnHeader[] = [
+  {
+    name: 'selection',
+    class: 'selection-column',
+    sortKey: 'none',
+    hideSort: true,
+    isColumnVisible: true,
+  },
   ...ID,
   {
     name: 'Source product',
@@ -198,6 +219,13 @@ export const STOCK_ACTIONS_MERGED: ITableColumnHeader[] = [
 ];
 
 export const STOCK_ACTIONS_LOSS: ITableColumnHeader[] = [
+  {
+    name: 'selection',
+    class: 'selection-column',
+    sortKey: 'none',
+    hideSort: true,
+    isColumnVisible: true,
+  },
   ...ID,
   {
     name: 'Removed product',

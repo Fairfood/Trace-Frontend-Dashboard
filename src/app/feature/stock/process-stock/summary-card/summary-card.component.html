@@ -53,7 +53,8 @@
                         |
                         <span class="font-1-normal text-blue"><b>{{summaryData.totalQuantity}}</b>&nbsp;kg</span>
                         |
-                        <span class="font-1-normal text-blue"><b>{{summaryData.totalPrice}}</b>&nbsp;{{summaryData.currency}}</span>
+                        <span
+                            class="font-1-normal text-blue"><b>{{summaryData.totalPrice}}</b>&nbsp;{{summaryData.currency}}</span>
                     </span>
                 </ng-container>
                 <div class="d-flex second-row">
@@ -129,13 +130,14 @@
         <mat-menu class="mat-menu more-products" #moreProducts="matMenu" xPosition="before">
             <ul>
                 <ng-container *ngIf="products.length<=7">
-                    <li class="text-overflow" *ngFor="let item of products?.slice(2, products.length)">
+                    <li class="text-overflow"
+                        *ngFor="let item of products?.slice(2, products.length); trackBy: trackByFn">
                         {{item}}
                     </li>
                 </ng-container>
                 <!-- showing only limited data if the batch length is more than 7 -->
                 <ng-container *ngIf="products.length>7">
-                    <li class="text-overflow" *ngFor="let item of products?.slice(2, 7)">
+                    <li class="text-overflow" *ngFor="let item of products?.slice(2, 7); trackBy: trackByFn">
                         {{item}}
                     </li>
                     and more

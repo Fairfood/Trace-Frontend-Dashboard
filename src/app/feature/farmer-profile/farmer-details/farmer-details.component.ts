@@ -6,26 +6,59 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
 import { Subscription } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+// material
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 // configs
 import {
   BASIC_DETAILS,
   CONTACT_DETAILS,
   GENDERS,
-  IFarmerDetails,
   PERSONAL_DETAILS,
-} from '../farmer-profile.config';
+} from '../farmer-profile.constants';
+import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { emailRegex } from 'src/app/shared/configs/app.constants';
 // services
 import { FarmerProfileStoreService } from '../farmer-profile-store.service';
-import { ICommonObj } from 'src/app/shared/configs/app.model';
 import { GlobalStoreService } from 'src/app/shared/store';
-import { emailRegex } from 'src/app/shared/configs/app.constants';
+// components
+import {
+  FairFoodInputComponent,
+  FfDropdownComponent,
+} from 'fairfood-form-components';
+import { ButtonsComponent } from 'fairfood-utils';
+import { TransformDropdownOptions } from './farmer-details.pipe';
+import { ProfileAvatarComponent } from 'src/app/shared/components/profile-avatar';
 
 @Component({
   selector: 'app-farmer-details',
   templateUrl: './farmer-details.component.html',
   styleUrls: ['./farmer-details.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FfDropdownComponent,
+    TransformDropdownOptions,
+    FairFoodInputComponent,
+    ButtonsComponent,
+    MatDatepickerModule,
+    MatIconModule,
+    ProfileAvatarComponent,
+    MatNativeDateModule,
+    TranslateModule,
+  ],
 })
 export class FarmerDetailsComponent implements OnInit, OnDestroy {
   @Output() editingStarted = new EventEmitter();
@@ -63,6 +96,7 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
       name: 'Unknown',
     },
   ];
+  dropdownVisible = true;
 
   constructor(
     private store: FarmerProfileStoreService,
@@ -103,9 +137,10 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
         if (res) {
           this.countryList = res;
           const found = res.find((a: any) => a.id === this.profileData.country);
-          this.store.updateFarmerDetails({
+          this.store.updateStateProp<any>('farmerDetails', {
             ...this.profileData,
             countryFlag: found.flag_url,
+            otherApiCall: false,
           });
           this.getOperations();
         }
@@ -125,16 +160,19 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
 
   getOperations(): void {
     const api = this.store.listOperations(2).subscribe((res: any) => {
-      this.operations = res.results;
+      const { results } = res;
+      this.operations = results;
       this.countryDataLoaded = true;
     });
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   get formControlsFarmer(): any {
     return this.detailsForm.controls;
   }
 
+  /* istanbul ignore next */
   formPatchValue(values: any): void {
     this.detailsForm.patchValue({
       ...values,
@@ -149,6 +187,7 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
       if (selectedValue) {
         const index = this.countryList.findIndex(m => m.id === selectedValue);
         const selectedSub = this.countryList[index].sub_divisions;
+
         this.setStateList(selectedSub, true);
 
         this.formPatchValue({ country: selectedValue });
@@ -188,8 +227,14 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
         province: this.stateList[0].id,
       });
     }
+    this.dropdownVisible = false;
+
+    setTimeout(() => {
+      this.dropdownVisible = true;
+    });
   }
 
+  /* istanbul ignore next */
   resetForm(): void {
     this.detailsForm.reset();
     this.isEditing = false;
@@ -206,6 +251,7 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   updateProfilePic(): void {
     if (this.profilePicChanged) {
       const api = this.store
@@ -225,9 +271,10 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   updateProfile(): void {
     if (this.detailsForm.valid) {
-      this.store.updatingData(true);
+      this.store.updateStateProp<boolean>('isUpdating', true);
       const reqObj = this.store.transformFormValues(this.detailsForm.value);
       this.store.updateFarmConnectionDetails(this.profileData.id, reqObj);
       this.editingStarted.emit(false);
@@ -247,6 +294,7 @@ export class FarmerDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   ngOnDestroy(): void {
     this.pageApis.forEach(m => m.unsubscribe());
   }

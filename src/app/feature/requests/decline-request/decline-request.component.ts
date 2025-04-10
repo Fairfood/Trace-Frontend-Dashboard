@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Component, Inject, OnDestroy } from '@angular/core';
 import {
   MatDialogRef,

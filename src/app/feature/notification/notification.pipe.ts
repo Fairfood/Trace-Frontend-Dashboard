@@ -19,11 +19,12 @@ export class FilterTodayPipe implements PipeTransform {
 })
 export class AvatarNotificationPipe implements PipeTransform {
   transform(actorName: string): string {
-    if (actorName) {
-      const [firstName, lastName] = actorName.split(' ');
-
-      return `${firstName ? firstName[0] : ''}${lastName ? lastName[0] : ''}`;
+    if (!actorName || typeof actorName !== 'string') {
+      console.error('Invalid actorName provided:', actorName);
+      return '';
     }
-    return '';
+    const [firstName, lastName] = actorName.split(' ');
+
+    return `${firstName ? firstName[0] : ''}${lastName ? lastName[0] : ''}`;
   }
 }

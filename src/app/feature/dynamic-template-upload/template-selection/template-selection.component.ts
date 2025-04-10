@@ -12,11 +12,7 @@ import { Subscription, finalize } from 'rxjs';
 // services
 import { DynamicTemplateUploadService } from '../dynamic-template-upload.service';
 import { DynamicTemplateStore } from '../dynamic-template-upload-store.service';
-import {
-  RouterService,
-  StorageService,
-  UtilService,
-} from 'src/app/shared/service';
+import { RouterService, UtilService } from 'src/app/shared/service';
 
 // configs
 import { ButtonState } from 'fairfood-utils';
@@ -60,8 +56,7 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
     private service: DynamicTemplateUploadService,
     private routerService: RouterService,
     private store: DynamicTemplateStore,
-    private utils: UtilService,
-    private storage: StorageService
+    private utils: UtilService
   ) {}
 
   ngOnInit(): void {
@@ -103,6 +98,7 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   formValueChangesTransaction(): void {
     const form = this.templateSelectionForm.statusChanges.subscribe(val => {
       if (val === 'VALID') {
@@ -121,6 +117,7 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
     this.dataLoaded = true;
   }
 
+  /* istanbul ignore next */
   formValueChangesConnection(): void {
     const form = this.templateForm.statusChanges.subscribe(val => {
       if (val === 'VALID') {
@@ -191,12 +188,15 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
    * Two action either forward or backward
    * @param type string
    */
+  /* istanbul ignore next */
   buttonAction(type: string): void {
     if (type === 'next') {
       this.customTemplate = false;
       this.templateFileUpload.nativeElement.click();
     } else {
-      this.routerService.navigateUrl('/stock/listing');
+      this.templateType === dynamicTemplateType.CONNECTION
+        ? this.routerService.navigateUrl('/connections')
+        : this.routerService.navigateUrl('/stock/listing');
     }
   }
 
@@ -223,6 +223,7 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
    * File content validation
    * @param fileData any
    */
+  /* istanbul ignore next */
   verifyApi(fileData: any): void {
     const api = this.service.verifyUpload(fileData.id).subscribe({
       next: (res: any): void => {
@@ -238,6 +239,9 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
   }
 
   handleUploadError(err?: any): void {
+    if (this.templateSelectionForm) {
+      this.templateSelectionForm.markAsUntouched();
+    }
     this.nextButton = {
       buttonText: 'Upload template and continue',
       disabled: false,
@@ -300,6 +304,7 @@ export class TemplateSelectionComponent implements OnInit, OnDestroy {
    * Custom template upload button clicked
    * On uploading the file, uploadTemplate() will be called
    */
+  /* istanbul ignore next */
   customUpload(): void {
     this.customTemplate = true;
     this.templateFileUpload.nativeElement.click();

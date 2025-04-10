@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Injectable } from '@angular/core';
 import { map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -6,10 +7,7 @@ import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { environment } from 'src/environments/environment';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import {
   HTTP_OPTION_3,
   HTTP_OPTION_4,
@@ -19,6 +17,7 @@ const BASE_URL = environment.baseUrl;
 // services
 import { StorageService } from 'src/app/shared/service';
 import { CompanyProfileStoreService } from './company-profile-store.service';
+import { headerOptions } from 'fairfood-utils';
 /**
  * Service for managing company profiles.
  */

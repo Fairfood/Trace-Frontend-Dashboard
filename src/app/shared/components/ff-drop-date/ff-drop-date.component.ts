@@ -50,6 +50,12 @@ import { FfFilterBoxComponent } from 'fairfood-form-components';
 export class FairFoodDropDateComponent implements OnInit {
   @Input() isMobile: boolean;
   @Input() label: string;
+  @Input() presetDate: {
+    selectedType: number;
+    selectedDate?: Date;
+    start?: Date;
+    end?: Date;
+  };
 
   @Output() appliedFilter = new EventEmitter();
   @Output() mobileValues = new EventEmitter();
@@ -89,12 +95,45 @@ export class FairFoodDropDateComponent implements OnInit {
   }
   /* istanbul ignore next */
   ngOnInit(): void {
+    if (this.presetDate?.selectedDate || this.presetDate?.start) {
+      const selectedDate = this.presetDate.selectedDate
+        ? this.presetDate.selectedDate.toISOString().split('T')[0]
+        : '';
+      const start = this.presetDate.start
+        ? this.presetDate.start.toISOString().split('T')[0]
+        : '';
+      const end = this.presetDate.end
+        ? this.presetDate.end.toISOString().split('T')[0]
+        : '';
+      this.dateForm.patchValue({
+        selectedType: this.presetDate.selectedType,
+        selectedDate: selectedDate,
+        start: start,
+        end: end,
+      });
+      this.dateFilterApplied = true;
+      this.dateFilterText =
+        this.presetDate.selectedType == 1
+          ? this.formatDate(this.presetDate?.start) +
+            '-' +
+            this.formatDate(this.presetDate?.end)
+          : this.formatDate(this.presetDate?.selectedDate);
+    }
     if (this.isMobile) {
       this.dateForm.valueChanges.subscribe(formValues => {
         this.mobileValues.emit(formValues);
       });
     }
   }
+
+  formatDate(date: Date): string {
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = d.getMonth() + 1; // Months are 0-based, so add 1
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   /* istanbul ignore next */
   applyDateFilter(): void {
     const receiveData: any = dateFilterCommon(this.dateForm.value);

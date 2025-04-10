@@ -1,20 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-
+// service and config
 import { CompanyProfileService } from '../company-profile.service';
 import { CHAIN_COLUMNS } from './supply-chain.config';
 // components
-import { LoaderComponent, FfPaginationComponent } from 'fairfood-utils';
+import {
+  LoaderComponent,
+  FfPaginationComponent,
+  FfCustomPaginationComponent,
+} from 'fairfood-utils';
 
 @Component({
   selector: 'app-supply-chains',
   templateUrl: './supply-chains.component.html',
   styleUrls: ['./supply-chains.component.scss'],
   standalone: true,
-  imports: [CommonModule, FfPaginationComponent, LoaderComponent],
+  imports: [
+    CommonModule,
+    FfPaginationComponent,
+    LoaderComponent,
+    TranslateModule,
+    FfCustomPaginationComponent,
+  ],
 })
 export class SupplyChainsComponent implements OnInit, OnDestroy {
   @Input() companyId: any;

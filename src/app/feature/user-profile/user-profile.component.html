@@ -144,7 +144,7 @@
 
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message" *ngIf="formcontrol.errors?.required && (submitted || formcontrol?.touched)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'mobile'">

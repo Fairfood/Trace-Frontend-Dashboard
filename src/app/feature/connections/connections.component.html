@@ -21,6 +21,11 @@
       <ng-container *ngIf="!listView">
         <app-export-icon></app-export-icon>
       </ng-container>
+      <ng-container *ngIf="linkNavigate ||((externalId$ | async) && linkConnect)">
+        <span class="mx-8">|</span>
+        <app-sync-btn [showNavigateBtn]="linkNavigate"
+        [showConnectBtn]="(externalId$ | async) && linkConnect"></app-sync-btn>
+      </ng-container>
     </aside>
   </section>
   <section class="help-wrapper" *ngIf="toggleHelp">

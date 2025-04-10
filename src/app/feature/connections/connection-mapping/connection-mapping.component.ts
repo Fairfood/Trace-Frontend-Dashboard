@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 // components
 import { LoaderComponent } from 'fairfood-utils';
@@ -21,6 +22,7 @@ import { LoaderComponent } from 'fairfood-utils';
     MatRadioModule,
     FormsModule,
     MatCheckboxModule,
+    TranslateModule,
   ],
   templateUrl: './connection-mapping.component.html',
   styleUrls: ['./connection-mapping.component.scss'],

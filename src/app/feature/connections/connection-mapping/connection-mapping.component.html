@@ -1,9 +1,9 @@
-<mat-checkbox [checked]="selectAll" (change)="modelChange()" class="w-100" *ngIf="supplySelection.length > 1"
+<mat-checkbox [checked]="selectAll" (change)="modelChange()" class="w-100" *ngIf="supplySelection?.length > 1"
     id="selectAllMapping">
-    Select all
+    {{'misc.selectAll' | translate}}
 </mat-checkbox>
 
-<ul class="supplied-for" *ngIf="supplySelection.length">
+<ul class="supplied-for" *ngIf="supplySelection?.length">
     <ng-container *ngFor="let supply of supplySelection; trackBy: trackByFn;let i=index">
         <li [ngClass]="{'selected': supply.selected}" class="ff-flex-between" (click)="updateTagging(supply)"
             *ngIf="supply.tier === 1" id="supplyTagging{{i}}">
@@ -17,8 +17,8 @@
     </ng-container>
     <ng-container *ngIf="!additionalLoader && !selectAll">
         <span class="value-tr load-more ff-flex-align-center"
-            *ngIf="supplySelection.length!==supplySelectionCount && supplySelectionCount > 10" (click)="loadMore()" id="loadMoreData">
-            Load more
+            *ngIf="supplySelection?.length!==supplySelectionCount && supplySelectionCount > 10" (click)="loadMore()" id="loadMoreData">
+            {{'connections.loadMore' | translate}}
         </span>
     </ng-container>
 </ul>

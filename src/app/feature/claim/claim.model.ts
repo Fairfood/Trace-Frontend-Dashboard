@@ -35,5 +35,5 @@ export interface IClaimCriteria extends ICommonObj {
   verification_type: number;
   verifier: any;
   fields: IClaimField[];
-  context: any;
+  context?: any;
 }

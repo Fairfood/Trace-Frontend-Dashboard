@@ -19,16 +19,16 @@
 
 
     <aside aria-label="main details" class="input-container-with-error">
-        <span class="badge-ff text-xs" [ngClass]="{'loss': transactionData.type === 2 && transactionData.transaction === 'internal'}">
+        <span *ngIf="transactionData?.badgeText" class="badge-ff text-xs" [ngClass]="{'loss': transactionData?.type === 2 && transactionData?.transaction === 'internal'}">
             {{transactionData?.badgeText}}
         </span>
 
         <article class="d-flex m-20">
             <span class="value-tr font-1-bold width-product text-overflow">
-                <ng-container *ngIf="transactionData.transaction == 'external'">
+                <ng-container *ngIf="transactionData?.transaction == 'external'">
                     {{transactionData?.destination_batches[0]?.name || transactionData?.products[0]?.name}}
                 </ng-container>
-                <ng-container *ngIf="transactionData.transaction == 'internal'">
+                <ng-container *ngIf="transactionData?.transaction == 'internal'">
                     <ng-container *ngIf="transactionData?.type === 1 || transactionData?.type === 3">
                         {{transactionData?.destinationProductNames }}
                     </ng-container>
@@ -39,12 +39,12 @@
             </span>
             <ng-container [ngTemplateOutlet]="dotIcon"></ng-container>
             <span class="value-tr">
-                <ng-container *ngIf="transactionData.transaction == 'external'">
+                <ng-container *ngIf="transactionData?.transaction == 'external'">
                     {{ transactionData.destination_batches ?
                     transactionData.destination_batches[0].quantity.toFixed(2) :
                     transactionData.quantity.toFixed(2) }}&nbsp;kg
                 </ng-container>
-                <ng-container *ngIf="transactionData.transaction == 'internal'">
+                <ng-container *ngIf="transactionData?.transaction == 'internal'">
                     <ng-container *ngIf="transactionData?.type === 1 || transactionData?.type === 3 ">
                         {{transactionData?.destination_quantity.toFixed(2) }}&nbsp;kg
                     </ng-container>
@@ -56,7 +56,7 @@
             </span>
         </article>
 
-        <article class="d-flex m-20" *ngIf="transactionData.transaction == 'external'">
+        <article class="d-flex m-20" *ngIf="transactionData?.transaction == 'external'">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="margin-top: 3px; margin-right: 6px;"
                 xmlns="http://www.w3.org/2000/svg">
                 <circle cx="9" cy="9" r="9" fill="#003A60" />

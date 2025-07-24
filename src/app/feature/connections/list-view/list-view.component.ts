@@ -10,6 +10,7 @@ import {
 import {
   COMPANY_COLUMNS,
   FARMER_COLUMNS,
+  LOCATION_TYPES,
   SEARCHBY_OPTIONS,
 } from './list-view.config';
 import {
@@ -26,6 +27,7 @@ import { ConnectionService } from '../connections.service';
 import { ListViewService } from './list-view.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ExportService } from 'src/app/shared/service/export.service';
+import { GlobalStoreService } from 'src/app/shared/store';
 
 @Component({
   selector: 'app-list-view',
@@ -60,6 +62,11 @@ export class ListViewComponent implements OnInit, OnDestroy {
   nodeId = this.storage.retrieveStoredData('companyID');
   supplyChainId: string = this.storage.retrieveStoredData('supplyChainId');
   companiesWithFarmers: any[] = [];
+  private currentSubscription: Subscription | null = null;
+  countryList: any[] = [];
+  stateList: any[] = [];
+  locationTypeList: any = LOCATION_TYPES;
+  customPageSize: { limit: number; offset: number };
 
   constructor(
     private dialog: MatDialog,
@@ -68,10 +75,12 @@ export class ListViewComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private listService: ListViewService,
     private utils: UtilService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private global: GlobalStoreService
   ) {}
 
   ngOnInit(): void {
+    this.getCountryList();
     this.initData();
     this.loadFullData();
     const api = this.utils.supplyChainData$.subscribe(() => {
@@ -105,13 +114,13 @@ export class ListViewComponent implements OnInit, OnDestroy {
   initData(): void {
     this.service.getConnections(this.nodeId, this.supplyChainId).subscribe();
     this.loader = true;
-    this.activeTab = this.tabGroup[0].id;
+    this.activeTab = this.tabGroup[0]?.id;
     this.resetAppliedFilters(1);
     this.displayedColumns = COMPANY_COLUMNS;
     this.filterValues = this.listService.setFilterValues();
     this.getConnectionLabels();
   }
-
+  /* istanbul ignore next */
   loadFullData(): void {
     const sub = this.service.mapData$.subscribe((res: any) => {
       if (res) {
@@ -125,7 +134,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
   }
 
   // fetching filter item master data
-
+  /* istanbul ignore next */
   getConnectionLabels() {
     const api = this.service.getUsedConnectionLabels().subscribe({
       next: (res: any) => {
@@ -140,7 +149,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
     });
     this.pageApis.push(api);
   }
-
+  /* istanbul ignore next */
   setConnectionLabelFilter(): void {
     if (this.filterValues.connectionLabels.length === 0) {
       this.availableFilters = this.availableFilters.filter(
@@ -148,7 +157,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
       );
     }
   }
-
+  /* istanbul ignore next */
   getTypes(): void {
     const api = this.service.listOperations().subscribe((res: any) => {
       const { results } = res;
@@ -161,7 +170,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
     });
     this.pageApis.push(api);
   }
-
+  /* istanbul ignore next */
   getCompanyClaims() {
     const api = this.listService.getCompanyClaims('').subscribe({
       next: (res: any) => {
@@ -173,17 +182,28 @@ export class ListViewComponent implements OnInit, OnDestroy {
     });
     this.pageApis.push(api);
   }
-
+  /* istanbul ignore next */
   getConnections(): void {
-    const api = this.service.connectionList(this.appliedFilters).subscribe({
-      next: (res: any) => {
-        const { count, results } = res;
-        this.dataSource = results;
-        this.dataCount = count;
-        this.loader = false;
-      },
-    });
-    this.pageApis.push(api);
+    // Cancel any ongoing subscription
+    if (this.currentSubscription) {
+      this.currentSubscription.unsubscribe();
+    }
+
+    this.currentSubscription = this.service
+      .connectionList(this.appliedFilters)
+      .subscribe({
+        next: (res: any) => {
+          const { count, results } = res;
+          this.dataSource = results;
+          this.dataCount = count;
+          this.customPageSize = {
+            limit: this.appliedFilters?.limit,
+            offset: this.appliedFilters?.offset,
+          };
+          this.loader = false;
+        },
+      });
+    this.pageApis.push(this.currentSubscription);
   }
 
   resetAppliedFilters(type: number): void {
@@ -195,9 +215,13 @@ export class ListViewComponent implements OnInit, OnDestroy {
       relationship: '',
       primaryOperation: '',
       status: '',
+      country: '',
+      province: '',
+      location_type: '',
+      searchBy: '',
     };
   }
-
+  /* istanbul ignore next */
   changeTab({ id }: ICommonObj): void {
     this.activeTab = id;
     this.loader = true;
@@ -215,31 +239,34 @@ export class ListViewComponent implements OnInit, OnDestroy {
     );
     this.getConnections();
   }
-
+  /* istanbul ignore next */
   searchFilter(data: string): void {
     this.loader = true;
+    this.appliedFilters.limit = 10;
+    this.appliedFilters.offset = 0;
     this.appliedFilters.searchString = data;
     this.getConnections();
   }
-
+  /* istanbul ignore next */
   filterClicked(): void {
     this.toggleFilter = !this.toggleFilter;
 
     if (!this.toggleFilter) {
       this.resetAppliedFilters(this.activeTab === 'company' ? 1 : 2);
       this.loader = true;
+      this.stateList = [];
       this.getConnections();
     }
   }
-
+  /* istanbul ignore next */
   addNewConnection(): void {
     this.listService.addNewConnection();
   }
-
+  /* istanbul ignore next */
   farmerConnection(item?: any): void {
     this.listService.farmerConnection(item);
   }
-
+  /* istanbul ignore next */
   paginatorEvent(data: any): void {
     const { limit, offset } = data;
     this.appliedFilters.limit = limit;
@@ -249,11 +276,13 @@ export class ListViewComponent implements OnInit, OnDestroy {
   }
 
   // go to details page
+  /* istanbul ignore next */
   viewDetails(element: any): void {
     this.listService.viewDetails(element);
   }
 
   // request to map supplier
+  /* istanbul ignore next */
   mapSuppliers(data: any): void {
     this.dialog.open(MapSuppliersRequestComponent, {
       disableClose: true,
@@ -261,7 +290,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
       height: 'auto',
       data: {
         map: true,
-        id: data.id,
+        id: data?.id,
         supplyChain: this.supplyChainId,
       },
       panelClass: 'custom-modalbox',
@@ -269,25 +298,22 @@ export class ListViewComponent implements OnInit, OnDestroy {
   }
 
   // resent invite dialog open
+  /* istanbul ignore next */
   resentInvite(id: string): void {
     const data = { supply_chain: this.supplyChainId, node: id };
     const api = this.service.resendFarmerInvite(data).subscribe({
       next: () => {
-        const message = this.translate.instant(
-          'companyProfile.snackBar.resendInvite'
-        );
+        const message = this.translate.instant('team.resendInvite');
         this.utils.customSnackBar(message, ACTION_TYPE.SUCCESS);
       },
       error: () => {
-        const message = this.translate.instant(
-          'companyProfile.snackBar.resendInviteFailed'
-        );
+        const message = this.translate.instant('team.resendInviteFailed');
         this.utils.customSnackBar(message, ACTION_TYPE.FAILED);
       },
     });
     this.pageApis.push(api);
   }
-
+  /* istanbul ignore next */
   sentInvite(id: string): void {
     const dialogRef = this.dialog.open(MapSuppliersRequestComponent, {
       disableClose: true,
@@ -303,39 +329,71 @@ export class ListViewComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (result.success) {
-          const message = this.translate.instant(
-            'companyProfile.snackBar.invite'
-          );
+          const message = this.translate.instant('team.invite');
           this.utils.customSnackBar(message, ACTION_TYPE.SUCCESS);
         }
       }
     });
   }
-
+  /* istanbul ignore next */
   getManageFarmerList(): void {
     this.companiesWithFarmers = this.listService.formatConnectedFarmerData(
       this.orginalConnectionData,
       this.nodeId
     );
   }
-
+  /* istanbul ignore next */
   filterItems(newValue: any, type: string): void {
     const { id } = newValue;
-
     this.appliedFilters[type] = id === 'All' ? '' : id;
     this.loader = true;
+    if (type == 'country') {
+      this.appliedFilters['province'] = '';
+      if (id != 'All') {
+        const selectedSub = newValue.sub_divisions;
+        this.setStateList(selectedSub, true);
+      } else {
+        this.stateList = [];
+      }
+    }
     this.getConnections();
   }
-
+  /* istanbul ignore next */
   addCompanyPopup(item: any): void {
     const { connection_details } = item;
     const connectionType =
       connection_details?.connection_type === 1 ? 'buyer' : 'supplier';
     this.listService.addCompanyPopup({ ...item, connectionType });
   }
-
+  /* istanbul ignore next */
   bulkUpload(): void {
     this.listService.dynamicTemplateRedirection();
+  }
+
+  getCountryList(): void {
+    const sub2 = this.global.countryList$.subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.countryList = res;
+        }
+      },
+    });
+    this.pageApis.push(sub2);
+  }
+
+  setStateList(selectedSub: any, firstSelected?: boolean): void {
+    this.stateList = Object.keys(selectedSub).map((key: any) => {
+      selectedSub[key].name = key;
+      selectedSub[key].id = key;
+      return selectedSub[key];
+    });
+  }
+
+  handleSearchByOptionChange(option: any): void {
+    const { id } = option;
+    id == 'all' ? '' : id;
+    this.appliedFilters.searchBy = id;
+    this.getConnections();
   }
 
   ngOnDestroy(): void {

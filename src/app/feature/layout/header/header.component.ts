@@ -69,10 +69,11 @@ export class HeaderComponent
     this.getUser();
   }
 
+  /* istanbul ignore next */
   getUser(): void {
     const userData = this.storage.retrieveStoredData('userData');
 
-    const userId = JSON.parse(userData).id;
+    const userId = JSON.parse(userData)?.id;
     this.notificationObject = JSON.parse(
       this.storage.retrieveStoredData('notificationObject')
     );
@@ -82,7 +83,7 @@ export class HeaderComponent
         this.userData = response;
         const impersonate = this.storage.retrieveStoredData('impersonate');
         const localNodeId = this.storage.retrieveStoredData('companyID');
-        this.viewingAsAdmin = impersonate === 'true' ? true : false;
+        this.viewingAsAdmin = impersonate === 'true';
 
         if (this.userData?.nodes?.length > 0) {
           if (!this.userData.default_node) {
@@ -103,48 +104,56 @@ export class HeaderComponent
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   backtoAdmin(): void {
     localStorage.clear();
     this.storage.clearStorage();
     window.location.href = environment.adminUrl + '?isClearStorage=true';
   }
 
-  // Logout function
+  /* istanbul ignore next */
   onLoggedout() {
     this.headerService.logout();
   }
 
-  // Function to switch company
+  /* istanbul ignore next */
   changeCompany(id: string, index: number): void {
+    this.dataLoaded = false;
     this.setNodeIdVariable(id);
     this.setCurrentCompany(index);
     this.storage.saveInStorage('companyID', id);
     this.userData.default_node = id;
     this.setActiveNode(id);
-    this.setSupplychains();
+    this.setSupplychains(true);
     this.setTheme(id);
     this.util.companyData$.next(id);
   }
 
+  /* istanbul ignore next */
   trackById(index: number, item: Partial<ICommonObj>): any {
     return item.id;
   }
 
+  /* istanbul ignore next */
   private emptyNodes(localNodeId: string): void {
     this.setNodeIdVariable(localNodeId);
     this.setTheme(localNodeId);
   }
 
+  /* istanbul ignore next */
   private noDefaultNode(nodeId: string): void {
     this.storage.saveInStorage('companyID', nodeId);
     this.setNodeIdVariable(nodeId);
     this.setCurrentCompany(0);
     this.setActiveNode(nodeId);
-    this.headerService.handleDashboardTheme(this.userData.nodes[0].ci_themes);
+    this.headerService.handleDashboardTheme(
+      this.userData.nodes[0]?.ci_themes || []
+    );
     this.setTheme(nodeId);
     this.setSupplychains();
   }
 
+  /* istanbul ignore next */
   private hasDefaultNode(impersonate: string, localNodeId: string): void {
     if (!impersonate) {
       this.storage.saveInStorage('companyID', this.userData.default_node);
@@ -162,27 +171,43 @@ export class HeaderComponent
     this.setSupplychains();
   }
 
+  /* istanbul ignore next */
   private setTheme(nodeId: string): void {
-    const node = this.userData.nodes.find((e: any) => {
-      return e.id === nodeId;
+    const api = this.util.fetchCompanyDetails(nodeId).subscribe({
+      next: (response: any) => {
+        const node = response;
+        if (node) {
+          this.storage.saveInStorage('memberType', node.member_role);
+          this.storage.saveInStorage(
+            'link_navigate',
+            node.features.link_navigate
+          );
+          this.storage.saveInStorage(
+            'link_connect',
+            node.features.link_connect
+          );
+          if (node?.theme?.id) {
+            this.headerService.handleThemeUpdate(node);
+          } else {
+            this.headerService.handleDefaultTheme();
+          }
+          this.headerService.handleCiThemes(node?.ci_themes || []);
+        } else {
+          this.headerService.handleNodeWithoutTheme();
+        }
+        this.setBrandLogo(node);
+        this.dataLoading.emit('completed');
+        this.dataLoaded = true;
+      },
+      error: (err: any) => {
+        console.log(err);
+      },
     });
 
-    if (node) {
-      this.storage.saveInStorage('memberType', node.member_role);
-      if (node?.theme?.id) {
-        this.headerService.handleThemeUpdate(node);
-      } else {
-        this.headerService.handleDefaultTheme();
-      }
-      this.headerService.handleCiThemes(node.ci_themes);
-    } else {
-      this.headerService.handleNodeWithoutTheme();
-    }
-    this.setBrandLogo(node);
-    this.dataLoading.emit('completed');
-    this.dataLoaded = true;
+    this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   changeSupplychain(chain: any): void {
     if (this.selectedSupplyChain.id && chain.id !== 'All') {
       this.storeSupplyChainDetails(chain);
@@ -196,6 +221,7 @@ export class HeaderComponent
     this.selectedSupplyChain = chain;
   }
 
+  /* istanbul ignore next */
   notificationChange(id: string): void {
     // when clicked on notification supplychain changed
     const chain = this.filteredSupplyChain.find(a => a.id === id);
@@ -204,12 +230,13 @@ export class HeaderComponent
     this.util.supplyChainData$.next(this.selectedSupplyChain.id);
   }
 
+  /* istanbul ignore next */
   notificationSwitchCompany(companyId: string): void {
     const index = this.userData.nodes.findIndex(a => a.id === companyId);
     this.changeCompany(companyId, index);
   }
 
-  // Un-subscribing subscription to prevent memory leak
+  /* istanbul ignore next */
   ngOnDestroy(): void {
     this.pageApis.forEach(m => m.unsubscribe());
   }

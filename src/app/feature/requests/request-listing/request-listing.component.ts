@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -221,9 +222,9 @@ export class RequestListingComponent implements OnInit, OnDestroy {
 
   fetchStatusList(type: number): any[] {
     const statuses = [
-      { id: 1, name: this.translateService.instant('home.chart.status3') },
-      { id: 2, name: this.translateService.instant('requests.status2') },
-      { id: 3, name: this.translateService.instant('requests.status3') },
+      { id: 1, name: this.translateService.instant('status.pending') },
+      { id: 2, name: this.translateService.instant('status.verified') },
+      { id: 3, name: this.translateService.instant('status.rejected') },
     ];
     if (type === 1) {
       return [...statuses];
@@ -240,6 +241,33 @@ export class RequestListingComponent implements OnInit, OnDestroy {
   // Open create request pop up
   createRequest(): void {
     const dialogRef = this.dialog.open(CreateRequestComponent, {
+      width: '50vw',
+      height: 'auto',
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        if (result.success) {
+          // show snackbar and update requests list
+          const message = this.translateService.instant(
+            'requests.snackbar.reqSent'
+          );
+          this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+          this.dataLoaded = false;
+          this.appliedFilterValues = {
+            searchText: '',
+            status: '',
+            requestType: '',
+            direction: 1,
+          };
+          this.getRequests();
+        }
+      }
+    });
+  }
+
+  // Open create request information pop up
+  createRequestInfo(): void {
+    const dialogRef = this.dialog.open(RequestForInfoComponent, {
       width: '50vw',
       height: 'auto',
     });

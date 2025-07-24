@@ -1,6 +1,6 @@
 <h3 class="text-md font-1-bold head text-blue">Lots ({{batches?.length}})</h3>
 <div class="container-main">
-    <section class="ff-table-container">
+    <section class="ff-table-container batch-list-table">
         <table mat-table [dataSource]="dataSource" class="w-100" aria-label="Batch list table data">
 
             <ng-container matColumnDef="number">
@@ -39,7 +39,7 @@
             <tr mat-row class="table-row" *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
         <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="batches?.length === 0">
-            No batches found
+            {{'trReport.noBatches'|translate}}
         </section>
     </section>
     <aside aria-label="extra information" class="information-section">
@@ -61,14 +61,16 @@
         <span class="font-1-normal text-off-blue" *ngIf="selectedBatchInfo?.id">{{selectedBatchInfo?.number}}</span>
         <ul class="transition" *ngIf="!selectedBatchInfo?.id">
             <li class="d-flex">
-                <span class="label-tr">Source</span>
+                <span class="label-tr">{{'trReport.source'|translate}}</span>
                 <span class="value-tr">
                     {{batches?.length}} {{batches?.length === 1 ? 'Lot': 'Lots'}}
-                    ({{stockIds.join(', ')}})
+                    <ng-container *ngIf="stockIds.length<2">
+                        ({{stockIds?.join(', ')}})
+                    </ng-container>
                 </span>
             </li>
             <li class="d-flex">
-                <span class="label-tr">Destination</span>
+                <span class="label-tr">{{'trReport.destination'|translate}}</span>
                 <span class="value-tr">{{destination}}</span>
                 <span class="arrow-down-stage"></span>
             </li>
@@ -76,7 +78,7 @@
         <section class="farmer-list" *ngIf="selectedBatchInfo?.id && !loading">
             <article class="heading">
                 <span class="text-xs font-1-bold">{{selectedBatchInfo.farmers}}&nbsp;</span>
-                <span class="text-xs font-1-normal">Farmers</span>
+                <span class="text-xs font-1-normal">{{'misc.farmers'|translate}}</span>
             </article>
             <ul class="d-flex flex-column">
                 <ng-container *ngFor="let item of selectedBatchInfo?.farmersList">
@@ -102,10 +104,11 @@
             </ul>
         </section>
         <section class="farmer-list" *ngIf="selectedBatchInfo?.id && loading">
-            <app-loader loaderText="Fetching farmer details" loaderType="type1"></app-loader>
+            <app-loader loaderText="{{'trReport.batchLoader'|translate}}" loaderType="type1"></app-loader>
         </section>
-        <h3 class="view-all text-sky-blue text-xs" *ngIf="selectedBatchInfo?.farmers > 3" (click)="gotoTrace()" id="viewAll">
-            View all +{{selectedBatchInfo?.farmers - 3}} Farmers
+        <h3 class="view-all text-sky-blue text-xs" *ngIf="selectedBatchInfo?.farmers > 3" (click)="gotoTrace()"
+            id="viewAll">
+            {{'misc.viewAll'|translate}} +{{selectedBatchInfo?.farmers - 3}} {{'misc.farmers'|translate}}
         </h3>
     </aside>
 </div>

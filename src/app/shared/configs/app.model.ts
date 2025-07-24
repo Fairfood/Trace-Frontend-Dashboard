@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* istanbul ignore file */
-type FieldNames = 'contentType' | 'token' | 'timezone' | 'userId' | 'nodeId';
+type FieldNames =
+  | 'contentType'
+  | 'token'
+  | 'timezone'
+  | 'userId'
+  | 'nodeId'
+  | 'urlEncode';
 
 export type IhttpHeadConfig = {
   [K in FieldNames]: boolean;
@@ -39,6 +45,7 @@ export interface IUserData extends UserString, UserBoolean {
 export interface ICommonObj {
   id: string;
   name: string;
+  selected?: boolean;
 }
 
 export interface ICommonIdName extends Omit<ICommonObj, 'id'> {
@@ -136,4 +143,35 @@ export interface INode extends ICommonObj {
   managers: any[];
   description_basic: string;
   add_connections: boolean;
+}
+
+export interface ISupplyChain extends ICommonObj {
+  description: string;
+  image: string;
+}
+
+export interface IdTokenRequest {
+  client_id?: string;
+  client_secret?: string;
+  code: string;
+  redirect_uri?: string;
+  grant_type?: string;
+}
+
+export interface IdTokenResponse {
+  access_token: string;
+  id_token: string;
+  refresh_token: string;
+}
+
+export interface IRefreshTokenApi {
+  refresh_token: string;
+  grant_type?: string;
+  client_id?: string;
+  client_secret?: string;
+}
+
+export interface LocationTypes {
+  id: string;
+  name: string;
 }

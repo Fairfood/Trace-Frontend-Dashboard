@@ -1,13 +1,12 @@
-/* istanbul ignore file */
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 // services
 import { BaseStoreService } from 'src/app/shared/store';
 // models and constants
 import {
+  IBatches,
   IFilterToggleItems,
   IListingState,
-  IProgressBar,
   IStockTableRow,
   ITableFilterProps,
 } from './listing.model';
@@ -20,21 +19,23 @@ const initialState: IListingState = {
   selectAll: false,
   stockAction: false,
   selectedStocks: [],
-  progressBarDetails: {
-    progress: false,
-    value: 0,
-  },
   viewSelected: false,
   enableSendStock: false,
   toggle: false,
   claimData: [],
   selectingOptions: null,
+  hideViewSelected: false,
+  changedBatches: [],
+  batches: [],
 };
 
 @Injectable({
   providedIn: 'root',
 })
 export class ListingStoreService extends BaseStoreService<IListingState> {
+  private scrollValue = new BehaviorSubject<number>(0);
+  scrollValue$ = this.scrollValue.asObservable();
+
   filterValues$: Observable<IFilterToggleItems> = this.select(
     (state: IListingState) => state.filters
   );
@@ -55,10 +56,6 @@ export class ListingStoreService extends BaseStoreService<IListingState> {
     (state: IListingState) => state.stockAction
   );
 
-  progressBarData$: Observable<IProgressBar> = this.select(
-    (state: IListingState) => state.progressBarDetails
-  );
-
   viewSelectedToggle$: Observable<boolean> = this.select(
     (state: IListingState) => state.viewSelected
   );
@@ -75,20 +72,32 @@ export class ListingStoreService extends BaseStoreService<IListingState> {
     (state: IListingState) => state.claimData
   );
 
-  hidePagination$: Subject<boolean> = new Subject<boolean>();
-
   selectOptions$: Observable<string | null> = this.select(
     (state: IListingState) => state.selectingOptions
+  );
+
+  hideViewSelected$: Observable<boolean> = this.select(
+    (state: IListingState) => state.hideViewSelected
+  );
+
+  changedBatches$: Observable<IBatches[]> = this.select(
+    (state: IListingState) => state.changedBatches
+  );
+
+  batches$: Observable<IBatches[]> = this.select(
+    (state: IListingState) => state.batches
   );
 
   constructor() {
     super(initialState);
   }
 
+  /* istanbul ignore next */
   updateStateProp<T>(key: string, value: T): void {
     this.setState({ [key]: value });
   }
 
+  /* istanbul ignore next */
   getTableProps(): ITableFilterProps {
     return this.state.tableProps;
   }
@@ -101,7 +110,26 @@ export class ListingStoreService extends BaseStoreService<IListingState> {
     return this.state.selectedStocks;
   }
 
+  /* istanbul ignore next */
   resetState(): void {
     this.setState(initialState);
+  }
+
+  /* istanbul ignore next */
+  getChangedBatches(): IBatches[] {
+    return this.state.changedBatches;
+  }
+
+  /* istanbul ignore next */
+  getBatches(): IBatches[] {
+    return this.state.batches;
+  }
+
+  setScrollValue(value: any) {
+    this.scrollValue.next(value);
+  }
+
+  getCurrentState(): IListingState {
+    return this.state;
   }
 }

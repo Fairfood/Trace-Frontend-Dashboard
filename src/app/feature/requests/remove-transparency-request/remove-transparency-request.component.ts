@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';

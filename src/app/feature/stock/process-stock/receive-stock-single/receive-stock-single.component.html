@@ -20,7 +20,7 @@
                 <article class="mb-20 flex-column">
                     <label class="has-float-label custom-input"
                         [ngClass]="{'has-error': ccontrol.name.invalid && ccontrol.name.touched }">
-                        <input placeholder=" " formControlName="name" type="text" class="stock"
+                        <input placeholder=" " id="farmerName" formControlName="name" type="text" class="stock"
                             [matAutocomplete]="fromFarmer" />
                         <span class="label">Farmer name*</span>
                         <mat-icon>keyboard_arrow_down</mat-icon>
@@ -29,12 +29,14 @@
                         <aside class="inside-container" aria-label=" auto complete options for the farmers">
                             <ng-container *ngIf="farmerSearchLoader">
                                 <mat-option>
-                                    <app-loader [noText]="true" loaderType="type1"></app-loader>
+                                    <app-loader [noText]="true" loaderType="type2"></app-loader>
                                 </mat-option>
                             </ng-container>
-                            <ng-container *ngFor="let item of farmerFilterOptions | async">
+                            <ng-container
+                                *ngFor="let item of farmerFilterOptions | async;let k=index; trackBy:trackByFn">
                                 <ng-container *ngIf="!farmerSearchLoader">
-                                    <mat-option [value]="item.name" (click)="selectFarmer(item)">
+                                    <mat-option [value]="item.name" (click)="selectFarmer(item)"
+                                        id="farmerOption-{{k}}">
                                         <article>
                                             <span class="avatar-round">
                                                 {{item.first_name[0]}} {{item.last_name[0]}}
@@ -63,23 +65,26 @@
                 <article class="mb-20 flex-column">
                     <label class="has-float-label custom-input"
                         [ngClass]="{'has-error': ccontrol.productName.invalid && ccontrol.productName.touched }">
-                        <input placeholder=" " formControlName="productName" type="text" class="stock"
+                        <input placeholder=" " id="product" formControlName="productName" type="text" class="stock"
                             [matAutocomplete]="productSection" />
                         <span class="label">Product*</span>
                         <span class="new-chip" *ngIf="newProduct">New</span>
                         <mat-icon>keyboard_arrow_down</mat-icon>
                     </label>
                     <mat-autocomplete #productSection="matAutocomplete">
-                        <aside class="inside-container" aria-label="">
+                        <aside class="inside-container" aria-label="available products">
                             <span class="autocomplete-heading" *ngIf="!(ccontrol.productName.value && newProduct)">
                                 Available products
                             </span>
                             <mat-option *ngIf="productLoader">
-                                <app-loader [noText]="true" loaderType="type1"></app-loader>
+                                <app-loader [noText]="true" loaderType="type2"></app-loader>
                             </mat-option>
-                            <ng-container *ngFor="let item of productFilterOptions | async">
+                            <ng-container
+                                *ngFor="let item of productFilterOptions | async;let k=index; trackBy:trackByFn">
                                 <ng-container *ngIf="!productLoader">
-                                    <mat-option [value]="item.name" (click)="selectProduct(item)">
+                                    <mat-option [value]="item.name"
+                                        (click)="selectProduct(item, farmerForm, buttonConfig)"
+                                        id="productOption-{{k}}">
                                         {{ item.name }}
                                     </mat-option>
                                 </ng-container>
@@ -89,7 +94,8 @@
                                 <span class="autocomplete-heading">
                                     Add as new product <span class="new-chip">New</span>
                                 </span>
-                                <mat-option [value]="ccontrol.productName.value" (click)="selectProduct(null)">
+                                <mat-option [value]="ccontrol.productName.value"
+                                    (click)="selectProduct(null, farmerForm, buttonConfig)">
                                     {{ccontrol.productName.value}}
                                 </mat-option>
                             </ng-container>
@@ -109,7 +115,7 @@
                         </ng-container>
                     </article>
                     <article class="receive-row-item mb-20">
-                        <app-ff-dropdown label="Unit" [defaultValue]="ccontrol.unit.value" [dropdownOptions]="units"
+                        <app-ff-dropdown label="Unit" [defaultValue]="units[0].id" [dropdownOptions]="units"
                             inputClass="profile" [hideSearch]="true">
                         </app-ff-dropdown>
                     </article>
@@ -130,8 +136,8 @@
                 <article class="w-50 m-r-12">
                     <article class="mb-20 flex-column">
                         <label class="has-float-label custom-input">
-                            <input placeholder=" " matInput [matDatepicker]="transactionDate" [max]="maxDate"
-                                formControlName="date" type="text" class="date-picker" readonly />
+                            <input placeholder=" " id="transactionDate" matInput [matDatepicker]="transactionDate"
+                                [max]="maxDate" formControlName="date" type="text" class="date-picker" readonly />
                             <span class="label">Transaction date*</span>
                             <mat-icon class="pointer" (click)="transactionDate.open()">calendar_today</mat-icon>
                         </label>
@@ -147,15 +153,15 @@
                 <article class="ff-flex-align-center">
                     <span class="file-name text-overflow"
                         *ngIf="ccontrol.receipt.value">{{ccontrol.receipt.value.name}}</span>
-                    <app-buttons *ngIf="!ccontrol.receipt.value" buttonType="fill" (buttonClicked)="attachFile.click()"
-                        buttonSize="medium">
+                    <app-buttons *ngIf="!ccontrol.receipt.value" buttonType="fill" customId="uploadFile"
+                        (buttonClicked)="attachFile.click()" buttonSize="medium">
                         Upload file
                     </app-buttons>
                     <input type="file" #attachFile (click)="attachFile.value = null" value=""
                         (change)="fileUpload($event)" class="input-file" placeholder="No file chosen" hidden
                         accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
-                    <app-buttons *ngIf="ccontrol.receipt.value" buttonType="stroked" (buttonClicked)="removeFile()"
-                        buttonSize="medium">
+                    <app-buttons customId="removeBtn" *ngIf="ccontrol.receipt.value" buttonType="stroked"
+                        (buttonClicked)="removeFile()" buttonSize="medium">
                         Remove
                     </app-buttons>
                 </article>
@@ -175,16 +181,16 @@
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message"
         *ngIf="ccontrol[formcontrol]?.errors?.required && (ccontrol[formcontrol]?.touched || submitted)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'productName'">
         <article *ngIf="ccontrol.productName.invalid && (ccontrol.productName.touched || submitted)">
             <span *ngIf="ccontrol.productName.errors.maxlength" class="error-message">
-                {{'productMaxLength'|translate}}
+                {{'formValidation.productMaxLength'|translate}}
             </span>
             <span *ngIf="ccontrol.productName.errors.minlength" class="error-message">
-                {{'productMinLength'|translate}}
+                {{'formValidation.productMinLength'|translate}}
             </span>
         </article>
     </ng-container>
@@ -192,18 +198,18 @@
     <ng-container *ngIf="formcontrol === 'quantity'">
         <span *ngIf="ccontrol.quantity.invalid && ccontrol.quantity.value && (ccontrol.quantity.touched || submitted)"
             class="error-message">
-            {{ 'trRequest.invalidQty'|translate }}
+            {{ 'formValidation.invalidQty'|translate }}
         </span>
     </ng-container>
     <ng-container *ngIf="formcontrol === 'price'">
         <span *ngIf="ccontrol.price.invalid && ccontrol.price.value && (ccontrol.price.touched || submitted)"
             class="error-message">
-            Invalid price
+            {{ 'formValidation.invalidPrice'|translate }}
         </span>
     </ng-container>
     <ng-container *ngIf="formcontrol === 'date'">
         <span class="error-message" *ngIf="ccontrol.date.invalid && (ccontrol.date.touched || submitted)">
-            {{ 'stock.invalidDate'|translate }}
+            {{ 'formValidation.invalidDate'|translate }}
         </span>
     </ng-container>
 </ng-template>

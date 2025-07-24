@@ -9,7 +9,7 @@ import {
   ITableFilterProps,
 } from './listing.model';
 
-export const LISTING_COLUMNS: ITableColumnHeader[] = [
+export const LISTING_COLUMNS_INIT: ITableColumnHeader[] = [
   {
     name: 'selection',
     class: 'selection-column',
@@ -17,6 +17,65 @@ export const LISTING_COLUMNS: ITableColumnHeader[] = [
     hideSort: true,
     isColumnVisible: true,
   },
+  {
+    name: 'Stock ID',
+    class: 'stock-id-column no-border-left',
+    sortKey: 'number',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Product',
+    class: 'large-column',
+    sortKey: 'product.name',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Created date',
+    class: 'normal-column',
+    sortKey: 'created_on',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Created from',
+    class: 'normal-column',
+    sortKey: 'from',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Supplier',
+    class: 'normal-column',
+    sortKey: 'batch',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Quantity available(kg)',
+    class: 'large-column',
+    sortKey: 'initial_quantity',
+    isColumnVisible: true,
+  },
+  {
+    name: 'Reference number',
+    class: 'normal-column',
+    sortKey: 'batch',
+    isColumnVisible: true,
+    hideSort: true,
+  },
+  {
+    name: '',
+    class: 'options-column',
+    sortKey: 'none',
+    hideSort: true,
+  },
+];
+
+export const LISTING_COLUMNS: ITableColumnHeader[] = [
+  // {
+  //   name: 'selection',
+  //   class: 'selection-column',
+  //   sortKey: 'none',
+  //   hideSort: true,
+  //   isColumnVisible: true,
+  // },
   {
     name: 'Stock ID',
     class: 'stock-id-column no-border-left',
@@ -100,6 +159,24 @@ export const RESET_FILTER: IFilterToggleItems = {
   dateFrom: '',
   searchString: '',
   createdFrom: '',
+  archived: false,
+  searchBy: '',
+};
+
+export const RESET_FILTER_ARCHIVE: IFilterToggleItems = {
+  selectedProduct: '',
+  selectedClaim: '',
+  selectedSupplier: '',
+  quantityFrom: '',
+  quantityTo: '',
+  quantityIs: '',
+  dateOn: '',
+  dateTo: '',
+  dateFrom: '',
+  searchString: '',
+  createdFrom: '',
+  archived: true,
+  searchBy: '',
 };
 
 export const TABLE_FILTER_PROPS: ITableFilterProps = {
@@ -111,6 +188,11 @@ export const TABLE_FILTER_PROPS: ITableFilterProps = {
 
 export const INIT_FILTERS: IFilterParams = {
   ...RESET_FILTER,
+  ...TABLE_FILTER_PROPS,
+};
+
+export const INIT_FILTERS_ARCHIVE: IFilterParams = {
+  ...RESET_FILTER_ARCHIVE,
   ...TABLE_FILTER_PROPS,
 };
 

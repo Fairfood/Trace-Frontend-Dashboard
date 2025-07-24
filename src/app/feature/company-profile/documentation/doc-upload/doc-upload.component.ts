@@ -1,15 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { Component, Inject, OnDestroy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { NgClass, NgIf } from '@angular/common';
 import { Subscription } from 'rxjs';
+// services
 import { DocumentationService } from '../documentation.service';
+// components
+import { FairFoodInputComponent } from 'fairfood-form-components';
+import { ButtonsComponent } from 'fairfood-utils';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-doc-upload',
   templateUrl: './doc-upload.component.html',
   styleUrls: ['./doc-upload.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgClass,
+    MatDialogModule,
+    MatIconModule,
+    FairFoodInputComponent,
+    ButtonsComponent,
+    TranslateModule,
+    ReactiveFormsModule,
+  ],
 })
 export class DocUploadComponent implements OnDestroy {
   files: any = [];
@@ -18,7 +39,6 @@ export class DocUploadComponent implements OnDestroy {
   uploadForm = this.fb.group({
     name: ['', [Validators.required]],
   });
-  errMessage = '*This field is required';
   sub: Subscription;
   constructor(
     public dialogRef: MatDialogRef<DocUploadComponent>,
@@ -27,6 +47,7 @@ export class DocUploadComponent implements OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
+  /* istanbul ignore next */
   get fcontrol() {
     return this.uploadForm.controls;
   }
@@ -45,25 +66,27 @@ export class DocUploadComponent implements OnDestroy {
       name: this.files.name,
     });
   }
+
   deleteAttachment(index: number): void {
     this.files.splice(index, 1);
   }
 
+  /* istanbul ignore next */
   uploadDocument(): void {
     this.loader = true;
     const formData = new FormData();
     formData.append('file', this.files);
     formData.append('name', this.uploadForm.controls.name.value);
-    this.sub = this.companyService.uploadDoc(formData).subscribe(
-      (res: any) => {
+    this.sub = this.companyService.uploadDoc(formData).subscribe({
+      next: (res: any) => {
         this.loader = false;
         this.dialogRef.close(res);
       },
-      () => {
+      error: () => {
         this.loader = false;
         this.dialogRef.close(false);
-      }
-    );
+      },
+    });
   }
 
   ngOnDestroy(): void {

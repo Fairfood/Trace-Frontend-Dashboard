@@ -23,6 +23,7 @@ import { ConnectionService } from '../connections.service';
 
 import { ButtonsComponent } from 'fairfood-utils';
 import { FairFoodInputComponent } from 'fairfood-form-components';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-map-suppliers-request',
@@ -37,6 +38,7 @@ import { FairFoodInputComponent } from 'fairfood-form-components';
     FormsModule,
     ButtonsComponent,
     FairFoodInputComponent,
+    TranslateModule,
   ],
 })
 export class MapSuppliersRequestComponent implements OnDestroy {
@@ -57,7 +59,7 @@ export class MapSuppliersRequestComponent implements OnDestroy {
   close(): void {
     this.dialogRef.close();
   }
-
+  /* istanbul ignore next */
   buttonAction(): void {
     const { map } = this.data;
     if (map) {
@@ -66,7 +68,7 @@ export class MapSuppliersRequestComponent implements OnDestroy {
       this.sendInvite();
     }
   }
-
+  /* istanbul ignore next */
   sendRequest(): void {
     const { id, supplyChain } = this.data;
     const params = {
@@ -91,7 +93,7 @@ export class MapSuppliersRequestComponent implements OnDestroy {
         }
       });
   }
-
+  /* istanbul ignore next */
   sendInvite(): void {
     const { id, supplyChain } = this.data;
     const params = {
@@ -108,7 +110,7 @@ export class MapSuppliersRequestComponent implements OnDestroy {
       },
     });
   }
-
+  /* istanbul ignore next */
   ngOnDestroy(): void {
     if (this.sub) {
       this.sub.unsubscribe();

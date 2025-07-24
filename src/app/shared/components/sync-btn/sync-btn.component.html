@@ -1,0 +1,16 @@
+<article>
+  <div [matMenuTriggerFor]="syncMenu" class="pointer ff-flex-align-center">
+    <img src="../../../assets/images/sync.svg" class="sync-icon" [ngClass]="connectSyncing || navigateSyncing?'syncing-icon':''" alt="">
+    <span *ngIf="!(connectSyncing || navigateSyncing)" class="sync-text ml-8">Sync</span>
+      <span *ngIf="connectSyncing || navigateSyncing" class="sync-text ml-8" [matTooltip]="connectSyncing?tooltipContentConnect:tooltipContentNavigate" matTooltipClass="custom-tooltip" #tooltip="matTooltip">Syncing...</span>
+      <mat-icon *ngIf="!(connectSyncing || navigateSyncing)" class="down-arrow">keyboard_arrow_down</mat-icon>
+  </div>
+  <mat-menu class="profile-dropdown navbar-collapse" #syncMenu="matMenu" xPosition="before">
+    <ng-container *ngIf="showConnectBtn">
+      <button mat-menu-item class="sync-text" (click)="syncFromConnect()">Sync from Connect</button>
+    </ng-container>
+    <ng-container *ngIf="showNavigateBtn">
+      <button mat-menu-item class="sync-text" (click)="syncWithNavigate()">Sync with Navigate</button>
+    </ng-container>
+  </mat-menu>
+</article>

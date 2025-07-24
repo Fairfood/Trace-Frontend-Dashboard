@@ -5,7 +5,13 @@
 .noti-icon {
   display: flex;
   position: relative;
-  margin-right: 25px;
+  left: 14px;
+  top: 15px;
+  @include devices(mobile) {
+    left: 0px;
+    top: 0px;
+    margin-right: 25px;
+  }
 }
 
 .red-label {

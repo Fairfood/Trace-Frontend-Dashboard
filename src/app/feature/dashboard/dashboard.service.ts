@@ -11,10 +11,7 @@ import { CompanyProfileService } from '../company-profile/company-profile.servic
 
 // configs
 import { environment } from 'src/environments/environment';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { HTTP_OPTION_4 } from 'src/app/shared/configs/app.constants';
 import { IMapTheme } from './dashboard.model';
 import {
@@ -22,6 +19,7 @@ import {
   ICommonAPIResponse,
 } from 'src/app/shared/configs/app.model';
 import { ITransactionData } from '../transactions/transactions.model';
+import { headerOptions } from 'fairfood-utils';
 
 const BASE_URL = environment.baseUrl;
 
@@ -92,6 +90,7 @@ export class DashboardService {
    * Observable indicating whether the map has been loaded.
    * @returns Observable of boolean indicating map loaded status.
    */
+  /* istanbul ignore next */
   mapLoaded(): Observable<boolean> {
     return this.util.mapInitialized$;
   }
@@ -136,6 +135,7 @@ export class DashboardService {
    * Retrieves recent activities.
    * @returns Observable of recent activities.
    */
+  /* istanbul ignore next */
   activities(): Observable<IActivity[]> {
     return this.companyService.activityLog(5).pipe(
       map((response: ICommonAPIResponse<IActivity>) => {

@@ -3,9 +3,11 @@
 // top section of the page
 // including filter and search
 // action button styles
-.stock-listing-table thead th:first-child {
-  border-radius: 6px 0 0 0;
-  border-left: 0;
+.stock-listing-table {
+  th:first-child {
+    border-radius: 6px 0 0 0;
+    border-left: 0;
+  }
 }
 
 .no-border-left {
@@ -55,4 +57,9 @@
 }
 .one-margin {
   margin-top: 1px !important;
+}
+
+.additional-rows {
+  padding: 15px 0;
+  text-align: center;
 }

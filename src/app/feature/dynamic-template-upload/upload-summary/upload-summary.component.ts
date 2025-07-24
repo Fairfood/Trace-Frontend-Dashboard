@@ -65,7 +65,7 @@ export class UploadSummaryComponent implements OnInit, OnDestroy {
         } else {
           this.summaryData = {
             ...summary,
-            productName: product_details.name,
+            productName: product_details?.name,
             currency,
           };
         }
@@ -111,6 +111,6 @@ export class UploadSummaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pageApis.forEach(api => api.unsubscribe());
+    this.pageApis?.forEach(api => api.unsubscribe());
   }
 }

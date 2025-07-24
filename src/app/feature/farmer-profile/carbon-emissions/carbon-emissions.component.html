@@ -1,0 +1,73 @@
+<article class="ff-flex-between top-section" *ngIf="!loading">
+    <h3 class="text-md font-1-bold head">Carbon transactions</h3>
+</article>
+<div class="container-main">
+    <div class="ff-flex-between">
+        <app-search-box id="search-box" placeholder="{{'misc.searchText' | translate}}" [searchString]="this.appliedFilterValues?.searchString" [hideOptions]="true"
+                (searchText)="searchFilter($event)" class="search-item">
+            </app-search-box>
+        <!-- <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
+            <ng-container *ngIf="toggleFilter">
+                <mat-icon class="clear-icon">close</mat-icon>
+                <span class="button-text">{{'misc.clearFilterText' | translate }}</span>
+            </ng-container>
+            <ng-container *ngIf="!toggleFilter">
+                <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
+                <span class="button-text">{{'misc.filterText' | translate}}</span>
+            </ng-container>
+        </app-buttons> -->
+    </div>
+    <!-- <div>
+        <section *ngIf="toggleFilter" class="filter-wrap ff-flex-start">
+            <ng-container  [ngTemplateOutlet]="transactionFilter">
+            </ng-container>
+        </section>
+    </div> -->
+    <section class="ff-table-container w-100">
+        <table *ngIf="!loading" aria-label="attachment table">
+            <thead>
+                <tr>
+                    <th *ngFor="let item of displayedColumns;trackBy: trackByFn;" class="{{item?.class}}">
+                        {{item?.name}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let element of dataSource;trackBy: trackByFn;" class="pointer">
+                    <td class="mat-cell normal-column">
+                        {{element?.number}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element?.connection?.name}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element?.quantity}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element?.trans_type}}
+                    </td>
+                    <td class="mat-cell normal-column">
+                        {{element?.date * 1000 | date: 'dd MMMM y' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <app-loader loaderText="Loading attachments" loaderType="type1" class="no-data" *ngIf="loading">
+        </app-loader>
+        <section class="col-12 text-center text-blue font-1-medium no-data" *ngIf="!loading && tableLength === 0">
+            {{'transactions.noTransaction' | translate}}
+        </section>
+    </section>
+    <div class="col-12 mt-10">
+        <app-ff-custom-pagination [totalCount]="tableLength" [customPage]="customPageSize"
+            (paginationAction)="paginatorEvent($event)"></app-ff-custom-pagination>
+    </div>
+</div>
+
+<!-- <ng-template #transactionFilter>
+
+    <app-ff-filter-box-wrapper  class="filter-container" label="{{'transactions.typeText' | translate}}" [hideSearch]="true"
+        [filterMasterData]="transactionListFilter"
+        [defaultValue]="appliedFilterValues.transactionType" (selectionChange)="filterTransactionList($event, 'type')">
+    </app-ff-filter-box-wrapper>
+</ng-template> -->

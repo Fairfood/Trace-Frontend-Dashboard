@@ -1,15 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 // services
 import { GlobalStoreService } from 'src/app/shared/store';
 import { ConnectionLabelService } from './connection-label.service';
@@ -20,11 +13,13 @@ import { IMPORTS, LABEL_COLUMNS } from './connection-label.config';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
 // component
 import { ProfilePopupComponent } from '../profile-popup/profile-popup.component';
+import { TranslateService } from '@ngx-translate/core';
+import { IPaginator } from 'fairfood-utils';
 
 @Component({
   selector: 'app-connection-label',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, MatDialogModule, ...IMPORTS],
+  imports: IMPORTS,
   templateUrl: './connection-label.component.html',
   styleUrls: ['./connection-label.component.scss'],
 })
@@ -49,13 +44,16 @@ export class ConnectionLabelComponent {
   submitted: boolean;
   isEdit: boolean;
   currentlyEditing: any;
+  selectedItems: any;
+  selectedIDs: any;
 
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
     private global: GlobalStoreService,
     private service: ConnectionLabelService,
-    private util: UtilService
+    private util: UtilService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -70,7 +68,7 @@ export class ConnectionLabelComponent {
 
   toggleAddScreen(): void {
     this.addScreenVisible = !this.addScreenVisible;
-
+    this.selectedIDs = [];
     if (this.addScreenVisible) {
       this.labelForm.patchValue({
         label: '',
@@ -94,6 +92,7 @@ export class ConnectionLabelComponent {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   getConnectionLabels(): void {
     this.connectionLabels = [];
     const api = this.service
@@ -121,18 +120,21 @@ export class ConnectionLabelComponent {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   createNewLabel(): void {
     this.submitted = true;
     if (this.labelForm.valid) {
       const { label: name, supplyChain, id } = this.labelForm.value;
-      const supply_chains = supplyChain?.map((s: any) => s.id) || [];
+      const supply_chains = supplyChain?.map((item: any) =>
+        typeof item === 'string' ? item : item.id ?? item
+      );
       const params = { supply_chains, name };
       if (!this.isEdit) {
-        const api = this.service.createConnectionLabel(params).subscribe(
-          () => {
+        const api = this.service.createConnectionLabel(params).subscribe({
+          next: () => {
             this.addScreenVisible = false;
             this.util.customSnackBar(
-              'Label created successfully',
+              this.translate.instant('connectionLabel.created'),
               ACTION_TYPE.SUCCESS
             );
             this.labelForm.reset();
@@ -143,10 +145,14 @@ export class ConnectionLabelComponent {
             this.getConnectionLabels();
             this.submitted = false;
           },
-          err => {
+          error: err => {
             console.log(err);
-          }
-        );
+            this.util.customSnackBar(
+              this.translate.instant('connectionLabel.createFailed'),
+              ACTION_TYPE.FAILED
+            );
+          },
+        });
         this.pageApis.push(api);
       } else {
         if (this.currentlyEditing) {
@@ -160,7 +166,7 @@ export class ConnectionLabelComponent {
         const api = this.service.updateConnectionLabel(id, params).subscribe({
           next: () => {
             this.util.customSnackBar(
-              'Label updated successfully',
+              this.translate.instant('connectionLabel.updateSuccess'),
               ACTION_TYPE.SUCCESS
             );
             this.labelForm.reset();
@@ -169,6 +175,10 @@ export class ConnectionLabelComponent {
           },
           error: err => {
             console.log(err);
+            this.util.customSnackBar(
+              this.translate.instant('connectionLabel.updateFailed'),
+              ACTION_TYPE.FAILED
+            );
           },
         });
         this.pageApis.push(api);
@@ -176,6 +186,7 @@ export class ConnectionLabelComponent {
     }
   }
 
+  /* istanbul ignore next */
   removeConnectionLabel(item: any): void {
     const dialogRef = this.dialog.open(ProfilePopupComponent, {
       width: '30vw',
@@ -191,7 +202,7 @@ export class ConnectionLabelComponent {
         const api = this.service
           .removeConnectionLabel(item.id)
           .subscribe(() => {
-            const message = 'Connection label removed successfully';
+            const message = this.translate.instant('connectionLabel.remove');
             this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
             this.dataLoading = true;
             this.getConnectionLabels();
@@ -210,14 +221,26 @@ export class ConnectionLabelComponent {
       supplyChain: item.supply_chains,
     });
     this.addScreenVisible = true;
+
+    this.selectedItems = this.labelForm.controls.supplyChain.value.map(
+      (s: any) => {
+        const { id, name } = s;
+        return { id, name };
+      }
+    );
+    this.selectedIDs = this.selectedItems.map((item: any) =>
+      typeof item === 'string' ? item : item.id ?? item
+    );
   }
 
-  paginatorEvent(data: any): void {
-    const { limit, offset } = data;
-    this.limit = limit;
-    this.offset = offset;
-    this.dataLoading = true;
-    this.getConnectionLabels();
+  paginatorEvent(data: IPaginator): void {
+    if (data) {
+      const { limit, offset } = data;
+      this.limit = limit;
+      this.offset = offset;
+      this.dataLoading = true;
+      this.getConnectionLabels();
+    }
   }
 
   setSupplychain(selectedData: any): void {

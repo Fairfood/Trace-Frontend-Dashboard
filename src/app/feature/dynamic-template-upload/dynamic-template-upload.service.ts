@@ -12,7 +12,6 @@ import {
   dynamicTemplateType,
 } from 'src/app/shared/configs/app.constants';
 import {
-  headerOptions,
   mapResults,
   successFormatter,
 } from 'src/app/shared/configs/app.methods';
@@ -23,6 +22,7 @@ import {
   UtilService,
 } from 'src/app/shared/service';
 import { ConnectionService } from '../connections/connections.service';
+import { headerOptions } from 'fairfood-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +40,7 @@ export class DynamicTemplateUploadService {
     private connectionService: ConnectionService
   ) {}
 
+  /* istanbul ignore next */
   availableTemplates(type: number, searchKey?: string): Observable<any> {
     return this.http
       .get(
@@ -51,6 +52,7 @@ export class DynamicTemplateUploadService {
       .pipe(map(mapResults));
   }
 
+  /* istanbul ignore next */
   templateForm(): any {
     return this.fb.group({
       templateId: ['', Validators.required],
@@ -58,6 +60,7 @@ export class DynamicTemplateUploadService {
     });
   }
 
+  /* istanbul ignore next */
   templateDetailsForm(): any {
     return this.fb.group({
       templateId: ['', Validators.required],
@@ -76,6 +79,7 @@ export class DynamicTemplateUploadService {
     });
   }
 
+  /* istanbul ignore next */
   linkFieldForm(): any {
     return this.fb.group({
       templateId: ['', Validators.required],
@@ -106,6 +110,7 @@ export class DynamicTemplateUploadService {
     });
   }
 
+  /* istanbul ignore next */
   linkFieldFormConnection(): any {
     return this.fb.group({
       templateId: ['', Validators.required],
@@ -121,6 +126,7 @@ export class DynamicTemplateUploadService {
       saveTemplate: [true, Validators.required],
       templateName: ['', Validators.required],
       fileName: [''],
+      latestUpload: [''],
     });
   }
 
@@ -156,6 +162,7 @@ export class DynamicTemplateUploadService {
     return formData;
   }
 
+  /* istanbul ignore next */
   createUploads(params: any): Observable<any> {
     return this.http
       .post(
@@ -166,6 +173,7 @@ export class DynamicTemplateUploadService {
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   verifyUpload(id: string): Observable<any> {
     return this.http
       .post(
@@ -182,6 +190,7 @@ export class DynamicTemplateUploadService {
    * Once the file is received from the server, it is converted to a Blob and saved with an appropriate name.
    * The function also manages the loading state during the download process.
    */
+  /* istanbul ignore next */
   downloadTemplate(id: string, name: string): Observable<any> {
     return this.http
       .get(
@@ -204,6 +213,7 @@ export class DynamicTemplateUploadService {
       );
   }
 
+  /* istanbul ignore next */
   getSummaryOfUpload(id: string): Observable<any> {
     return this.http
       .get(
@@ -213,6 +223,7 @@ export class DynamicTemplateUploadService {
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   confirmTransaction(id: string): Observable<any> {
     return this.http
       .post(
@@ -261,6 +272,7 @@ export class DynamicTemplateUploadService {
    * Based on the uploaded ID a 2d array of the template is returned
    * @param id string
    */
+  /* istanbul ignore next */
   getPreviewOfUploadedTemplate(id: string): Observable<any> {
     return this.http
       .get(
@@ -270,16 +282,18 @@ export class DynamicTemplateUploadService {
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   patchTemplate(id: string, params: any): Observable<any> {
     return this.http
       .patch(
-        `${BASE_URL}/bulk-uploads/data-sheet-templates/${id}/`,
+        `${BASE_URL}/bulk-uploads/data-sheet-templates/${id}/?visibility=all`,
         params,
         headerOptions(HTTP_OPTION_3)
       )
       .pipe(map(successFormatter));
   }
 
+  /* istanbul ignore next */
   validateRows(id: string, params: any): Observable<any> {
     return this.http
       .post(

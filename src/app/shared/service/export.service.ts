@@ -2,14 +2,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, map } from 'rxjs';
+import { headerOptions } from 'fairfood-utils';
 // config
-import {
-  headerOptions,
-  mapResults,
-  successFormatter,
-} from '../configs/app.methods';
+import { mapResults, successFormatter } from '../configs/app.methods';
 import { HTTP_OPTION_3 } from '../configs/app.constants';
 import { environment } from 'src/environments/environment';
+
 const BASE_URL = environment.baseUrl;
 
 @Injectable({
@@ -56,6 +54,7 @@ export class ExportService {
     );
   }
 
+  /* istanbul ignore next */
   reportListing(): Observable<any> {
     return this.http
       .get(BASE_URL + '/reports/exports/', headerOptions(HTTP_OPTION_3))

@@ -405,7 +405,7 @@
     }
 
     .avatar-round {
-      @include set-avatar-props(16px, var(--color-white), var(--font-color));
+      @include set-avatar-props(18px, var(--color-white), var(--font-color));
       font-size: 10px;
       margin-right: 10px;
     }

@@ -6,7 +6,6 @@
 @include reset-ul;
 @include company-selection;
 
-
 .quantity-row {
   display: flex;
   width: 100%;
@@ -31,7 +30,7 @@
   .claim-list {
     background-color: var(--border-color);
     padding: 12px;
-    margin: 8px;    
+    margin: 8px;
     margin-left: 0;
     mat-icon {
       margin-left: 5px;
@@ -46,4 +45,18 @@
 
 .main-div {
   padding: 20px;
+}
+
+.claim-header {
+  padding: 0px 0px 10px 0px;
+  h4 {
+    font-family: var(--font-bold);
+    color: var(--font-color);
+    font-size: 18px;
+    margin: 0;
+  }
+}
+
+.claim-container {
+  max-height: 16vh;
 }

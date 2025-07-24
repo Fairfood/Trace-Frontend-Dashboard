@@ -1,4 +1,4 @@
-<section class="ff-table-container w-100 pt-20">
+<section class="ff-table-container w-100 pt-20" *ngIf="showMappingList">
     <table aria-label="Mapping table in excel">
         <thead>
             <tr>
@@ -7,7 +7,7 @@
                         <span class="heading">
                             {{item}}
                         </span>
-                        <app-ff-column-mapping-box [dropdownMasterData]="dropdownMasterData$ | async"
+                        <app-ff-column-mapping-box  [dropdownMasterData]="dropdownMasterData$ | async"
                             [defaultValue]="schemaData | mapColumnName: i" (clearSelection)="clearDropdown($event, i)"
                             (itemSelected)="mapFields($event, i)"></app-ff-column-mapping-box>
                     </section>

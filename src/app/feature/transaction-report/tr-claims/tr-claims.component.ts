@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -9,7 +10,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { saveAs } from 'file-saver';
 
 import { ClaimService } from '../../claim/claim.service';
@@ -18,19 +19,24 @@ import { UtilService } from 'src/app/shared/service';
 import { ClaimDetailComponent } from '../../claim/claim-detail';
 import { CL_IMPORTS } from './tr-claims.config';
 import { GlobalStoreService } from 'src/app/shared/store';
+import { ClaimPopupCommonComponent } from 'src/app/shared/components/claim-popup-common/claim-popup-common.component';
+import { ACTION_TYPE } from 'fairfood-utils';
 @Component({
   selector: 'app-tr-claims',
   templateUrl: './tr-claims.component.html',
   styleUrls: ['./tr-claims.component.scss'],
   standalone: true,
-  imports: [...CL_IMPORTS],
+  imports: CL_IMPORTS,
 })
 export class TrClaimsComponent implements OnChanges, OnDestroy {
   @Input() attachedClaims: any[];
   @Input() transactionId: string;
   @Input() isReversal: boolean;
+  @Input() currentClaimInput: any;
 
   @Output() claimAttached = new EventEmitter();
+
+  private destroy$ = new Subject<void>();
 
   availableClaims: any[] = [];
   selectedClaims: any[] = [];
@@ -40,42 +46,47 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
   pageApis: Subscription[] = [];
   currentClaim: any;
   companies: any[];
+  showCheckStatusDiv = true;
 
   constructor(
     private claimService: ClaimService,
     public dialog: MatDialog,
     private util: UtilService,
-    private store: GlobalStoreService
+    private store: GlobalStoreService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   /**
    * Get all the connected suppliers for initial showing
    */
-  getConnectedCompanyList(transactionClaims: any): void {
+  getConnectedCompanyList(transactionClaims: any, currentClaim?: any): void {
     const API_CALL = this.store.connectedCompanies$.subscribe({
       next: (res: any) => {
         if (res) {
           this.companies = res;
-          this.fetchClaims(transactionClaims);
+          this.fetchClaims(transactionClaims, currentClaim);
         }
       },
       error: (err: any) => {
         console.log(err);
-        this.fetchClaims(transactionClaims);
+        this.fetchClaims(transactionClaims, currentClaim);
       },
     });
     this.pageApis.push(API_CALL);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const { attachedClaims } = changes;
+    const { attachedClaims, currentClaimInput } = changes;
     const transactionClaims = attachedClaims.currentValue;
     if (this.isReversal) {
       this.selectedClaims = transactionClaims;
       this.currentClaim = transactionClaims[0];
       this.loading = false;
     } else {
-      this.getConnectedCompanyList(transactionClaims);
+      this.getConnectedCompanyList(
+        transactionClaims,
+        currentClaimInput?.currentValue
+      );
     }
   }
 
@@ -83,9 +94,9 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
    * Fetch claims from the API or cache
    * @param transactionClaims any[]
    */
-  fetchClaims(transactionClaims: any[]): void {
+  fetchClaims(transactionClaims: any[], currentClaim?: any): void {
     const api = this.claimService.getClaims().subscribe((result: any) => {
-      this.generateClaimList(result, transactionClaims);
+      this.generateClaimList(result, transactionClaims, currentClaim);
     });
     this.pageApis.push(api);
   }
@@ -95,7 +106,11 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
    * @param result any[]
    * @param transactionClaims any[]
    */
-  generateClaimList(result: any[], transactionClaims: any[]): void {
+  generateClaimList(
+    result: any[],
+    transactionClaims: any[],
+    currentClaim?: any
+  ): void {
     const selectedClaimsIds = transactionClaims?.map(m => m.claim_id);
     this.listOfClaims = this.claimService.formatClaimsData(
       result,
@@ -107,7 +122,14 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
       }
     });
     this.selectedClaims = transactionClaims;
-    this.currentClaim = transactionClaims[0];
+
+    currentClaim
+      ? (this.currentClaim = this.selectedClaims.find(
+          claim => claim.id === currentClaim.id
+        ))
+      : (this.currentClaim = transactionClaims[0]);
+
+    this.cdr.detectChanges();
     this.loading = false;
   }
   /**
@@ -124,6 +146,7 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
     );
     const dialogRef = this.dialog.open(ClaimDetailComponent, {
       disableClose: true,
+      autoFocus: false,
       width: '45vw',
       maxWidth: '800px',
       height: 'auto',
@@ -243,7 +266,10 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
   }
 
   processCompleted(): void {
-    this.claimAttached.emit(true);
+    this.claimAttached.emit({
+      reload: true,
+      currentClaim: this.currentClaim,
+    });
     this.loading = false;
   }
 
@@ -251,6 +277,7 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
     if (claim.id !== this.currentClaim?.id) {
       this.currentClaim = claim;
     }
+    this.showCheckStatusDiv = true;
   }
 
   downloadFile(fileUrl: string): void {
@@ -258,6 +285,60 @@ export class TrClaimsComponent implements OnChanges, OnDestroy {
       saveAs(result, fileUrl?.split('/').pop());
     });
     this.pageApis.push(api);
+  }
+
+  // openPopup(): void {
+  //   if (
+  //     this.currentClaim?.claim_processor == 'guardian' &&
+  //     this.currentClaim?.status == 2
+  //   ) {
+  //     const dialogRef = this.dialog.open(ClaimPopupCommonComponent, {
+  //       disableClose: true,
+  //       width: '45vw',
+  //       maxWidth: '800px',
+  //       height: 'auto',
+  //       maxHeight: '700px',
+  //       data: { claim: this.currentClaim, nodeId: this.transactionNumber },
+  //       panelClass: 'custom-modalbox',
+  //     });
+
+  //     // dialogRef.afterClosed().subscribe(result => {
+  //     //   this.loading = true;
+  //     //   this.getConnectedCompanyList(this.attachedClaims);
+  //     // });
+  //   }
+  // }
+
+  checkStatus(): void {
+    this.showCheckStatusDiv = false;
+    setTimeout(() => {
+      this.showCheckStatusDiv = true;
+    }, 20000);
+    const message = 'Checking claim status...';
+    this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+    this.util
+      .checkStatus(
+        this.currentClaim?.guardian_claims[0]?.id,
+        this.transactionId
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        if (res.success) {
+          // if (res?.data?.claim_status != this.currentClaim.status) {
+          this.loading = true;
+          this.claimAttached.emit({
+            reload: true,
+            currentClaim: this.currentClaim,
+          });
+          // }
+        } else {
+          // handle failure if needed
+        }
+      });
+  }
+
+  openGuardianUrl(url: string): void {
+    window.open(url, '_blank');
   }
 
   ngOnDestroy(): void {

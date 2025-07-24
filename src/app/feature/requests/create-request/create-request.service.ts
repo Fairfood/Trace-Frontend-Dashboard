@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { headerOptions } from 'fairfood-utils';
 import { Observable, map } from 'rxjs';
 import {
   BASE_URL,
   HTTP_OPTION_3,
   HTTP_OPTION_4,
 } from 'src/app/shared/configs/app.constants';
-import { headerOptions, mapResults } from 'src/app/shared/configs/app.methods';
+import { mapResults } from 'src/app/shared/configs/app.methods';
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +22,14 @@ export class CreateRequestService {
   }
 
   // Supplier data
-  getSuppliers(type: number, search = ''): Observable<any> {
-    const supplyChainId = this.supplyChainData();
+  getSuppliers(type: number, search = '', sId?: string): Observable<any> {
+    let supplyChainId = '';
+    if (sId) {
+      supplyChainId = sId;
+    } else {
+      supplyChainId = this.supplyChainData();
+    }
+
     return this.http
       .get(
         BASE_URL +
@@ -77,6 +85,14 @@ export class CreateRequestService {
       BASE_URL + '/requests/stock/verify/',
       params,
       headerOptions(HTTP_OPTION_3)
+    );
+  }
+
+  createClaimRequest(params: any): Observable<any> {
+    return this.http.post(
+      BASE_URL + '/requests/claim/',
+      params,
+      headerOptions(HTTP_OPTION_4)
     );
   }
 }

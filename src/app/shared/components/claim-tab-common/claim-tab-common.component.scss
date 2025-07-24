@@ -1,0 +1,210 @@
+@import 'src/styles/utils';
+@import 'src/styles/responsive';
+@include key-value-pair;
+@include reset-ul;
+@include claim-detail-common;
+
+.claim-listing {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 20px;
+
+  li {
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--color-tr-claims);
+    border-radius: 6px;
+    margin-bottom: 15px;
+
+    svg {
+      margin-right: 5px;
+    }
+
+    &.selected {
+      background-color: var(--color-table-row-active);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .left-side {
+      display: flex;
+      align-items: center;
+
+      mat-icon {
+        font-size: 34px;
+        height: 34px;
+        width: 34px;
+        margin-right: 25px;
+        color: var(--color-tr-claims);
+      }
+    }
+
+    .content-claim {
+      display: flex;
+      flex-direction: column;
+
+      .desc {
+        max-width: 300px;
+        color: var(--font-color-2);
+      }
+    }
+
+    .arrow-icon {
+      color: var(--font-color-2);
+      margin-right: 10px;
+      padding-top: 3px;
+      margin-left: 10px;
+    }
+  }
+}
+
+.header-wrap {
+  margin-top: 15px;
+}
+
+.inherited-label {
+  border-radius: 3px;
+  background-color: var(--font-color-2);
+  color: var(--color-white);
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.new-wrapper {
+  margin-top: 2px;
+  padding-right: 10px;
+
+  @include devices(desktop) {
+    max-width: 70%;
+  }
+}
+
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.left {
+  width: 100%;
+
+  @include devices(laptop) {
+    max-width: 60%;
+    width: 60%;
+  }
+
+  @include devices(laptop-lg) {
+    max-width: 50%;
+    width: 50%;
+  }
+}
+
+.open-popup:hover {
+  text-decoration: underline;
+}
+
+.check-status-text {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.status-icon {
+  width: 16px;
+  margin-right: 8px;
+}
+
+.check-status-container {
+  margin-left: 10px;
+  margin-top: 28px;
+}
+
+.guardian-icon {
+  margin: 0px 26px 0px 2px;
+  width: 29px;
+  height: 34px;
+}
+
+.verified-guardian-text {
+  margin-left: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark, #003a60);
+  text-decoration: underline;
+}
+
+.hedra-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.key {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--font-color);
+  margin-bottom: 12px
+}
+
+.container-2 {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 16px;
+  /* space between columns */
+}
+
+.column {
+  flex: 1;
+  /* makes both columns take equal width */
+  display: flex;
+  flex-direction: column;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--font-color-2)!important;
+  text-align: justify;
+}
+
+.data {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--font-color)!important;
+  padding-bottom: 20px;
+  padding-top: 10px;
+}
+
+.data-status-container {
+  padding-bottom: 20px;
+  padding-top: 10px;
+}
+
+.claim-verified-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 5px;
+}
+
+.claim-info {
+  background: var(--color-white);
+  border-radius: 5px;
+  padding: 15px 10px 0px 10px
+}
+
+.column .hedra-icon{
+  padding-bottom: 10px;
+  margin-right: 5px;
+}
+.item{
+  padding: 0px 10px !important;
+}
+.hash:hover {
+  color: blue !important;
+}

@@ -6,7 +6,7 @@ import { ITableColumnHeader } from 'src/app/shared/configs/app.model';
 export interface ITransactionFilter {
   selectedProduct: string;
   selectedType: string;
-  selectedDate: string;
+  selectedDate: any;
   selectedActor: string;
   offset: number;
   limit: number;

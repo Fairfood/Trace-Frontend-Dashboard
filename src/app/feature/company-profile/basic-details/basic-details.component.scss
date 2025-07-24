@@ -16,7 +16,7 @@
   @include key-value-pair;
 }
 
-.first-details {
+.first-details, .second-details {
   .item {
     min-width: 300px;
   }

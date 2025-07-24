@@ -1,36 +1,36 @@
-<h3 class="font-1-bold">Farm details</h3>
+<h3 class="font-1-bold">{{'newPlot.farmDetails'|translate}}</h3>
 <aside aria-label="list item wrapping" class="d-flex item-wrapper">
     <article class="item">
-        <span class="key">Total area in use (acres)</span>
+        <span class="key">{{'newPlot.areaUse'|translate}}</span>
         <span class="value">
             {{farmerData?.total_area_in_use || '-'}}
         </span>
     </article>
     <article class="item">
-        <span class="key">Crop types</span>
+        <span class="key">{{'farmer.crop'|translate}}</span>
         <span class="value text-overflow" style="max-width: 200px;" title="{{farmerData?.all_crop_types}}">
             {{ farmerData?.all_crop_types || '-' }}
         </span>
     </article>
 </aside>
 <article class="underline"></article>
-<h3 class="font-1-bold mb-25">Fields</h3>
+<h3 class="font-1-bold mb-25">{{'farmer.fields'|translate}}</h3>
 
 <section class="list-detail-container" *ngIf="!loading">
     <section class="no-ref text-xs font-1-medium" *ngIf="farmList.length === 0">
-        No fields found
+        {{'farmer.noFields'|translate}}
     </section>
     <app-list-detail [iterationList]="farmList" [activeItem]="activeId" [showAddButton]="farmerData?.is_editable"
-        [addButtonText]="'Add plot'" (listClicked)="plotSelected($event)"
+        addButtonText="{{'button.addPlot'|translate}}" (listClicked)="plotSelected($event)"
         (buttonPressed)="createPlot()"></app-list-detail>
     <aside aria-label="farm details" class="list-information" *ngIf="activePlotDetails">
         <section class="section-detail">
             <article class="ff-flex-between">
-                <h3 class="font-1-bold">Plot details</h3>
+                <h3 class="font-1-bold">{{'farmer.plotDetails'|translate}}</h3>
                 <article class="ff-flex-align-center">
                     <span class="editing d-flex pointer" (click)="createPlot(true)" *ngIf="farmerData.is_editable"
                         id="creatPlot">
-                        <mat-icon>edit</mat-icon> Edit
+                        <mat-icon>edit</mat-icon> {{'misc.edit'|translate}}
                     </span>
                     <span class="delete pointer" *ngIf="farmerData.is_editable"
                         (click)="deletePlot(activePlotDetails.id)" id="deletePlot">
@@ -54,49 +54,49 @@
             </article>
             <aside aria-label="list item wrapping" class="d-flex item-wrapper">
                 <article class="item">
-                    <span class="key">Plot name</span>
+                    <span class="key">{{'farmer.plotName'|translate}}</span>
                     <span class="value">
                         {{activePlotDetails?.name}}
                     </span>
                 </article>
                 <article class="item">
-                    <span class="key">Address</span>
+                    <span class="key">{{'misc.address'|translate}}</span>
                     <span class="value">
                         {{activePlotDetails?.address}}
                     </span>
                 </article>
             </aside>
             <article class="underline"></article>
-            <aside aria-label="list item wrapping" class="d-flex item-wrapper">
+            <aside aria-label="list item wrapping" class="d-flex item-wrapper" *ngIf="activePlotDetails?.latitude">
                 <article class="item">
-                    <span class="key">Latitude</span>
+                    <span class="key">{{'company.latitude'|translate}}</span>
                     <span class="value">
                         {{activePlotDetails?.latitude}}
                     </span>
                 </article>
                 <article class="item">
-                    <span class="key">Longitude</span>
+                    <span class="key">{{'company.longitude'|translate}}</span>
                     <span class="value">
                         {{activePlotDetails?.longitude}}
                     </span>
                 </article>
                 <article class="item">
-                    <span class="key">Location type</span>
+                    <span class="key">{{'newPlot.type'|translate}}</span>
                     <span class="value">
-                        {{ activePlotDetails?.location_type === 'APPROXIMATE'?'Approximate location': '-'}}
+                        {{ activePlotDetails.plotType | translate }}
                     </span>
                 </article>
             </aside>
-            <article class="underline"></article>
+            <article class="underline" *ngIf="activePlotDetails?.latitude"></article>
             <aside aria-label="list item wrapping" class="d-flex item-wrapper">
                 <article class="item">
-                    <span class="key">Total plot area</span>
+                    <span class="key">{{'farmer.totalArea'|translate}}</span>
                     <span class="value">
-                        {{activePlotDetails?.total_plot_area}}
+                        {{activePlotDetails?.total_plot_area!=0?activePlotDetails?.total_plot_area:'-'}}
                     </span>
                 </article>
                 <article class="item">
-                    <span class="key">Crop types</span>
+                    <span class="key">{{'farmer.crop'|translate}}</span>
                     <span class="value">
                         {{activePlotDetails?.crop_types || '-'}}
                     </span>
@@ -104,13 +104,25 @@
             </aside>
             <article class="underline"></article>
             <aside class="map-height" *ngIf="apiLoaded | async" aria-label="Map view">
-                <google-map height="350px" width="100%" [center]="center" [zoom]="zoom">
-                    <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
-                        [options]="markerOptions"></map-marker>
+                <google-map height="350px" width="100%" [center]="center" [zoom]="zoom" [options]="mapDefaultOptions"
+                    (mapInitialized)="mapReady($event)">
+                    <ng-container
+                        *ngIf="activePlotDetails?.location_type === plotTypes[0].id || activePlotDetails?.location_type === plotTypes[1].id">
+                        <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+                            [options]="markerOptions"></map-marker>
+                    </ng-container>
+                    <ng-container *ngIf="activePlotDetails?.location_type === 'POLYGON'">
+                        <map-polygon [paths]="markerPositions" />
+                    </ng-container>
+                    <ng-container
+                        *ngIf="geoJsonType === 'Point'">
+                        <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+                            [options]="markerOptions"></map-marker>
+                    </ng-container>
                 </google-map>
             </aside>
         </section>
     </aside>
 </section>
 
-<app-loader loaderText="Loading plots" loaderType="type1" *ngIf="loading"></app-loader>
+<app-loader loaderText="{{'loaderText.plot'|translate}}" loaderType="type1" *ngIf="loading"></app-loader>

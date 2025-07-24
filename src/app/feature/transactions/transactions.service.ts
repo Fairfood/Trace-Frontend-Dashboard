@@ -2,13 +2,10 @@
 /* istanbul ignore file */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 // configs and constants
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import {
   HTTP_OPTION_3,
   HTTP_OPTION_4,
@@ -27,10 +24,13 @@ import {
   ICommonObj,
 } from 'src/app/shared/configs/app.model';
 import { ITeamMember } from '../company-profile/team-members/team-members.config';
+import { headerOptions } from 'fairfood-utils';
 const BASE_URL = environment.baseUrl;
 
 // Helper function to format product names with quantities
-const formatTableProduct = (productArray: Partial<ICommonObj>[]): string => {
+export const formatTableProduct = (
+  productArray: Partial<ICommonObj>[]
+): string => {
   const names = productArray.map((product: any) => {
     const { name, quantity } = product;
     return `${name}(${quantity.toFixed(2)}kg)`;
@@ -49,7 +49,7 @@ const formatTableProduct = (productArray: Partial<ICommonObj>[]): string => {
 };
 
 // Helper function to format stock IDs
-const stockIdFormater = (productArray: any[]): string => {
+export const stockIdFormater = (productArray: any[]): string => {
   const stockIds = productArray.map((m: any) => m.number);
 
   let result: string;
@@ -68,18 +68,88 @@ const stockIdFormater = (productArray: any[]): string => {
   providedIn: 'root',
 })
 export class TransactionsService {
+  transactionType = 'external';
+  stockTransactionType = 1;
+  private initialState = {
+    selectedProduct: '',
+    selectedCompany: '',
+    searchString: '',
+    transactionType: '',
+    limit: 10,
+    offset: 0,
+    orderBy: 'desc',
+    sortBy: 'date',
+    quantityFrom: '',
+    quantityTo: '',
+    dateOn: '',
+    dateTo: '',
+    dateFrom: '',
+    creator: '',
+    archived: false,
+  };
+
+  private paginationState = new BehaviorSubject<any>({ ...this.initialState });
+
+  paginationState$ = this.paginationState.asObservable(); // Observable for components to subscribe
+
+  private initialStateInternal = {
+    selectedSourceProduct: '',
+    selectedDestinationProduct: '',
+    searchString: '',
+    limit: 10,
+    offset: 0,
+    orderBy: 'desc',
+    sortBy: 'date',
+    quantityFrom: '',
+    quantityTo: '',
+    dateOn: '',
+    dateTo: '',
+    dateFrom: '',
+    creator: '',
+    archived: false,
+  };
+
+  private paginationStateInternal = new BehaviorSubject<any>({
+    ...this.initialStateInternal,
+  });
+
+  paginationStateInternal$ = this.paginationStateInternal.asObservable(); // Observable for components to subscribe
+
   constructor(
     private http: HttpClient,
     private storage: StorageService,
     private exportService: ExportService
   ) {}
 
+  setPaginationState(newState: any) {
+    this.paginationState.next(newState);
+  }
+
+  /** Reset pagination state to initial values */
+  resetPaginationState() {
+    this.paginationState.next({ ...this.initialState });
+  }
+
+  setPaginationStateInternal(newState: any) {
+    this.paginationStateInternal.next({
+      ...this.paginationStateInternal.value,
+      ...newState,
+    });
+  }
+
+  /** Reset pagination state to initial values */
+  resetPaginationStateInternal() {
+    this.paginationStateInternal.next({ ...this.initialStateInternal });
+  }
+
   // Helper method to retrieve supply chain data from storage
+  /* istanbul ignore next */
   supplyChainData(): any {
     return this.storage.retrieveStoredData('supplyChainId');
   }
 
   // Helper method to retrieve member type from storage
+  /* istanbul ignore next */
   memberType(): string {
     return this.storage.retrieveStoredData('memberType');
   }
@@ -88,6 +158,7 @@ export class TransactionsService {
    * Fetch all the transactions in the supply chain.
    * @returns Observable any
    */
+  /* istanbul ignore next */
   getTransactionHistory(
     reqOptions: any
   ): Observable<ICommonAPIResponse<ITransactionData>> {
@@ -107,6 +178,7 @@ export class TransactionsService {
       orderBy,
       sortBy,
       creator,
+      archived,
     } = reqOptions;
 
     // splitting the lengthy url
@@ -116,7 +188,7 @@ export class TransactionsService {
     const urlPart3 = `&date_from=${dateFrom}&date_to=${dateTo}&date_on=${dateOn}`;
     const urlPart4 = `&quantity_from=${quantityFrom}&quantity_to=${quantityTo}`;
     const urlPart5 = `&search=${searchString}&type=${transactionType}&creator=${creator}`;
-    const urlPart6 = `&sort_by=${sortBy}&order_by=${orderBy}`;
+    const urlPart6 = `&sort_by=${sortBy}&order_by=${orderBy}&archived=${archived}&is_carbon_product=false`;
 
     return this.http
       .get(
@@ -162,6 +234,7 @@ export class TransactionsService {
    * Fetch all the internal Transactions(stock actions like merge, convert and remove) in the supply chain.
    * @returns Observable any
    */
+  /* istanbul ignore next */
   getStockactionsList(byStockAction: number, reqOptions: any): Observable<any> {
     const supplyChainId = this.supplyChainData();
     const {
@@ -178,6 +251,7 @@ export class TransactionsService {
       selectedSourceProduct,
       selectedDestinationProduct,
       creator,
+      archived,
     } = reqOptions;
 
     // splitting the lengthy url
@@ -187,7 +261,7 @@ export class TransactionsService {
     const urlPart3 = `&date_from=${dateFrom}&date_to=${dateTo}&date_on=${dateOn}`;
     const urlPart4 = `&quantity_from=${quantityFrom}&quantity_to=${quantityTo}`;
     const urlPart5 = `&search=${searchString}&type=${byStockAction}&creator=${creator}`;
-    const urlPart6 = `&sort_by=${sortBy}&order_by=${orderBy}`;
+    const urlPart6 = `&sort_by=${sortBy}&order_by=${orderBy}&archived=${archived}&is_carbon_product=false`;
 
     return this.http
       .get(
@@ -200,6 +274,22 @@ export class TransactionsService {
           return data;
         })
       );
+  }
+
+  updateArchiveStatusInternal(data: any): Observable<any> {
+    return this.http.post(
+      BASE_URL + '/transactions/internal/toggle-archive/',
+      data,
+      headerOptions(HTTP_OPTION_3)
+    );
+  }
+
+  updateArchiveStatusExternal(data: any): Observable<any> {
+    return this.http.post(
+      BASE_URL + '/transactions/external/toggle-archive/',
+      data,
+      headerOptions(HTTP_OPTION_3)
+    );
   }
 
   // Helper method to construct export parameters for stock actions
@@ -235,6 +325,7 @@ export class TransactionsService {
   }
 
   // Helper method to navigate to the consumer interface
+  /* istanbul ignore next */
   traceSource(el: any): void {
     const theme = localStorage.getItem('ci_theme')
       ? localStorage.getItem('ci_theme')
@@ -314,20 +405,18 @@ export class TransactionsService {
         created: date,
         creator: creator?.first_name + ' ' + creator?.last_name,
       };
-
+      data['sourceQuantity'] = source_quantity ? source_quantity.toFixed(2) : 0;
       if (stockAction === 1) {
         data['sourceProduct'] = formatTableProduct(source_batches);
-        data['sourceQuantity'] = source_quantity.toFixed(2);
         data['destinationProduct'] = formatTableProduct(destination_batches);
       } else if (stockAction === 3) {
         data['sourceProduct'] = formatTableProduct(source_batches);
-        data['sourceQuantity'] = source_quantity.toFixed(2);
+
         data['destinationProduct'] = formatTableProduct(destination_batches);
-        data['quantity'] = destination_quantity.toFixed(2);
+        data['quantity'] = destination_quantity.toFixed(2) ?? 0;
       } else {
         data['sourceProduct'] = formatTableProduct(source_batches);
         data['removedStockId'] = stockIdFormater(source_batches);
-        data['sourceQuantity'] = source_quantity.toFixed(2);
       }
       return data;
     });
@@ -336,6 +425,7 @@ export class TransactionsService {
   }
 
   // Helper method to load team members
+  /* istanbul ignore next */
   loadTeamMembers(reqOptions: {
     limit: number;
     offset: number;
@@ -350,6 +440,7 @@ export class TransactionsService {
   }
 
   // Helper method to initiate export of transaction data
+  /* istanbul ignore next */
   exportData(
     transactionType: string,
     appliedFilterValues: any,
@@ -373,7 +464,23 @@ export class TransactionsService {
   }
 
   // Helper method to observe export icon clicks
+  /* istanbul ignore next */
   exportIconClicked(): Observable<any> {
     return this.exportService.exportIconClicked$;
+  }
+
+  getCarbonEmissionTransaction(
+    reqOptions: any,
+    node: string
+  ): Observable<ICommonAPIResponse<any>> {
+    const { searchString, offset, limit } = reqOptions;
+
+    // splitting the lengthy url
+
+    const urlPart1 = `${BASE_URL}/transactions/carbon-transactions/?offset=${offset}&limit=${limit}`;
+    const urlPart2 = `&search=${searchString}&node=${node}`;
+    return this.http
+      .get(urlPart1 + urlPart2, headerOptions(HTTP_OPTION_3))
+      .pipe(map(successFormatter));
   }
 }

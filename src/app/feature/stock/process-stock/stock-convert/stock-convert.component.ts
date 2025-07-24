@@ -7,60 +7,57 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+// rxjs
+import { Observable } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
-  finalize,
   startWith,
   switchMap,
   tap,
 } from 'rxjs/operators';
-// services and configs
+// configs
 import {
   ButtonNav,
   StepValues,
-  StockButtonState,
   TransactionState,
 } from '../process-stock.config';
 import { UNITS } from 'src/app/shared/configs/app.constants';
-import { StockService } from '../../stock.service';
+import { CONVERT_CONFIG } from './stock-convert.config';
+// services
 import { StockProcessService } from '../stock-process.service';
 import { GlobalStoreService } from 'src/app/shared/store';
+import { StockService } from '../../stock.service';
+// other components
+import { ProcessStockCommonComponent } from '../process-stock-common.component';
 
 @Component({
   selector: 'app-stock-convert',
   templateUrl: './stock-convert.component.html',
   styleUrls: ['./stock-convert.component.scss'],
+  standalone: true,
+  imports: CONVERT_CONFIG,
 })
-export class StockConvertComponent implements OnInit, OnDestroy {
+export class StockConvertComponent
+  extends ProcessStockCommonComponent
+  implements OnInit, OnDestroy
+{
   @Output() nextPage = new EventEmitter();
 
-  nextButtonState: StockButtonState;
-
   convertFilterProducts: Observable<any[]>[] = [];
-  products: any[] = [];
-  units = UNITS;
+  // units = UNITS;
   maxDate = new Date();
 
   // declare form processing (internal)
   convertForm: FormGroup = this.fb.group({
     type: [1],
     transactionDate: [new Date(), Validators.required],
-    items: this.fb.array([this.processService.convertStockForm()]),
+    items: this.fb.array([this.service.convertStockForm()]),
   });
-  pageApis: Subscription[] = [];
-  productLoader: boolean;
-  submitted: boolean;
-  loader = true;
   listingInfo: any;
 
-  constructor(
-    private fb: FormBuilder,
-    private stockService: StockService,
-    private processService: StockProcessService,
-    private global: GlobalStoreService
-  ) {
+  constructor(private fb: FormBuilder) {
+    super();
     this.nextButtonState = {
       action: 'init',
       disabled: true,
@@ -70,26 +67,35 @@ export class StockConvertComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getProductsList();
-    this.listingInfo = this.processService.getListingInfo();
+    this.getProductsList('convert');
+    this.listingInfo = this.service.getListingInfo();
+    this.formStatusChanges();
+    this.stateChanges();
+    this.formValueChangesConvertStock(0);
+  }
+
+  formStatusChanges(): void {
     const form = this.convertForm.statusChanges.subscribe(val => {
-      this.nextButtonState = this.processService.stepOneFormChanges(
+      this.nextButtonState = this.service.stepOneFormChanges(
         false,
         val,
         'Continue'
       );
     });
+    this.pageApis.push(form);
+  }
 
+  stateChanges(): void {
     // when navigating between tabs data should be retained
-    const dataSub = this.processService
+    const dataSub = this.service
       .currentTransactionState()
       .subscribe((result: TransactionState) => {
         if (result) {
           const { transactionDetails } = result;
           if (transactionDetails) {
             const { items } = transactionDetails;
-            if (this.convertForm.value.items.length !== items.length) {
-              if (items.length > 1) {
+            if (this.convertForm.value.items.length !== items?.length) {
+              if (items?.length > 1) {
                 for (let index = 0; index < items.length - 1; index++) {
                   this.addMore();
                 }
@@ -103,32 +109,18 @@ export class StockConvertComponent implements OnInit, OnDestroy {
         }
       });
     this.pageApis.push(dataSub);
-    this.pageApis.push(form);
-  }
-
-  // get all available product list
-  getProductsList(): void {
-    const API_CALL = this.global.supplychainProducts$.subscribe({
-      next: (res: any) => {
-        this.products = res;
-        this.formValueChangesConvertStock(0);
-        this.loader = false;
-      },
-      error: () => {
-        this.products = [];
-      },
-    });
-    this.pageApis.push(API_CALL);
   }
 
   get stockItems(): any {
     return this.convertForm.get('items') as FormArray;
   }
 
+  /* istanbul ignore next */
   get convertFormControls() {
     return this.convertForm.controls;
   }
 
+  /* istanbul ignore next */
   formValueChangesConvertStock(index: number): void {
     this.convertFilterProducts[index] = this.stockItems
       .at(index)
@@ -149,11 +141,7 @@ export class StockConvertComponent implements OnInit, OnDestroy {
           return this.productFilter(value);
         })
       );
-  }
-  private productFilter(keyword: string): any {
-    return this.stockService
-      .searchProduct(keyword)
-      .pipe(finalize(() => (this.productLoader = false)));
+    this.loader = false;
   }
 
   identifyNewProduct(name: string, index: number): void {
@@ -185,12 +173,13 @@ export class StockConvertComponent implements OnInit, OnDestroy {
       this.submitted = true;
       this.addBulkProducts();
     } else {
-      this.processService.navigateToStockListing();
+      this.service.navigateToStockListing();
+      this.resetNewProduct();
     }
   }
 
   addMore(): void {
-    this.stockItems.push(this.processService.convertStockForm());
+    this.stockItems.push(this.service.convertStockForm());
     this.formValueChangesConvertStock(this.stockItems.value.length - 1);
     this.submitted = false;
   }
@@ -226,7 +215,9 @@ export class StockConvertComponent implements OnInit, OnDestroy {
       const api = this.stockService
         .createProductBulk(data)
         .subscribe((res: any) => {
-          this.patchBatchProducts(res.data.products);
+          if (res) {
+            this.patchBatchProducts(data?.products);
+          }
         });
       this.pageApis.push(api);
     } else {
@@ -252,7 +243,7 @@ export class StockConvertComponent implements OnInit, OnDestroy {
       const destProdArr = this.stockItems.value.map((e: any) => {
         return e.productName;
       });
-      this.processService.updateState({
+      this.service.updateState({
         transactionDetails: this.convertForm.value,
         requestedData: null,
       });
@@ -260,18 +251,14 @@ export class StockConvertComponent implements OnInit, OnDestroy {
         .map((p: any) => parseFloat(p.quantity))
         .reduce((a: number, b: number) => a + b, 0);
       const uniqArr = Array.from(new Set(destProdArr));
-      this.processService.updateSummaryData({
-        ...this.processService.getSummaryData(),
+      this.service.updateSummaryData({
+        ...this.service.getSummaryData(),
         currentStep: StepValues.CLAIMS,
         destinationQuantity: destQuantity,
         destinationProducts: uniqArr,
         transactionDate,
       });
-      this.nextPage.emit(true);
+      this.nextPage.emit();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.pageApis.forEach(m => m.unsubscribe());
   }
 }

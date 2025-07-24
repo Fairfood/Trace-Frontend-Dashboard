@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 // services
 import { CompanyProfileStoreService } from '../company-profile-store.service';
@@ -28,29 +28,28 @@ import {
   FfDropdownComponent,
 } from 'fairfood-form-components';
 import { GlobalStoreService } from 'src/app/shared/store';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-basic-details',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule,
     ButtonsComponent,
     MatIconModule,
     FairFoodInputComponent,
     FfDropdownComponent,
+    TranslateModule,
   ],
   templateUrl: './basic-details.component.html',
   styleUrls: ['./basic-details.component.scss'],
 })
-export class BasicDetailsComponent implements OnDestroy {
+export class BasicDetailsCompanyComponent implements OnDestroy {
   @Input() isConnection: boolean;
   @Output() editingStarted = new EventEmitter();
 
   isEdit: boolean;
   detailsForm = this.companyService.basicDetailsForm();
-
-  errorMessage = 'This field is required *';
 
   tabOne = BASIC_DETAILS;
   companyProfileData: any;
@@ -63,11 +62,14 @@ export class BasicDetailsComponent implements OnDestroy {
   stateList: any[];
 
   constructor(
+    private companyService: CompanyProfileService,
     private store: CompanyProfileStoreService,
     private global: GlobalStoreService,
     private util: UtilService,
-    private companyService: CompanyProfileService
-  ) {
+    private translate: TranslateService
+  ) {}
+
+  ngOnInit(): void {
     this.initSub();
   }
 
@@ -186,7 +188,7 @@ export class BasicDetailsComponent implements OnDestroy {
           next: result => {
             if (result.success) {
               this.util.customSnackBar(
-                'Company profile updated successfully',
+                this.translate.instant('companyProfile.profileUpdate'),
                 ACTION_TYPE.SUCCESS
               );
               this.companyProfileData = result?.data;
@@ -206,7 +208,7 @@ export class BasicDetailsComponent implements OnDestroy {
       this.pageApis.push(api);
     } else {
       this.util.customSnackBar(
-        'There are some error in the form',
+        this.translate.instant('companyProfile.formError'),
         ACTION_TYPE.FAILED
       );
       this.savingProfile = false;

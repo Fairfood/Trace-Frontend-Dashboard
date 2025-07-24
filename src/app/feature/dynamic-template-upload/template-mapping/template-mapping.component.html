@@ -13,13 +13,17 @@
                     Link the row in the sheet with the fields given below
                 </article>
                 <aside aria-label="save this template" class="col-md-6 ff-flex-start">
-                    <mat-checkbox formControlName="saveTemplate"></mat-checkbox>
                     <span class="value-tr">Check if you want to save this template</span>
+                    
+                    <label class="switch">
+                        <input type="checkbox" id="templateNameSwitch" name="view" formControlName="saveTemplate">
+                        <span class="slider round"></span>
+                    </label>
                 </aside>
                 <div class="col-md-3">
                     <article class="flex-column">
                         <app-ff-input label="Title of the table*" [parentFormGroup]="templateSelectionForm"
-                            [controlName]="'title'" inputSize="profile" inputType="text" class="form-items">
+                            controlName="title" inputSize="profile" inputType="text" class="form-items">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'title'}">
@@ -29,7 +33,7 @@
                 <div class="col-md-3">
                     <article class="flex-column">
                         <app-ff-input label="Data starts at*" [parentFormGroup]="templateSelectionForm"
-                            [controlName]="'dataRow'" inputSize="profile" inputType="text" class="form-items">
+                            controlName="dataRow" inputSize="profile" inputType="text" class="form-items">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'dataRow'}">
@@ -37,9 +41,9 @@
                     </article>
                 </div>
                 <div class="col-md-6">
-                    <article class="flex-column">
-                        <app-ff-input label="Name*" [parentFormGroup]="templateSelectionForm"
-                            [controlName]="'templateName'" inputSize="profile" inputType="text" class="form-items">
+                    <article class="flex-column" *ngIf="visibilityOfName">
+                        <app-ff-input label="Name*" [parentFormGroup]="templateSelectionForm" controlName="templateName"
+                            inputSize="profile" inputType="text" class="form-items">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'templateName'}">
@@ -50,11 +54,11 @@
             <span class="value-tr d-flex p10">Mapped columns</span>
             <div class="flex-wrap">
                 <ng-container *ngFor="let item of (schemaFields$ | async)">
-                    <span class="new-chip-template" *ngIf="item.required"
+                    <span class="new-chip-template ff-flex-align-center" *ngIf="item.required"
                         [ngClass]="item.selected?'active-required':'inactive'">
                         {{item.label}}* <mat-icon class="check" *ngIf="item.selected">check_circle</mat-icon>
                     </span>
-                    <span class="new-chip-template" *ngIf="!item.required"
+                    <span class="new-chip-template ff-flex-align-center" *ngIf="!item.required"
                         [ngClass]="item.selected?'active-optional':'inactive'">
                         {{item.label}}
                     </span>
@@ -74,7 +78,7 @@
 
 
     <span class="error-message" *ngIf="templateSelectionForm | showRequiredError: formcontrol">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
     <ng-container *ngIf="formcontrol === 'title'">
         <span class="error-message" *ngIf="templateSelectionForm.get(formcontrol)?.hasError('min')">

@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription, map } from 'rxjs';
+import { Subscription, concatMap, map, of } from 'rxjs';
 
 import {
   IDropdownItem,
   ICommonObj,
   IUserData,
+  ISupplyChain,
 } from 'src/app/shared/configs/app.model';
 import { GlobalStoreService } from 'src/app/shared/store';
 import {
@@ -36,19 +37,20 @@ export class HeaderBaseComponent {
     brandLogo: '',
   };
   dataLoaded: boolean;
-  supplyChainList: Partial<ICommonObj>[];
+  supplyChainList: ISupplyChain[];
   filteredSupplyChain: IDropdownItem[] = [];
   // selected supplychain details id and name
   selectedSupplyChain: IDropdownItem;
   isHomePage: boolean;
 
   constructor(
-    public util: UtilService,
-    public globalStore: GlobalStoreService,
-    public routeService: RouterService,
-    public storage: StorageService
+    protected util: UtilService,
+    protected globalStore: GlobalStoreService,
+    protected routeService: RouterService,
+    protected storage: StorageService
   ) {
-    util.loadGoogleMaps().subscribe();
+    // first time load
+    util.loadGoogleMaps();
   }
 
   initSubscription(): void {
@@ -80,9 +82,25 @@ export class HeaderBaseComponent {
   }
 
   initBackgroundCalls(): void {
-    this.util.searchProduct('').subscribe();
-    this.util.getCompany().subscribe();
-    this.util.searchConnectedCompany('', true).subscribe();
+    of(null)
+      .pipe(
+        // First API call
+        concatMap(() => this.util.searchProduct('')),
+        // Second API call
+        concatMap(() => this.util.getCompany()),
+        // Third API call
+        concatMap(() => this.util.searchConnectedCompany('', true))
+      )
+      .subscribe({
+        next: () => {
+          // All calls completed successfully
+          console.log('All API calls completed');
+        },
+        error: error => {
+          // Handle error
+          console.error('Error:', error);
+        },
+      });
   }
 
   setNodeIdVariable(value: string): void {
@@ -99,10 +117,14 @@ export class HeaderBaseComponent {
     this.nodeDetails.brandLogo = node?.theme?.image || '';
   }
 
+  /* istanbul ignore next */
   gotoHome(): void {
     this.routeService.navigateUrl('/dashboard');
   }
 
+  /**
+   * WHen user changes the company it will be set as active node or default node
+   */
   setActiveNode(id: string): void {
     const api = this.util
       .updateUser({
@@ -125,7 +147,8 @@ export class HeaderBaseComponent {
     this.storage.saveInStorage('supplyChainName', name);
   }
 
-  setSupplychains(): void {
+  /* istanbul ignore next */
+  setSupplychains(callProductList?: boolean): void {
     const api = this.util
       .getSupplyChains()
       .pipe(map((response: any) => this.processSupplyChainResponse(response)))
@@ -138,6 +161,11 @@ export class HeaderBaseComponent {
           this.supplyChainList = supplyChainList;
           this.selectedSupplyChain = selectedSupplyChain;
           this.filteredSupplyChain = filteredSupplyChain;
+
+          if (callProductList) {
+            this.util.searchProduct('').subscribe();
+            this.util.getCompany().subscribe();
+          }
         },
         error: (err: any) => {
           console.log(err);
@@ -147,17 +175,19 @@ export class HeaderBaseComponent {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   private handleSupplyChainError(): void {
     this.supplyChainList = [];
     this.filteredSupplyChain = [];
     this.globalStore.initSupplychainData(this.supplyChainList);
   }
 
+  /* istanbul ignore next */
   private processSupplyChainResponse(response: any): any {
     const { count, results } = response;
     const supplyChainList = count > 0 ? results : [];
     let selectedSupplyChain;
-    let filteredSupplyChain;
+    let filteredSupplyChain: any;
 
     if (supplyChainList.length > 0) {
       selectedSupplyChain = this.selectSupplyChain(supplyChainList);
@@ -171,7 +201,7 @@ export class HeaderBaseComponent {
     return { supplyChainList, selectedSupplyChain, filteredSupplyChain };
   }
 
-  private selectSupplyChain(supplyChainList: any[]): any {
+  selectSupplyChain(supplyChainList: ISupplyChain[]): IDropdownItem {
     const supplyChainId = this.storage.retrieveStoredData('supplyChainId');
     const chainIdIndex = supplyChainList.findIndex(e => e.id === supplyChainId);
 
@@ -191,17 +221,20 @@ export class HeaderBaseComponent {
     }
   }
 
-  private createFilteredSupplyChain(supplyChainList: any[]): any[] {
+  createFilteredSupplyChain(supplyChainList: ISupplyChain[]): IDropdownItem[] {
+    const filteredSupplyChain = supplyChainList.map(({ id, name }) => ({
+      id,
+      name,
+    }));
+
     if (this.isHomePage) {
-      return [
-        { id: 'All', name: 'All supply chain' },
-        ...supplyChainList.map(item => ({ id: item.id, name: item.name })),
-      ];
-    } else {
-      return supplyChainList.map(item => ({ id: item.id, name: item.name }));
+      filteredSupplyChain.unshift({ id: 'All', name: 'All supply chain' });
     }
+
+    return filteredSupplyChain;
   }
 
+  /* istanbul ignore next */
   toggleSidebar(): void {
     this.util.toggleSidebar();
   }

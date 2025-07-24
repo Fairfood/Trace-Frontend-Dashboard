@@ -7,7 +7,6 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { ICommonObj } from 'src/app/shared/configs/app.model';
 
-import { ProfileAvatarModule } from '../profile-avatar';
 import { NotificationHomeComponent } from '../notification';
 import { ProfilePreferencesComponent } from './profile-preferences';
 
@@ -20,12 +19,13 @@ import {
   FairFoodInputComponent,
   FfDropdownComponent,
 } from 'fairfood-form-components';
+import { ProfileAvatarComponent } from 'src/app/shared/components/profile-avatar';
 
 export const IMPORT_CONFIGS = [
   CommonModule,
   MatIconModule,
   FairFoodCustomTabComponent,
-  ProfileAvatarModule,
+  ProfileAvatarComponent,
   LoaderComponent,
   NotificationHomeComponent,
   ReactiveFormsModule,
@@ -43,6 +43,6 @@ export const PROFILE_TABS: ICommonObj[] = [
   },
   {
     id: 'settings',
-    name: 'Settings',
+    name: 'Notification preferences',
   },
 ];

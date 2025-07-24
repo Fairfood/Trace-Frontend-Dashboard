@@ -14,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from 'src/app/feature/authentication';
 import { SnackBarComponent } from '../components/snack-bar';
 import { environment } from 'src/environments/environment';
+import { StorageService } from './storage.service';
 /**
  * Service responsible for intercepting HTTP requests and handling errors globally.
  */
@@ -25,10 +26,13 @@ export class ErrorInterceptorService implements HttpInterceptor {
    * @param authService - Authentication service.
    * @param snackBar - Angular Material Snackbar service.
    */
+
+  private is403ErrorHandled = false; // Flag to track 403 error
   constructor(
     public router: Router,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private storage: StorageService
   ) {}
 
   /**
@@ -55,8 +59,33 @@ export class ErrorInterceptorService implements HttpInterceptor {
           } else {
             this.authService.clearLocalStorage();
           }
+        } else if ([403].indexOf(globalError.status) !== -1) {
+          const impersonate = localStorage.getItem('impersonate');
+          if (this.is403ErrorHandled) {
+            // Prevent further action if 403 has already been handled
+            return throwError(
+              () => new Error('403 error handled - request canceled')
+            );
+          }
+
+          if (impersonate) {
+            //clearing data
+            this.storage.clearStorage();
+            window.location.href =
+              environment.adminUrl + '?isClearStorage=true';
+          } else {
+            this.noAccessSnackBar();
+            this.storage.clearStorage();
+            window.location.href = `${environment.authUrl}`;
+          }
+          // Mark 403 error as handled
+          this.is403ErrorHandled = true;
         }
-        return throwError(() => globalError.error);
+
+        if (globalError.error) {
+          return throwError(() => globalError.error);
+        }
+        return throwError(() => globalError);
       })
     );
   }
@@ -81,7 +110,7 @@ export class ErrorInterceptorService implements HttpInterceptor {
   noAccessSnackBar() {
     this.snackBar.openFromComponent(SnackBarComponent, {
       data: {
-        message: 'User role was updated, Redirecting to home page.',
+        message: 'User has no access to this page!',
         icon: 'Error',
       },
       panelClass: 'snackbar-color',

@@ -56,10 +56,11 @@
   margin: 4px;
   margin-top: 10px;
   border-radius: 6px !important;
+  padding: 0 14px;
 }
 
 ::ng-deep .info-container button {
-  font-family: 'Moderat Medium' !important;
+  font-family: var(--font-medium)!important;
   height: 34px !important;
   border-radius: 0px !important;
   border-radius: 6px !important;

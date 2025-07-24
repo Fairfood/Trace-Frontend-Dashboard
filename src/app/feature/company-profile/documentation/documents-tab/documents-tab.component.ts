@@ -1,22 +1,47 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatDialog } from '@angular/material/dialog';
+import { NgFor, NgIf } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { saveAs } from 'file-saver';
 
-import { DocUploadComponent } from '../doc-upload/doc-upload.component';
-import { ProfilePopupComponent } from '../../profile-popup/profile-popup.component';
-
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginator } from '@angular/material/paginator';
+// components
+import { DocUploadComponent } from '../doc-upload';
+import { ProfilePopupComponent } from '../../profile-popup';
+// constants
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
+// services
 import { UtilService } from 'src/app/shared/service';
 import { DocumentationService } from '../documentation.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+// components
+import {
+  ButtonsComponent,
+  FfPaginationComponent,
+  LoaderComponent,
+  FfCustomPaginationComponent,
+} from 'fairfood-utils';
 
 @Component({
   selector: 'app-documents-tab',
   templateUrl: './documents-tab.component.html',
   styleUrls: ['./documents-tab.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    MatIconModule,
+    MatMenuModule,
+    LoaderComponent,
+    DocUploadComponent,
+    FfPaginationComponent,
+    TranslateModule,
+    ButtonsComponent,
+    FfCustomPaginationComponent,
+  ],
 })
 export class DocumentsTabComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -32,7 +57,8 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
   constructor(
     private companyService: DocumentationService,
     private dialog: MatDialog,
-    private util: UtilService
+    private util: UtilService,
+    private translate: TranslateService
   ) {
     this.appliedFilter = {
       limit: 10,
@@ -57,6 +83,7 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
   }
 
   // Document upload Pop-up
+  /* istanbul ignore next */
   openDocumentDialog(): void {
     const dialogRef = this.dialog.open(DocUploadComponent, {
       width: '30vw',
@@ -65,10 +92,13 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         if (result === false) {
-          this.util.customSnackBar('Document added failed', ACTION_TYPE.FAILED);
+          this.util.customSnackBar(
+            this.translate.instant('document.addFailed'),
+            ACTION_TYPE.FAILED
+          );
         } else {
           this.util.customSnackBar(
-            'Document added successfully',
+            this.translate.instant('document.add'),
             ACTION_TYPE.SUCCESS
           );
           this.appliedFilter = {
@@ -82,6 +112,7 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* istanbul ignore next */
   openDocDeleteDialog(elem: any): void {
     const dialogRef = this.dialog.open(ProfilePopupComponent, {
       width: '30vw',
@@ -96,19 +127,24 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         if (result === false) {
-          const message = 'Document delete failed';
-          this.util.customSnackBar(message, ACTION_TYPE.FAILED);
+          this.util.customSnackBar(
+            this.translate.instant('document.deleteFailed'),
+            ACTION_TYPE.FAILED
+          );
         } else {
-          const message = 'Document deleted successfully';
           this.loader = true;
           this.getAllDocuments();
-          this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
+          this.util.customSnackBar(
+            this.translate.instant('document.delete'),
+            ACTION_TYPE.SUCCESS
+          );
         }
       }
     });
   }
 
   // Method to download company documents
+  /* istanbul ignore next */
   downloadDoc(file: any): void {
     this.downloadSub = this.util
       .downloadReceipt(file.file)
@@ -123,6 +159,10 @@ export class DocumentsTabComponent implements OnInit, OnDestroy {
     this.appliedFilter.offset = offset;
     this.loader = true;
     this.getAllDocuments();
+  }
+
+  trackByFn(index: number): number {
+    return index;
   }
 
   ngOnDestroy(): void {

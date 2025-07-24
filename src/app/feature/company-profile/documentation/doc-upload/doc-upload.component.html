@@ -1,6 +1,6 @@
 <section class="pop-header ff-flex-between">
   <h4>
-    Add document
+    {{'document.heading' | translate}}
   </h4>
   <mat-icon class="pointer" (click)="close()">close</mat-icon>
 </section>
@@ -18,19 +18,19 @@
   <div class="mb-20 wrap" [ngClass]="filename?'between': 'center'">
     <form *ngIf="filename" id="comapny" class="row px-0 comapny input-box" [formGroup]="uploadForm">
       <article class="input-container-with-error">
-        <app-ff-input label="File Name" [parentFormGroup]="uploadForm" controlName="name" inputSize="full"
-          inputType="text" class="item">
+        <app-ff-input label="{{'claim.file'|translate}}" [parentFormGroup]="uploadForm" controlName="name"
+          inputSize="full" inputType="text" class="item">
         </app-ff-input>
         <span class="error-message"
           *ngIf="uploadForm.controls.name?.errors?.required && (uploadForm.controls.name?.touched)">
-          This field is required *
+          {{'formValidation.commonValidationError' | translate}}
         </span>
       </article>
     </form>
     <aside class="ff-flex-center">
       <app-buttons buttonType="fill" (buttonClicked)="uploadForm.invalid ? fileInput.click() : uploadDocument()">
         <img [hidden]="!loader" src="../../../../../assets/images/loading-white.svg" width="20" alt="">
-        Upload
+        {{'button.upload' | translate}}
       </app-buttons>
     </aside>
 

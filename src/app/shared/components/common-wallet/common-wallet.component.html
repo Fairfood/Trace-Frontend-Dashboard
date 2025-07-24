@@ -13,7 +13,7 @@
         </aside>
     </ng-container>
     <ng-container *ngIf="showCopyIcon">
-        <span *ngIf="wallet" class="pl-3 ff-flex-center">
+        <span *ngIf="wallet" class="ff-flex-center">
             <mat-icon class="pointer" [cdkCopyToClipboard]="wallet" matTooltip="Copied" #tooltip="matTooltip"
                 matTooltipPosition="above" (mouseenter)="$event.stopImmediatePropagation()"
                 (mouseleave)="$event.stopImmediatePropagation()" (click)="tooltip.show()"

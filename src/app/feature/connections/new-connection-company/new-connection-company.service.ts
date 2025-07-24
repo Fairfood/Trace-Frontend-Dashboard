@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -9,11 +10,13 @@ import { RouterService, StorageService } from 'src/app/shared/service';
 import { ConnectionService } from '../connections.service';
 // methods and constants
 import {
+  notOnlyWhitespace,
   removeSpaces,
   successFormatter,
 } from 'src/app/shared/configs/app.methods';
 import { BASE_URL } from 'src/app/shared/configs/app.constants';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { HTTP_OPTION_3, headerOptions } from 'fairfood-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +34,7 @@ export class NewConnectionCompanyService {
 
   createBasicDetailsForm(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, removeSpaces]],
+      name: ['', [Validators.required, removeSpaces, notOnlyWhitespace()]],
       primaryOperation: ['', Validators.required],
       identificationNo: [''],
     });
@@ -50,8 +53,8 @@ export class NewConnectionCompanyService {
 
   createAddressForm(): FormGroup {
     return this.fb.group({
-      street: ['', Validators.required],
-      city: ['', [Validators.required, removeSpaces]],
+      street: ['', [Validators.required, notOnlyWhitespace(), removeSpaces]],
+      city: ['', [Validators.required, removeSpaces, notOnlyWhitespace()]],
       province: ['', Validators.required],
       country: ['', Validators.required],
       latitude: [
@@ -70,11 +73,17 @@ export class NewConnectionCompanyService {
           Validators.max(180),
         ],
       ],
-      zipcode: [''],
-      inFirstName: ['', [Validators.required, removeSpaces]],
-      inLastName: ['', [Validators.required, removeSpaces]],
+      zipcode: ['', removeSpaces],
+      inFirstName: [
+        '',
+        [Validators.required, removeSpaces, notOnlyWhitespace()],
+      ],
+      inLastName: [
+        '',
+        [Validators.required, removeSpaces, notOnlyWhitespace()],
+      ],
       inEmail: ['', [Validators.required, Validators.email]],
-      inDialCode: ['', Validators.required],
+      dialCode: ['', Validators.required],
       inMobile: [
         '',
         [
@@ -160,7 +169,7 @@ export class NewConnectionCompanyService {
       inFirstName,
       inLastName,
       inEmail,
-      inDialCode,
+      dialCode,
       inMobile,
       ...restOfItems
     } = form2;
@@ -178,7 +187,7 @@ export class NewConnectionCompanyService {
       in_fname: inFirstName,
       in_lname: inLastName,
       in_email: inEmail,
-      in_dial_code: inDialCode,
+      in_dial_code: dialCode,
       in_mobile: inMobile,
       message,
       incharge: {
@@ -187,7 +196,7 @@ export class NewConnectionCompanyService {
         email: inEmail,
       },
       phone: {
-        dial_code: inDialCode,
+        dial_code: dialCode,
         phone: inMobile,
       },
       send_email: !silentInvite,
@@ -200,7 +209,7 @@ export class NewConnectionCompanyService {
   inviteCompany(id: string, params: any) {
     const url = `${BASE_URL}/supply-chain/invite/company/`;
     return this.http
-      .post(url, params, this.connectionService.options(id))
+      .post(url, params, headerOptions(HTTP_OPTION_3))
       .pipe(map(successFormatter));
   }
 

@@ -17,6 +17,7 @@ export interface IClaim extends ICommonObj {
   assignVerifier?: boolean;
   verifierName?: string;
   selected?: boolean;
+  status?: number;
 }
 
 export interface IClaimField {
@@ -35,5 +36,5 @@ export interface IClaimCriteria extends ICommonObj {
   verification_type: number;
   verifier: any;
   fields: IClaimField[];
-  context: any;
+  context?: any;
 }

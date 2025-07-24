@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 
 // services and configs
 import { TraceStoreService } from '../trace-store.service';
@@ -10,8 +11,8 @@ import {
   TR_COLUMNS,
   TR_TYPES,
 } from '../trace.config';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { ITableColumnHeader } from 'src/app/shared/configs/app.model';
+import { TR_CONFIG } from './tr-transactions.config';
 
 const defaultPagination = {
   offset: 0,
@@ -22,6 +23,8 @@ const defaultPagination = {
   selector: 'app-tr-transactions',
   templateUrl: './tr-transactions.component.html',
   styleUrls: ['./tr-transactions.component.scss'],
+  standalone: true,
+  imports: TR_CONFIG,
 })
 export class TrTransactionsComponent implements OnInit, OnDestroy {
   @ViewChild(MatMenuTrigger) dropdownMenuItem: MatMenuTrigger;

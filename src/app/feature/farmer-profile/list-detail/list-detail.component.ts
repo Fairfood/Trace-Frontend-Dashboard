@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { IList } from 'src/app/shared/configs/app.model';
@@ -9,6 +15,7 @@ import { IList } from 'src/app/shared/configs/app.model';
   styleUrls: ['./list-detail.component.scss'],
   standalone: true,
   imports: [CommonModule, MatIconModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDetailComponent {
   @Input() iterationList: IList[];

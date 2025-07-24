@@ -2,7 +2,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-
+import { TranslateModule } from '@ngx-translate/core';
 // services
 import { RouterService } from 'src/app/shared/service';
 import { DashboardService } from '../dashboard.service';
@@ -22,7 +22,7 @@ import { ButtonsComponent, LoaderComponent } from 'fairfood-utils';
   templateUrl: './recent-transaction.component.html',
   styleUrls: ['./recent-transaction.component.scss'],
   standalone: true,
-  imports: [ButtonsComponent, LoaderComponent, CommonModule],
+  imports: [ButtonsComponent, LoaderComponent, CommonModule, TranslateModule],
 })
 export class RecentTransactionComponent implements OnInit, OnDestroy {
   stockData: IDashboardProducts[];
@@ -68,6 +68,7 @@ export class RecentTransactionComponent implements OnInit, OnDestroy {
   /**
    * Fetches recent transaction data and updates the component.
    */
+  /* istanbul ignore next */
   loadTransactions(): void {
     const api = this.dashboardService.getRecentTransactions().subscribe({
       next: (res: ICommonAPIResponse<ITransactionData>) => {

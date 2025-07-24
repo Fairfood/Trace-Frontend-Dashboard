@@ -1,9 +1,4 @@
-<section class="progress-bar-loader w-100" *ngIf="progressBarData?.progress">
-    <span class="value-tr">Fetching stock - {{progressBarData.value}}%</span>
-    <mat-progress-bar mode="determinate" value="{{progressBarData.value}}"></mat-progress-bar>
-</section>
-
-<section class="info-wrap ff-flex-between" *ngIf="showInfo | async">
+<section class="info-wrap ff-flex-between" *ngIf="showInfo$ | async">
     <span class="left font-1-bold text-blue">
         {{selectedInformation?.noBatches === 1 ? 1+' item': selectedInformation?.noBatches +' items'}} selected
     </span>
@@ -14,7 +9,7 @@
             |
             <span><b>{{selectedInformation?.totalQuantity}}</b>kg</span>
         </span>
-        <span class="view-selected pointer">
+        <span class="view-selected pointer" *ngIf="!(hideViewSelected$ | async)">
             <span class="value-tr">
                 View selected batches only
             </span>

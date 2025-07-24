@@ -7,13 +7,16 @@
 </section>
 <section class="details">
     <article class="ff-flex-between">
-        <span class="font-1-bold text-blue">Description</span>
+        <span class="font-1-bold text-blue">{{'misc.desc'|translate}}</span>
     </article>
     <p class="text-off-blue" id="claimDescription">
         {{data?.description_full}}
     </p>
     <article class="ff-flex-between" *ngIf="data?.evidence">
-        <span class="font-1-bold text-blue">Upload{{data?.inherited?'ed':''}} evidence</span>
+        <span class="font-1-bold text-blue">
+            <ng-container *ngIf="data?.inherited">{{'claim.uploaded'|translate}}</ng-container>
+            <ng-container *ngIf="!data?.inherited">{{'claim.upload'|translate}}</ng-container>
+        </span>
     </article>
     <section class="evidence" *ngIf="data?.criteria?.length">
         <ng-container *ngFor="let criteria of data?.criteria; index as i">
@@ -25,9 +28,10 @@
 
                             <ng-container *ngFor="let res of item.responses;index as j">
                                 <article class="flex-col flex-column">
-                                    <span>{{j+1}}. Evidence {{j+1}}</span>
+                                    <span>{{j+1}}. {{'claim.evidenceText'|translate}} {{j+1}}</span>
                                     <span *ngIf="res.field_response.type === 3">
-                                        <a href="{{res.field_response.file}}" target="_blank">View file</a>
+                                        <a href="{{res.field_response.file}}"
+                                            target="_blank">{{'claim.viewFile'|translate}}</a>
                                     </span>
                                     <span *ngIf="res.field_response.type !== 3" class="text-blue font-1-normal">
                                         {{res.field_response.title}}: {{res.field_response.response}}
@@ -35,7 +39,7 @@
                                 </article>
                             </ng-container>
                             <article class="flex-col flex-column">
-                                <span class="font-1-bold text-blue">Uploaded by</span>
+                                <span class="font-1-bold text-blue">{{'claim.uploadedBy'|translate}}</span>
                                 <h5 class="text-sm text-blue font-1-medium line-margin">{{ item.added_by.name }}</h5>
                             </article>
                         </ng-container>
@@ -48,27 +52,29 @@
                 <section *ngIf="!data?.inherited && criteria?.fields?.length > 0" class="row evidence-section">
                     <ng-container *ngFor="let field of criteria.fields;index as j">
                         <!-- file upload is required as claim evidence  -->
-                        <aside aria-label="evidence row file" class="sub-row flex-column col-12" *ngIf="field.type === 3">
+                        <aside aria-label="evidence row file" class="sub-row flex-column col-12"
+                            *ngIf="field.type === 3">
                             <p class="font-1-medium text-blue">
                                 {{ field.title}}
                             </p>
                             <div class="ff-flex-align-center">
                                 <span class="file-name text-overflow" *ngIf="field.file"
                                     title="{{field.fileName}}">{{field.fileName}}</span>
-                                <app-buttons *ngIf="!field.file && !data?.inherited" buttonType="fill"
-                                    (buttonClicked)="attachFile.click()" buttonSize="medium">
-                                    Upload file
+                                <app-buttons customId="uploadFile" *ngIf="!field.file && !data?.inherited"
+                                    buttonType="fill" (buttonClicked)="attachFile.click()" buttonSize="medium">
+                                    {{'claim.uploadFile'|translate}}
                                 </app-buttons>
-                                <app-buttons *ngIf="!field.file && data?.inherited" buttonType="fill"
-                                    (buttonClicked)="viewFiles(field)" buttonSize="medium" id="viewFiles">
-                                    View files
+                                <app-buttons customId="viewFile" *ngIf="!field.file && data?.inherited"
+                                    buttonType="fill" (buttonClicked)="viewFiles(field)" buttonSize="medium"
+                                    id="viewFiles">
+                                    {{'claim.viewFile'|translate}}
                                 </app-buttons>
                                 <input type="file" #attachFile (click)="attachFile.value = null" value=""
                                     (change)="claimsFile($event, field)" class="input-file" placeholder="No file chosen"
                                     hidden accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf">
-                                <app-buttons *ngIf="field.file" buttonType="stroked"
-                                    (buttonClicked)="removeClaimFile(field)" buttonSize="medium" id="removeClaim">
-                                    Remove
+                                <app-buttons customId="removeClaim" *ngIf="field.file" buttonType="stroked"
+                                    (buttonClicked)="removeClaimFile(field)" buttonSize="medium">
+                                    {{'button.remove'|translate}}
                                 </app-buttons>
                             </div>
                         </aside>
@@ -81,9 +87,19 @@
                         <aside aria-label="field type is input" *ngIf="field.type == 1" class="col-6 form-element m-12">
                             <label class="has-float-label">
                                 <input placeholder=" " [hidden]="data.inherited" [formControlName]="field.id"
-                                    type="text" class="full" maxlength="25" (change)="setInputTypes(field)"id="input-{{field.id}}" />
+                                    type="text" class="full" maxlength="25" (change)="setInputTypes(field)"
+                                    id="input-{{field.id}}" />
                                 <span class="label">{{ field.title }}*</span>
                             </label>
+
+                            <span class="error-message"
+                                *ngIf="evidenceForm.controls[field.id].hasError('required') && evidenceForm.controls[field.id].touched">
+                                {{ 'formValidation.commonValidationError' | translate }}
+                            </span>
+                            <span class="error-message"
+                                *ngIf="evidenceForm.controls[field.id].hasError('notOnlyWhitespace') && evidenceForm.controls[field.id].touched && (!evidenceForm.controls[field.id].hasError('required'))">
+                                {{ 'formValidation.whiteSpaceErr' | translate }}
+                            </span>
                         </aside>
                     </ng-container>
                 </section>
@@ -94,7 +110,7 @@
                         <label class="has-float-label custom-input">
                             <input placeholder=" " formControlName="verifier" type="text" class="full"
                                 [matAutocomplete]="verifier" id="verifierInput" />
-                            <span class="label">Assign verifier*</span>
+                            <span class="label">{{'claim.assign'|translate}}*</span>
                             <mat-icon>keyboard_arrow_down</mat-icon>
                         </label>
                         <mat-autocomplete #verifier="matAutocomplete">
@@ -105,7 +121,7 @@
                             </ng-container>
                         </mat-autocomplete>
                         <p class="error-message" *ngIf="verifierControl.invalid && verifierControl.touched">
-                            Please assign verifier
+                            {{'formValidation.verifier'|translate}}
                         </p>
                     </div>
                 </section>
@@ -115,9 +131,13 @@
     </section>
 </section>
 
+
 <article class="ff-flex-between p-20-button" *ngIf="!data?.inherited">
-    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
-    <app-buttons buttonType="fill" [isDisabled]="evidenceForm?.invalid" (buttonClicked)="claimValidation()">
-        {{data?.isEdit?'Save': 'Add claim'}}
+    <app-buttons customId="cancelBtn" buttonType="stroked" (buttonClicked)="close()">
+        {{'button.cancel' | translate}}
+    </app-buttons>
+    <app-buttons customId="addBtn" buttonType="fill" [isDisabled]="evidenceForm?.invalid"
+        (buttonClicked)="claimValidation()">
+        {{data?.isEdit?('button.save' | translate): ('button.addClaim' | translate)}}
     </app-buttons>
 </article>

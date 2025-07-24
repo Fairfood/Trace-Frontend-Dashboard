@@ -16,8 +16,7 @@ const MATERIAL = [
   MatTooltipModule,
 ];
 import { TransactionReportComponent } from './transaction-report.component';
-import { TraceModule } from '../trace/trace.module';
-
+import { TranslateModule } from '@ngx-translate/core';
 // standalone components
 import {
   LoaderComponent,
@@ -35,6 +34,7 @@ import { BatchListComponent } from './batch-list/batch-list.component';
 import { TrClaimsComponent } from './tr-claims/tr-claims.component';
 import { ReceiptComponent } from './receipt';
 import { CommonWalletComponent } from 'src/app/shared/components/common-wallet';
+import { TraceComponent } from '../trace';
 
 const COMPONENTS = [
   LoaderComponent,
@@ -66,7 +66,8 @@ const trRoutes: Routes = [
     ...MATERIAL,
     ...COMPONENTS,
     RouterModule.forChild(trRoutes),
-    TraceModule,
+    TraceComponent,
+    TranslateModule.forChild(),
   ],
 })
 export class TransactionReportModule {}

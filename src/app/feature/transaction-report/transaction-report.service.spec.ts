@@ -5,6 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { TransactionReportService } from './transaction-report.service';
 import { BASE_URL } from 'src/app/shared/configs/app.constants';
+import { ITransactionDetail } from './transaction-report.config';
 
 describe('TransactionReportService', () => {
   let service: TransactionReportService;
@@ -36,7 +37,19 @@ describe('TransactionReportService', () => {
   it('should get internal transaction detail', () => {
     const transaction = 'external';
     const id = '123';
-    const mockResponse = { id: id, data: 'transactionData' };
+    const mockResponse: ITransactionDetail = {
+      number: '2134',
+      claims: [],
+      logged_time: '21323',
+      date: '123123',
+      seller_ref_number: 'asdasd',
+      status: 1,
+      transaction_type: 2,
+      type: 4,
+      buyer_ref_number: 'string',
+      id,
+      explorer_url: 'string',
+    };
 
     service
       .getInternalTransactionDetail(transaction, id)

@@ -1,0 +1,39 @@
+<section class="pop-header ff-flex-between">
+  <h4>
+    Reject claim
+  </h4>
+  <mat-icon class="pointer" (click)="close()" id="closeIcon">close</mat-icon>
+</section>
+<aside class="details flex-column" aria-label="popup body">
+  <span class="value-tr">
+    Are you sure you want to reject this transparency request?
+  </span>
+  <article class="input-container-with-error col-12">
+    <app-ff-input label="Please enter a valid reason" [parentFormGroup]="detailsForm" controlName="comment"
+      inputSize="profile" [isTextarea]="true" class="w-100">
+    </app-ff-input>
+    <ng-container *ngIf="detailsForm.controls.comment.touched">
+      <span class="error-message" *ngIf="detailsForm.controls.comment.errors?.required">
+        {{'formValidation.commonValidationError'|translate}}
+      </span>
+      <span class="error-message" *ngIf="detailsForm.controls.comment.invalid && detailsForm.controls.comment.value && (!detailsForm.get('comment')?.errors?.notOnlyWhitespace)">
+        {{'formValidation.maxLength50'|translate}}
+      </span>
+
+      <span class="error-message"
+        *ngIf="detailsForm.get('comment')?.errors?.notOnlyWhitespace && (detailsForm.get('comment')?.touched) && (!detailsForm.get('comment')?.errors?.required)">
+        {{ 'formValidation.whiteSpaceErrorReason' | translate }}
+      </span>
+    </ng-container>
+
+  </article>
+</aside>
+<article class="ff-flex-end p-20-button">
+  <app-buttons buttonType="stroked" (buttonClicked)="close()" customId="cancelBtn">Cancel</app-buttons>
+  <app-buttons buttonType="fill" [isDisabled]="detailsForm.controls.comment.invalid" (buttonClicked)="rejectClaim()"
+    customId="rejectClaim">
+    <img *ngIf="loading" class="img-loader" src="../../.././../assets/images/loading-white.svg" width="20" alt="">
+    {{loading?'Rejecting':'Reject claim'}}
+  </app-buttons>
+
+</article>

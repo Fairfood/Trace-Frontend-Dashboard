@@ -32,8 +32,8 @@ export interface ITransactionData {
   id: string;
   quantity: number;
   buyer_ref_number: string;
-  connection: ITransactionConnection;
-  creator: ITransactionCreator;
+  connection?: ITransactionConnection;
+  creator?: ITransactionCreator;
   currency: string;
   date: number;
   number: number;
@@ -43,6 +43,7 @@ export interface ITransactionData {
   result_batches: string[];
   seller_ref_number: string;
   type: number;
+  source?: Source;
 }
 export interface ITrListFilterMaster {
   transactionFilterTypes: ICommonIdName[];
@@ -66,6 +67,8 @@ export interface IAppliedFilterTransaction {
   dateTo: string;
   dateFrom: string;
   creator: string;
+  archived: boolean;
+  isCarbonProduct?: boolean;
 }
 
 export interface IStockActionTable {
@@ -79,4 +82,46 @@ export interface IStockActionTable {
   destinationProduct?: string;
   quantity?: number;
   removedStockId?: string;
+}
+
+export interface FilterParams {
+  type?: number;
+  date_from: string;
+  date_to: string;
+  date_on: string;
+  search: string;
+  creator: string;
+  quantity_from: string;
+  quantity_to: string;
+  product?: string;
+  node?: string;
+  destination_product?: string;
+  source_product?: string;
+}
+
+export interface Source {
+  id: string;
+  name: string;
+  short_name: string;
+  blockchain_address: string;
+  primary_operation: PrimaryOperation;
+  type: number;
+  status: number;
+  image: string;
+  latitude: number;
+  longitude: number;
+  country: string;
+  province: string;
+  description_basic: string;
+  date_joined: any;
+  managers: string[];
+  claims: any[];
+  email_sent: boolean;
+  add_connections: boolean;
+  pseudonimized: boolean;
+}
+
+export interface PrimaryOperation {
+  id: string;
+  name: string;
 }

@@ -1,0 +1,11 @@
+<section  class="ff-flex-align-center top-wrapper" *ngIf="!dataLoading">
+    <app-search-box [placeholder]="'Search here'" [searchString]="appliedFilterValues?.searchString" [hideOptions]="false" [searchByOptions]="searchOptions"
+        [clearSearch]="clearSearch" (searchText)="searchFilter($event)" class="search-wrap"></app-search-box>
+    <app-listing-action (getApi)="clearAndResetToDefault()" [pageType]="'archiveStocks'" class="filter-wrap" (filterChanged)="callStockApi(); clearSearch = true"></app-listing-action>
+</section>
+
+ <app-listing-filters *ngIf="toggleFilter" (filterChanged)="callStockApi()"></app-listing-filters>
+
+<app-stock-table [stocks]="stocks" [dataLoading]="dataLoading" [archivePage]="true" [tableLength]="tableLength" [scrollValue]="scrollValue"
+    (rowSelection)="rowSelectionCondition($event)" (filterChanged)="callStockApi($event)">
+</app-stock-table>

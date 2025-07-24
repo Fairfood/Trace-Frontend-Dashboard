@@ -1,18 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* istanbul ignore file */
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { CompanyProfileService } from '../company-profile.service';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 // components
-import { LoaderComponent, FfPaginationComponent } from 'fairfood-utils';
+import {
+  LoaderComponent,
+  FfPaginationComponent,
+  FfCustomPaginationComponent,
+} from 'fairfood-utils';
+import { CompanyProfileService } from '../company-profile.service';
 
 @Component({
   selector: 'app-activities',
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.scss'],
   standalone: true,
-  imports: [CommonModule, LoaderComponent, FfPaginationComponent],
+  imports: [
+    CommonModule,
+    LoaderComponent,
+    FfPaginationComponent,
+    TranslateModule,
+    FfCustomPaginationComponent,
+  ],
 })
 export class ActivitiesComponent implements OnInit, OnDestroy {
   @Input() companyId: string;
@@ -56,7 +66,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.loadActivities();
   }
 
-  trackByFn(index: number, item: any): any {
+  trackByFn(index: number): any {
     return index;
   }
 

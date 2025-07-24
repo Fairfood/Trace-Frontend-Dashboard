@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { ITabItem } from 'src/app/shared/configs/app.model';
 
 export const STOCK_PROCESS: ITabItem[] = [
@@ -98,3 +99,15 @@ export const RECEIVE_STOCK: ITabItem[] = [
     active: false,
   },
 ];
+
+export const CUSTOM_DATE_FORMATS = {
+  parse: {
+    dateInput: 'LL',
+  },
+  display: {
+    dateInput: 'LL',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};

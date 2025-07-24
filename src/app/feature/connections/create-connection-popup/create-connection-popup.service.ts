@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 // configs
-import { ButtonState } from 'fairfood-utils';
+import { ButtonState, HTTP_OPTION_3, headerOptions } from 'fairfood-utils';
 import { BASE_URL } from 'src/app/shared/configs/app.constants';
 import { removeSpaces } from 'src/app/shared/configs/app.methods';
 
@@ -183,7 +184,7 @@ export class CreateConnectionPopupService {
    */
   inviteCompany(id: string, params: any) {
     const url = `${BASE_URL}/supply-chain/invite/company/`;
-    return this.http.post(url, params, this.options(id));
+    return this.http.post(url, params, headerOptions(HTTP_OPTION_3));
   }
 
   /**
@@ -203,31 +204,5 @@ export class CreateConnectionPopupService {
         disabled: true,
       };
     }
-  }
-
-  /**
-   * Gets the HTTP options.
-   * @param id - Company ID.
-   * @returns HTTP options.
-   */
-  options(id?: string) {
-    const data = JSON.parse(localStorage.getItem('userData'));
-    const nodeId = localStorage.getItem('companyID');
-    const impersonate = localStorage.getItem('impersonate');
-
-    const req: any = {
-      'Content-Type': 'application/json',
-      Bearer: data.token,
-      'User-ID': data.id,
-      'Node-ID': id ?? nodeId,
-    };
-
-    if (impersonate) {
-      req['X-Impersonate'] = 'true';
-    }
-    const httpOptions = {
-      headers: new HttpHeaders(req),
-    };
-    return httpOptions;
   }
 }

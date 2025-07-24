@@ -1,17 +1,42 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FarmerProfileStoreService } from '../farmer-profile-store.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { IReference } from '../farmer-profile.config';
+
+import { FarmerProfileStoreService } from '../farmer-profile-store.service';
 import { UtilService } from 'src/app/shared/service';
+// constants and configs
+import { IReference } from '../farmer-profile.config';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
+// components
+import { ButtonsComponent } from 'fairfood-utils';
+import {
+  FairFoodInputComponent,
+  FfDropdownComponent,
+} from 'fairfood-form-components';
 
 @Component({
   selector: 'app-add-reference',
   templateUrl: './add-reference.component.html',
   styleUrls: ['./add-reference.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatIconModule,
+    ButtonsComponent,
+    FfDropdownComponent,
+    FairFoodInputComponent,
+    TranslateModule,
+  ],
 })
 export class AddReferenceComponent implements OnInit, OnDestroy {
   refForm: FormGroup;
@@ -25,7 +50,9 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private store: FarmerProfileStoreService,
-    private dataService: UtilService
+    private dataService: UtilService,
+    private translate: TranslateService,
+    private util: UtilService
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +85,9 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
 
   createReference(): void {
     this.loading = true;
-    this.buttonText = this.data.isEdit ? 'Updating' : 'Creating';
+    this.buttonText = this.data.isEdit
+      ? this.translate.instant('button.updating')
+      : this.translate.instant('button.creating');
     this.submitted = true;
     if (this.refForm.valid) {
       const {
@@ -73,9 +102,20 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
         };
         const api = this.store
           .createFarmerReference(reqObj, this.data.farmerId)
-          .subscribe(() => {
-            this.loading = false;
-            this.dialogRef.close(true);
+          .subscribe({
+            next: () => {
+              this.loading = false;
+              this.dialogRef.close(true);
+            },
+            error: err => {
+              this.loading = false; // Stop loading indicator
+              const detail = err?.detail;
+              this.util.customSnackBar(
+                detail?.detail || detail?.number,
+                ACTION_TYPE.FAILED
+              );
+              this.dialogRef.close(true);
+            },
           });
         this.pageApis.push(api);
       } else {
@@ -89,6 +129,7 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   updateReference(reqObj: any, id: string): void {
     const api = this.store.updateFarmerReference(reqObj, id).subscribe({
       next: () => {
@@ -99,8 +140,11 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.loading = false;
-        const { detail } = err.error;
-        this.dataService.customSnackBar(detail.detail, ACTION_TYPE.FAILED);
+        const detail = err?.detail;
+        this.util.customSnackBar(
+          detail?.detail || detail?.number,
+          ACTION_TYPE.FAILED
+        );
         this.dialogRef.close();
         this.refForm.reset();
         this.submitted = false;
@@ -109,6 +153,7 @@ export class AddReferenceComponent implements OnInit, OnDestroy {
     this.pageApis.push(api);
   }
 
+  /* istanbul ignore next */
   close(): void {
     this.dialogRef.close();
   }

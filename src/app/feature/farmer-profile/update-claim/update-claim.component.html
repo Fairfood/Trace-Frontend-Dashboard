@@ -1,0 +1,73 @@
+<aside class="header ff-flex-between">
+    <div class="d-flex flex-row">
+        <img src="../../../../assets/images/claim.svg" alt="" class="carbon-icon">
+        <span class="modal-title">
+            {{ data?.name }}
+        </span>
+    </div>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</aside>
+
+<section class="content flex-column">
+    <ng-container>
+        <article class="item d-flex flex-column">
+            <span class="key">Description</span>
+            <span class="value">
+                {{data?.description_full || '-'}}
+            </span>
+        </article>
+    </ng-container>
+</section>
+
+<section class="content-2  flex-column">
+    <ng-container>
+        <article class="item d-flex flex-column">
+            <span class="key">Details</span>
+            <div class="container">
+                <div class="column">
+                    <span class="value">Issuer</span>
+                    <span class="data">{{ data?.attached_by?.name || '-' }}</span>
+                </div>
+                <div class="column">
+                    <span class="value">Verifier</span>
+                    <span class="data">{{ data?.verifier?.name || '-' }}</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column">
+                <span class="value">Value</span>
+                <span class="data">{{data?.criteria[0]?.field_responses[0]?.response || '-'}}</span>
+            </div>
+            <div class="d-flex flex-column">
+                <span class="value">Comment</span>
+                <span class="data">{{data?.note || '-'}}</span>
+            </div>
+            <div class=" flex-column">
+                <div class="d-flex ">
+                    <span class="value">Evidence</span>
+                </div>
+                <ng-container *ngIf="hasFiles(); else noFiles">
+                    <div class="d-flex flex-row align-items-center mb-2" *ngFor="let file of data?.criteria[0]?.field_responses">
+                      <ng-container *ngIf="file?.file_name">
+                        <div class="d-flex align-items-center" style="min-width: 300px;">
+                          <span class="evidence text-truncate" >
+                            {{ file.file_name?.length > 30 ? (file?.file_name | slice:0:30) + '...' : file?.file_name }}
+                          </span>
+                        </div>
+                        <app-buttons id="custom-btn" *ngIf="file?.file" class="view-btn ms-2" buttonType="stroked"
+                            (buttonClicked)="openEvidence(file?.file)">
+                          View
+                        </app-buttons>
+                      </ng-container>
+                    </div>
+                  </ng-container>
+                  
+
+                <ng-template #noFiles>
+                    <span class="data">-</span>
+                </ng-template>
+
+            </div>
+        </article>
+    </ng-container>
+</section>

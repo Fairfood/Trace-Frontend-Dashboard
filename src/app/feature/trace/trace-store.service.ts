@@ -7,11 +7,9 @@ import { Observable } from 'rxjs';
 import { IStage, ITransactionFilter, ITransactionList } from './trace.config';
 import { environment } from 'src/environments/environment';
 import { BaseStoreService } from 'src/app/shared/store/base-store.service';
-import {
-  convertDateStringToTimestamp,
-  headerOptions,
-} from 'src/app/shared/configs/app.methods';
+import { convertDateStringToTimestamp } from 'src/app/shared/configs/app.methods';
 import { HTTP_OPTION_3 } from 'src/app/shared/configs/app.constants';
+import { headerOptions } from 'fairfood-utils';
 
 const BASE_URL = environment.baseUrl;
 interface ITransactionState {

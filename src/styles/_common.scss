@@ -49,6 +49,11 @@ p {
   @include flex-wrap(wrap);
 }
 
+.ff-flex-align-end {
+  @include flex-container;
+  @include align-items(flex-end);
+}
+
 .loader-only {
   height: 100vh;
   width: 100%;
@@ -132,6 +137,10 @@ p {
 
 .text-24 {
   font-size: 24px !important;
+}
+
+.text-22 {
+  font-size: 22px !important;
 }
 
 .text-md {
@@ -316,7 +325,7 @@ p {
   font-size: 12px;
 }
 .bg-light-blue {
-  background: var(--color-primary-3) !important;
+  background: var(--color-filter-active) !important;
 }
 .mb-20 {
   margin-bottom: 20px;
@@ -355,4 +364,13 @@ p {
   @include devices(desktop) {
     font-size: 16px;
   }
+}
+
+.additional-count {
+  border-radius: 50%;
+  background-color: var(--font-color-2);
+  font-size: 13px;
+  padding: 6px;
+  color: var(--color-white);
+  margin-left: 10px;
 }

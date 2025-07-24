@@ -4,14 +4,19 @@
             <a class="url text-xxxs text-overflow font-1-normal" href="{{storyTellingUrl}}" target="_blank">
                 {{storyTellingUrl}}
             </a>
-            <mat-icon class="pointer" [cdkCopyToClipboard]="storyTellingUrl" matTooltip="Copied"  #tooltip="matTooltip"
+            <mat-icon class="pointer" [cdkCopyToClipboard]="storyTellingUrl" matTooltip="Copied" #tooltip="matTooltip"
                 matTooltipPosition="above" (mouseenter)="$event.stopImmediatePropagation()"
-                (mouseleave)="$event.stopImmediatePropagation()" (click)="tooltip.show()" id="copyContent">content_copy</mat-icon>
+                (mouseleave)="$event.stopImmediatePropagation()" (click)="tooltip.show()"
+                id="copyContent">content_copy</mat-icon>
         </article>
-
-        <ngx-qrcode *ngIf="qrCodeValue" id="qrCodeImage" [value]="qrCodeValue">
-        </ngx-qrcode>
-        <img src="../../../../assets/images/F_logo.png" alt="F" class="center-logo">
+        <qrcode [qrdata]="qrCodeValue" [allowEmptyString]="true"
+                [ariaLabel]="'QR Code image with the following content...'" [cssClass]="'center'"
+                colorDark="#000000ff" colorLight="#ffffffff" elementType="canvas"
+                errorCorrectionLevel="M" imageSrc="../../../../assets/images/F_logo.png" [imageHeight]="30"
+                [imageWidth]="30" [margin]="4" [scale]="1" [title]="'A custom title attribute'" [width]="170"></qrcode>
+      
+        <img *ngIf="!gtinNumber" src="../../../../assets/images/F_logo.png" alt="F" class="center-logo">
+        <img *ngIf="gtinNumber"  src="../../../../assets/images/gs1.svg" alt="F" class="center-logo">
     </aside>
     <span class="download text-xs pointer" (click)="downloadImage()" id="downloadQrCode">
         <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,6 +27,6 @@
                 d="M11.3233 9.74984H1.07415C0.729759 9.74984 0.449219 9.4693 0.449219 9.12491V8.87493C0.449219 8.53054 0.729759 8.25 1.07415 8.25H11.3233C11.6677 8.25 11.9483 8.53054 11.9483 8.87493V9.12491C11.9483 9.4693 11.6677 9.74984 11.3233 9.74984Z"
                 fill="#003A60" stroke="#003A60" stroke-width="0.5" />
         </svg>
-        Download QR
+        {{'transaction.downloadQr'|translate}}
     </span>
 </article>

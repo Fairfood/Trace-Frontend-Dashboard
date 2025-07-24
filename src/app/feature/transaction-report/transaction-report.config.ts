@@ -73,6 +73,10 @@ export interface ITransactionDetail {
   blockchain_address?: string;
   explorer_url: string;
   wallet_type?: number;
+  archived?: boolean;
+  remittance_type?: string;
+  gtin?: string;
+  is_batch_editable?: boolean;
 }
 
 export enum BadgeText {
@@ -82,4 +86,5 @@ export enum BadgeText {
   PROCESSING = 'Processing',
   LOSS = 'Stock loss',
   MERGE = 'Merge',
+  NULL = '',
 }

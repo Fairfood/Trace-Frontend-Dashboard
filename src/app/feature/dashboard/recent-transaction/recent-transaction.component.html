@@ -1,10 +1,10 @@
 <section class="row-md">
     <div class="col-md-4">
         <section class="header ff-flex-between">
-            <h3>In stock</h3>
+            <h3>{{'stocks.heading1'|translate}}</h3>
 
             <app-buttons buttonType="fill" (buttonClicked)="viewStockClicked()" id="viewStockButton">
-                View stock
+                {{'button.viewStock'|translate}}
             </app-buttons>
         </section>
 
@@ -13,10 +13,10 @@
                 <thead>
                     <tr>
                         <th class="normal-column pointer">
-                            Product
+                            {{'transactions.product'|translate}}
                         </th>
                         <th class="normal-column pointer">
-                            Quantity (kg)
+                            {{'transactions.qty'|translate}} (kg)
                         </th>
                     </tr>
                 </thead>
@@ -33,20 +33,20 @@
             </table>
 
             <aside class="no-data w-100" aria-label="no data" *ngIf="stockData?.length === 0" [hidden]="stockLoading">
-                No stock found
+                {{'stocks.noStocks'|translate}}
             </aside>
 
-            <app-loader loaderType="type1" loaderText="Loading recent stocks" *ngIf="stockLoading"
+            <app-loader loaderType="type1" loaderText="{{'loaderText.recentStocks'|translate}}" *ngIf="stockLoading"
                 class="min-h-300"></app-loader>
 
         </section>
     </div>
     <div class="col-md-8">
         <section class="header ff-flex-between">
-            <h3>Recent transactions</h3>
+            <h3>{{'transactions.recent'|translate}}</h3>
 
             <app-buttons buttonType="fill" (buttonClicked)="viewTransactionClicked()">
-                View transactions
+                {{'button.viewTr'|translate}}
             </app-buttons>
         </section>
 
@@ -55,16 +55,16 @@
                 <thead>
                     <tr>
                         <th class="large-column pointer">
-                            Product
+                            {{'transactions.product'|translate}}
                         </th>
                         <th class="normal-column pointer">
-                            Transaction type
+                            {{'transactions.typeText'|translate}}
                         </th>
                         <th class="normal-column pointer">
-                            Connection
+                            {{'connections.tooltip.connection'|translate}}
                         </th>
                         <th class="normal-column pointer">
-                            Date
+                            {{'misc.date'|translate}}
                         </th>
                     </tr>
                 </thead>
@@ -75,9 +75,15 @@
                             {{ transaction?.products[0]?.name }}
                         </td>
                         <td class="mat-cell normal-column">
-                            <span *ngIf="transaction?.type == 1">Sent stock</span>
-                            <span *ngIf="transaction?.type == 2">Received stock</span>
-                            <span *ngIf="transaction?.type == 3">Reversal</span>
+                            <span *ngIf="transaction?.type == 1">
+                                {{'stocks.type1'|translate}}
+                            </span>
+                            <span *ngIf="transaction?.type == 2">
+                                {{'stocks.type2'|translate}}
+                            </span>
+                            <span *ngIf="transaction?.type == 3">
+                                {{'stocks.type3'|translate}}
+                            </span>
                         </td>
                         <td class="mat-cell normal-column">
                             {{ transaction?.connection?.name }}
@@ -91,10 +97,10 @@
 
             <aside class="no-data w-100" aria-label="no data" *ngIf="transactionData?.length === 0"
                 [hidden]="transactionLoading">
-                No recent transaction found
+                {{'transactions.noRecent'|translate}}
             </aside>
 
-            <app-loader loaderType="type1" loaderText="Loading recent transactions" *ngIf="transactionLoading"
+            <app-loader loaderType="type1" loaderText="{{'loaderText.recentTr'|translate}}" *ngIf="transactionLoading"
                 class="min-h-300"></app-loader>
 
         </section>

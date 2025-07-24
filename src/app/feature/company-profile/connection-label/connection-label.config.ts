@@ -12,11 +12,15 @@ import {
   LoaderComponent,
   ButtonsComponent,
   FfPaginationComponent,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 // angular material
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 
 export const IMPORTS = [
   CommonModule,
@@ -29,6 +33,10 @@ export const IMPORTS = [
   MatIconModule,
   MatTooltipModule,
   FfMultiSelectDropdownComponent,
+  TranslateModule,
+  ReactiveFormsModule,
+  MatDialogModule,
+  FfCustomPaginationComponent,
 ];
 export const LABEL_COLUMNS: ITableColumnHeader[] = [
   {

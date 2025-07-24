@@ -10,6 +10,6 @@
     </p>
 </article>
 <article class="ff-flex-between p-20-button">
-    <app-buttons buttonType="stroked" (buttonClicked)="close()">Cancel</app-buttons>
-    <app-buttons buttonType="fill" (buttonClicked)="remove()">Remove</app-buttons>
+    <app-buttons buttonType="stroked" (buttonClicked)="close()" customId="cancelButton">Cancel</app-buttons>
+    <app-buttons buttonType="fill" (buttonClicked)="remove()" customId="removeButton">Remove</app-buttons>
 </article>

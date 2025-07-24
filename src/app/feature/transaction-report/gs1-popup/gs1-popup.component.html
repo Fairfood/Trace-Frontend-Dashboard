@@ -1,0 +1,60 @@
+<div *ngIf="data?.type=='add'">
+    <aside class="pop-header ff-flex-between">
+        <h4>
+            Add GS1 Info
+        </h4>
+        <mat-icon class="pointer" (click)="close()">close</mat-icon>
+    </aside>
+
+    <section class="content flex-column" [formGroup]="gtinForm">
+        <article class="input-container-with-error">
+            <span class="label-tr">Enter a valid GTIN to generate a GS1-formatted URL and trace batch QR code</span>
+
+        </article>
+        <article class="input-container-with-error">
+            <app-ff-input label="GTIN *" [parentFormGroup]="gtinForm" [controlName]="'gtin'" inputSize="profile"
+                inputType="text">
+            </app-ff-input>
+            <span class="error-message"
+                *ngIf="gtinForm?.controls?.gtin?.errors?.required && gtinForm?.controls?.gtin?.touched">
+                This field shouldn't be empty *
+            </span>
+            <span class="error-message" *ngIf="gtinForm.controls.gtin.invalid && gtinForm.controls.gtin.touched && !gtinForm?.controls?.gtin?.errors?.required">
+                Please enter a valid GTIN (GTIN-8, 12, 13, or 14) *
+            </span>
+
+        </article>
+    </section>
+    <section class="ff-flex-between action">
+        <app-buttons buttonType="stroked" (buttonClicked)="close()">
+            Cancel
+        </app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="updateGtin()" [isDisabled]="gtinForm.invalid">
+            Save
+        </app-buttons>
+    </section>
+</div>
+
+<div *ngIf="data?.type=='remove'">
+    <aside class="pop-header ff-flex-between">
+        <h4>
+            Remove GS1 Info
+        </h4>
+        <mat-icon class="pointer" (click)="close()">close</mat-icon>
+    </aside>
+
+    <section class="content flex-column" [formGroup]="gtinForm">
+        <article class="input-container-with-error">
+            <span class="label-tr">Remove GS1 Info ?</span>
+
+        </article>
+    </section>
+    <section class="ff-flex-between action">
+        <app-buttons buttonType="stroked" (buttonClicked)="close()">
+            Cancel
+        </app-buttons>
+        <app-buttons buttonType="fill" (buttonClicked)="updateGtin('remove')">
+            Remove GTIN
+        </app-buttons>
+    </section>
+</div>

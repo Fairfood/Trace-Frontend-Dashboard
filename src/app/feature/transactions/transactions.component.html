@@ -1,29 +1,44 @@
 <div class="page-container">
     <section class="heading-section">
         <h1 class="page-heading">
-            Transaction history
+            {{'transactions.history' | translate}}
         </h1>
-        <aside class="right-section" aria-label="export icon">
+        <aside class="ff-flex-end" aria-label="export icon">
             <app-export-icon></app-export-icon>
+            <ng-container *ngIf="linkNavigate ||((externalId$ | async)&& linkConnect)">
+                <span class="mx-8">|</span>
+                <app-sync-btn [showNavigateBtn]="linkNavigate"
+                    [showConnectBtn]="(externalId$ | async) && linkConnect"></app-sync-btn>
+            </ng-container>
+            <app-buttons class="ml-10" customId="goToArchive" buttonType="secondary" (click)="goToArchive()">
+                <span> Go to archive</span>
+            </app-buttons>
         </aside>
     </section>
 
     <section class="utils ff-flex-between flex-column">
-        <app-ff-custom-tab [tabGroupItems]="transactionTypesOptions" [activeTabId]="transactionType"
+        <app-ff-custom-tab [tabGroupItems]="transactionTypesOptions" class="" [activeTabId]="transactionType"
             (tabChanged)="changeHistoryTab($event)"></app-ff-custom-tab>
         <aside class="search-wrap ff-flex-align-center" aria-label="Right side action">
-            <app-search-box [placeholder]="'Search here'" [hideOptions]="true" (searchText)="searchFilter($event)"
-                class="search-item">
+            <app-search-box placeholder="{{'misc.searchText' | translate}}" [searchString]="this.appliedFilterValues?.searchString || this.stockActionFilterValues?.searchString" [hideOptions]="true"
+                (searchText)="searchFilter($event)" class="search-item">
             </app-search-box>
 
             <app-buttons buttonType="secondary" buttonSize="medium" (buttonClicked)="filterClicked()">
-                <ng-container *ngIf="toggleFilter">
+                <ng-container *ngIf="toggleFilter || toggleFilterInternal">
                     <mat-icon class="clear-icon">close</mat-icon>
-                    <span class="button-text">Clear filters</span>
+                    <span class="button-text">{{'misc.clearFilterText' | translate }}</span>
                 </ng-container>
-                <ng-container *ngIf="!toggleFilter">
+                <ng-container *ngIf="!toggleFilter && !toggleFilterInternal">
                     <img src="../../../../assets/images/settings-slider-icon.svg" alt="icon">
-                    <span class="button-text">Filters</span>
+                    <span class="button-text">{{'misc.filterText' | translate}}</span>
+                </ng-container>
+            </app-buttons>
+            <app-buttons *ngIf="selectedItems.length>0 || entireListSelected" buttonType="secondary"
+                customId="moveToArchive" (buttonClicked)="toggleArchiveStatus()">
+                <ng-container>
+                    <img src="../../../../assets/images/archive_icon.svg" alt="icon">
+                    <span class="button-text">Move to archive</span>
                 </ng-container>
             </app-buttons>
         </aside>
@@ -32,7 +47,7 @@
     <section class="utils no-border" *ngIf="transactionType === 'internal'">
         <aside class="status-container ff-flex-align-center" aria-label="Filter section">
             <span class="label-text">
-                {{byStockAction === 1?'Stock action types':'Internal transaction type'}}
+                {{byStockAction === 1?('stocks.actionTypes' | translate):('transactions.internalType' | translate)}}
             </span>
             <span class="radio-c ff-flex-between">
                 <mat-radio-group [(ngModel)]="byStockAction" id="byStockGroup">
@@ -46,7 +61,7 @@
         </aside>
     </section>
 
-    <section *ngIf="toggleFilter" class="filter-wrap ff-flex-start">
+    <section *ngIf="toggleFilter || toggleFilterInternal" class="filter-wrap ff-flex-start">
         <ng-container *ngIf="transactionType === 'external'" [ngTemplateOutlet]="transactionFilter">
         </ng-container>
         <ng-container *ngIf="transactionType === 'internal'" [ngTemplateOutlet]="stockActionFilterItems">
@@ -59,26 +74,55 @@
                 <tr>
                     <ng-container *ngFor="let item of displayedColumns; trackBy: trackFn">
                         <th class="{{item?.class}}" *ngIf="item.isColumnVisible">
-                            <article class="ff-flex-start pointer" (click)="sortData(item.sortKey)" *ngIf="item.name"
-                                id="sortIcon">
-                                {{item.name}}
-                                <ng-container *ngIf="!item?.hideSort">
-                                    <app-sort-custom [filterValues]="appliedFilterValues"
-                                        [columnName]="item.sortKey"></app-sort-custom>
-                                </ng-container>
-                            </article>
-                            <ng-container *ngIf="!item.name && transactionType === 'external'">
-                                <img src="../../../assets/images/add-icon.png" alt="add"
-                                    [matMenuTriggerFor]="moreColumns" class="pointer" id="addIcon">
-                                <mat-menu class="mat-menu more-filters" #moreColumns="matMenu" xPosition="before">
-                                    <ul id="moreColumnOptions">
-                                        <li *ngFor="let item of additionalColumns; trackBy: trackFnFor; let j=index">
-                                            <mat-checkbox [checked]="item.visible" class="w-100"
-                                                (change)="updateColumns(item)"
-                                                id="checkboxMore{{j}}">{{item?.name}}</mat-checkbox>
-                                        </li>
-                                    </ul>
+                            <ng-container *ngIf="item.name === 'selection'">
+                                <span *ngIf="dataSource?.length>0" class="custom-checkbox">
+                                    <mat-checkbox
+                                        [checked]="selectAllChecked || entireListSelected && selectedItems.length==0"></mat-checkbox>
+                                    <span class="overlay pointer" [matMenuTriggerFor]="selectList"></span>
+                                </span>
+
+                                <!-- new feature  -->
+                                <mat-menu class="mat-menu more-filters" #selectList="matMenu" xPosition="after">
+                                    <mat-radio-group id="selectAllOptions" [(ngModel)]="selectedOption"
+                                        aria-label="Select an option">
+                                        <mat-radio-button value="page" (change)="radioButtonChanged($event)"
+                                            class="font-1-normal text-xs text-blue radio-items">
+                                            Select current list ({{dataSource?.length}})
+                                        </mat-radio-button>
+                                        <mat-radio-button value="all" (change)="radioButtonChanged($event)"
+                                            class="font-1-normal text-xs text-blue radio-items">
+                                            Select entire list ({{tableLength}})
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                    <article *ngIf="allSelected" class="footer-selection font-1-medium pointer"
+                                        (click)="clearPageSelection()">
+                                        Clear selection
+                                    </article>
                                 </mat-menu>
+                            </ng-container>
+                            <ng-container *ngIf="item.name !== 'selection'">
+                                <article class="ff-flex-start pointer" (click)="sortData(item.sortKey)"
+                                    *ngIf="item.name" id="sortIcon">
+                                    {{item.name}}
+                                    <ng-container *ngIf="!item?.hideSort">
+                                        <app-sort-custom [filterValues]="appliedFilterValues"
+                                            [columnName]="item.sortKey"></app-sort-custom>
+                                    </ng-container>
+                                </article>
+                                <ng-container *ngIf="!item.name && transactionType === 'external'">
+                                    <img src="../../../assets/images/add-icon.png" alt="add"
+                                        [matMenuTriggerFor]="moreColumns" class="pointer" id="addIcon">
+                                    <mat-menu class="mat-menu more-filters" #moreColumns="matMenu" xPosition="before">
+                                        <ul id="moreColumnOptions">
+                                            <li
+                                                *ngFor="let item of additionalColumns; trackBy: trackFnFor; let j=index">
+                                                <mat-checkbox [checked]="item.visible" class="w-100"
+                                                    (change)="updateColumns(item)"
+                                                    id="checkboxMore{{j}}">{{item?.name}}</mat-checkbox>
+                                            </li>
+                                        </ul>
+                                    </mat-menu>
+                                </ng-container>
                             </ng-container>
                         </th>
                     </ng-container>
@@ -86,41 +130,44 @@
 
             </thead>
             <tbody>
-                <tr *ngFor="let element of dataSource;trackBy: trackFn" class="pointer"
-                    (click)="selectTransaction(element)">
+                <tr *ngFor="let element of dataSource;trackBy: trackFn" class="pointer">
+                    <td class="mat-cell selection-column">
+                        <mat-checkbox [ngModel]="element.selected"
+                            (change)="changeSelect($event, element)"></mat-checkbox>
+                    </td>
                     <td class="mat-cell smaller-column">
                         {{element?.id}}
                     </td>
 
                     <ng-container *ngIf="transactionType === 'external'">
-                        <td class="mat-cell transaction-type-column">
-                            <span *ngIf="element.type == 1">Sent stock</span>
-                            <span *ngIf="element.type == 2">Received stock</span>
-                            <span *ngIf="element.type == 3">Reversal</span>
+                        <td class="mat-cell transaction-type-column" (click)="selectTransaction(element)">
+                            <span *ngIf="element.type == 1">{{'stocks.type1'|translate}}</span>
+                            <span *ngIf="element.type == 2">{{'stocks.type2'|translate}}</span>
+                            <span *ngIf="element.type == 3">{{'stocks.type3'|translate}}</span>
                         </td>
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{element.connection}}
                         </td>
-                        <td class="mat-cell large-column">
+                        <td class="mat-cell large-column" (click)="selectTransaction(element)">
                             {{element.product}}
                         </td>
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{element.quantity?.toFixed(2)}}
                         </td>
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{element.created * 1000 | date: 'dd MMMM y'}}
                         </td>
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{ element.creator }}
                         </td>
                         <ng-container *ngIf="additionalColumns[0]?.visible">
-                            <td class="mat-cell normal-column">
+                            <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                                 {{ element.refNo || '-' }}
                             </td>
                         </ng-container>
 
-                        <td class="mat-cell large-column">
-                            <span *ngIf="!element.log">In progress</span>
+                        <td class="mat-cell large-column" (click)="selectTransaction(element)">
+                            <span *ngIf="!element.log">{{'transactions.progressText'|translate}}</span>
                             <span *ngIf="element.log" class="hash-text ff-flex-align-center">
                                 <img src="../../../../assets/images/hedra.svg" class="mr-3 cursor-pointer" alt="">
                                 {{(element.log.length > 20)? (element.log | slice:0:19)+'..':(element.log)}}
@@ -130,40 +177,40 @@
                     </ng-container>
 
                     <ng-container *ngIf="transactionType === 'internal'">
-                        <td class="mat-cell large-column">
+                        <td class="mat-cell large-column" (click)="selectTransaction(element)">
                             <article class="text-overflow">
                                 {{element?.sourceProduct}}
                             </article>
                         </td>
                         <ng-container *ngIf="byStockAction === 1 || byStockAction === 3">
-                            <td class="mat-cell normal-column">
+                            <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                                 {{element?.sourceQuantity}}
                             </td>
-                            <td class="mat-cell large-column">
+                            <td class="mat-cell large-column" (click)="selectTransaction(element)">
                                 <article class="text-overflow">
                                     {{element?.destinationProduct}}
                                 </article>
                             </td>
                         </ng-container>
                         <ng-container *ngIf="byStockAction === 3">
-                            <td class="mat-cell normal-column">
+                            <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                                 {{element?.quantity}}
                             </td>
                         </ng-container>
 
                         <ng-container *ngIf="byStockAction === 2">
-                            <td class="mat-cell normal-column">
+                            <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                                 {{element?.removedStockId}}
                             </td>
-                            <td class="mat-cell normal-column">
+                            <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                                 {{element?.sourceQuantity}}
                             </td>
                         </ng-container>
 
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{element.created * 1000 | date: 'dd MMMM y'}}
                         </td>
-                        <td class="mat-cell normal-column">
+                        <td class="mat-cell normal-column" (click)="selectTransaction(element)">
                             {{ element.creator }}
                         </td>
 
@@ -177,12 +224,12 @@
                         <mat-menu class="mat-menu" #beforeMenu="matMenu" xPosition="before">
                             <button (click)="selectTransaction(element)" class="text-xs text-blue" mat-menu-item
                                 id="viewDetailsButton">
-                                View details
+                                {{'button.viewButton' | translate}}
                             </button>
                             <button *ngIf="element?.rejectable && memberType != 3"
                                 (click)="rejectTransactionDialog(element)" class="text-xs text-blue" mat-menu-item
                                 id="rejectTransaction">
-                                Reject transaction
+                                {{'button.rejectTr' | translate}}
                             </button>
                         </mat-menu>
                     </td>
@@ -195,45 +242,52 @@
 
 
         <div class="min-h-300" *ngIf="dataLoading">
-            <app-loader [loaderText]="'Loading transactions'" [loaderType]="'type1'"></app-loader>
+            <app-loader [loaderText]="'loaderText.transaction'|translate" loaderType="type1"></app-loader>
         </div>
 
 
-        <section class="no-data w-100" *ngIf="!dataLoading && dataSource.length === 0">
-            No transactions found
+        <section class="no-data w-100 flex-column" *ngIf="!dataLoading && dataSource.length === 0">
+            <div>
+                <img class="no-data-image" src="../../../../assets/images/no_transactions.svg" alt="">
+            </div>
+            <span>{{'transactions.noTransaction' | translate}}</span>
         </section>
     </section>
 
-    <app-ff-pagination [totalCount]="tableLength" [customPageSize]="paginationReset"
-        (paginationAction)="paginationChange($event)"></app-ff-pagination>
+    <!-- <app-ff-pagination *ngIf="!pageSelected" [totalCount]="tableLength" [customPageSize]="paginationReset"
+        (paginationAction)="paginationChange($event)"></app-ff-pagination> -->
+        <app-ff-custom-pagination *ngIf="!dataLoading" [totalCount]="tableLength" [customPage]="customPageSize" (paginationAction)="paginationChange($event)"></app-ff-custom-pagination>
 </div>
 <!-- filter sections are added here for more clarification  -->
 
 <!-- 1. Transaction filter ( External transaction filter items) -->
 <ng-template #transactionFilter>
 
-    <app-ff-filter-box-wrapper label="Transaction type" [hideSearch]="true"
-        [filterMasterData]="transactionListFilter?.transactionFilterTypes"
+    <app-ff-filter-box-wrapper class="mx-4" label="{{'transactions.typeText' | translate}}" [hideSearch]="true"
+        [filterMasterData]="transactionListFilter?.transactionFilterTypes" customId="transactionTypeFilter"
         [defaultValue]="appliedFilterValues.transactionType" (selectionChange)="filterTransactionList($event, 'type')">
     </app-ff-filter-box-wrapper>
 
-    <app-ff-filter-box-wrapper label="Product" [filterMasterData]="transactionListFilter?.productData"
+    <app-ff-filter-box-wrapper class="mx-4" label="{{'transactions.product' | translate}}"
+        [filterMasterData]="transactionListFilter?.productData"
         [hideSearch]="transactionListFilter?.productData?.length < 4 ? true : false"
-        [defaultValue]="appliedFilterValues.selectedProduct"
+        [defaultValue]="appliedFilterValues.selectedProduct" customId="transactionProductFilter"
         (selectionChange)="filterTransactionList($event, 'product')">
     </app-ff-filter-box-wrapper>
 
-    <app-ff-filter-box-wrapper label="Company" [filterMasterData]="transactionListFilter?.companyData"
+    <app-ff-filter-box-wrapper class="mx-4" label="{{'types.company' | translate}}"
+        [filterMasterData]="transactionListFilter?.companyData"
         [hideSearch]="transactionListFilter?.companyData?.length < 4 ? true : false"
-        [defaultValue]="appliedFilterValues.selectedCompany"
+        [defaultValue]="appliedFilterValues.selectedCompany" customId="transactionCompanyFilter"
         (selectionChange)="filterTransactionList($event, 'company')">
     </app-ff-filter-box-wrapper>
 
-    <app-ff-filter-box-wrapper label="Created by" [filterMasterData]="transactionListFilter?.teamMembers"
+    <app-ff-filter-box-wrapper *ngIf="transactionListFilter?.teamMembers?.length>0"  class="mx-4" label="{{'misc.createdBy' | translate}}"
+        [filterMasterData]="transactionListFilter?.teamMembers"
         [hideSearch]="transactionListFilter?.teamMembers?.length < 4 ? true : false"
-        [defaultValue]="appliedFilterValues.creator" (selectionChange)="filterTransactionList($event, 'creator')">
+        customId="transactionsCreatorFilter" [defaultValue]="appliedFilterValues.creator"
+        (selectionChange)="filterTransactionList($event, 'creator')">
     </app-ff-filter-box-wrapper>
-
 
     <ng-container [ngTemplateOutlet]="additionalFilters">
     </ng-container>
@@ -241,32 +295,35 @@
 <!-- 1. Stock action filter ( Internal transaction filter items) -->
 <ng-template #stockActionFilterItems>
     <ng-container *ngIf="byStockAction === 2">
-        <app-ff-filter-box-wrapper label="Product" [filterMasterData]="transactionListFilter?.productData"
+        <app-ff-filter-box-wrapper label="{{'transactions.product' | translate}}"
+            [filterMasterData]="transactionListFilter?.productData"
             [hideSearch]="transactionListFilter?.productData?.length < 4 ? true : false"
-            [defaultValue]="stockActionFilterValues.selectedSourceProduct"
+            [defaultValue]="stockActionFilterValues.selectedSourceProduct" customId="transactionProductFilter"
             (selectionChange)="filterTransactionList($event, 'product')">
         </app-ff-filter-box-wrapper>
     </ng-container>
     <ng-container *ngIf="byStockAction === 1 || byStockAction === 3">
-        <app-ff-filter-box-wrapper [label]="byStockAction === 1 ?'Destination product': 'Merged product'"
+        <app-ff-filter-box-wrapper
+            [label]="byStockAction === 1 ?('transactions.destinationPro' | translate): ('transactions.mergedPro' | translate)"
             [filterMasterData]="transactionListFilter?.productData"
             [hideSearch]="transactionListFilter?.productData?.length < 4 ? true : false"
-            [defaultValue]="stockActionFilterValues.selectedDestinationProduct"
+            [defaultValue]="stockActionFilterValues.selectedDestinationProduct" customId="destinationProductFilter"
             (selectionChange)="filterTransactionList($event, 'destProduct')">
         </app-ff-filter-box-wrapper>
 
-        <app-ff-filter-box-wrapper label="Source product" [filterMasterData]="transactionListFilter?.productData"
+        <app-ff-filter-box-wrapper label="{{'transactions.sourcePro' | translate}}"
+            [filterMasterData]="transactionListFilter?.productData"
             [defaultValue]="stockActionFilterValues.selectedSourceProduct"
-            [hideSearch]="transactionListFilter?.productData?.length < 4 ? true : false"
+            [hideSearch]="transactionListFilter?.productData?.length < 4 ? true : false" customId="sourceProductFilter"
             (selectionChange)="filterTransactionList($event, 'sourceProduct')">
         </app-ff-filter-box-wrapper>
 
     </ng-container>
 
-    <app-ff-filter-box-wrapper label="Created by" [filterMasterData]="transactionListFilter?.teamMembers"
-        [defaultValue]="stockActionFilterValues.creator"
+    <app-ff-filter-box-wrapper label="{{'misc.createdBy' | translate}}"
+        [filterMasterData]="transactionListFilter?.teamMembers" [defaultValue]="stockActionFilterValues.creator"
         [hideSearch]="transactionListFilter?.teamMembers?.length < 4 ? true : false"
-        (selectionChange)="filterTransactionList($event, 'creator')">
+        customId="transactionCreatedByFilter" (selectionChange)="filterTransactionList($event, 'creator')">
     </app-ff-filter-box-wrapper>
 
     <ng-container [ngTemplateOutlet]="additionalFilters">
@@ -276,20 +333,22 @@
 <!-- Additional filter button and filter items are common for everything  -->
 <ng-template #additionalFilters>
     <!-- using shared component -->
-    <app-ff-drop-date label="Date" (appliedFilter)="filterByAdditional($event)" *ngIf="availableFilters[0].visible">
+    <app-ff-drop-date class="mx-4" label="{{'misc.date' | translate}}" [presetDate]="presetDate" (appliedFilter)="filterByAdditional($event)"
+        *ngIf="availableFilters[0].visible">
     </app-ff-drop-date>
-    <app-ff-drop-quantity *ngIf="availableFilters[1].visible" (appliedFilter)="filterByAdditional($event)">
+    <app-ff-drop-quantity  [defaultValues]="currentFilters" class="mx-4" *ngIf="availableFilters[1].visible" (appliedFilter)="filterByAdditional($event)">
     </app-ff-drop-quantity>
 
 
-    <app-buttons buttonType="secondary" [matMenuTriggerFor]="moreFilters">
-        + More filters
+    <app-buttons buttonType="secondary"  class="mx-4" [matMenuTriggerFor]="moreFilters">
+        + {{ 'misc.moreFilter' | translate }}
     </app-buttons>
     <mat-menu class="mat-menu more-filters" #moreFilters="matMenu" xPosition="before">
         <ul>
             <li *ngFor="let item of availableFilters;trackBy: trackFnFor; let k=index">
                 <mat-checkbox [checked]="item.visible" (change)="showFilter(item)"
-                    id="checkboxMoreFilter{{k}}">{{item.name}}</mat-checkbox>
+                    id="checkboxMoreFilter{{k}}">{{item.name}}
+                </mat-checkbox>
             </li>
         </ul>
     </mat-menu>

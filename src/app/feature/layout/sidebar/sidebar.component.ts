@@ -7,22 +7,27 @@ import {
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 // services
-import { StorageService, UtilService } from 'src/app/shared/service';
+import {
+  RouterService,
+  StorageService,
+  UtilService,
+} from 'src/app/shared/service';
 import { AuthService } from '../../authentication/auth.service';
 import { GlobalStoreService } from 'src/app/shared/store';
 import { StockProcessService } from '../../stock/process-stock';
 import { ListingStoreService } from '../../stock/listing/listing-store.service';
 // model
 import { IUserData } from 'src/app/shared/configs/app.model';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, TranslateModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
@@ -36,12 +41,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   pageApis: Subscription[] = [];
   userData: Partial<IUserData>;
   constructor(
+    private processService: StockProcessService,
     private storeService: StorageService,
-    private auth: AuthService,
+    private listing: ListingStoreService,
     private global: GlobalStoreService,
     private util: UtilService,
-    private processService: StockProcessService,
-    private listing: ListingStoreService
+    private auth: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -109,14 +115,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   /**
    * Reset the stock store to default state
-   * @param stock - boolean value to reset stock or not
    */
-  resetStock(stock?: boolean): void {
-    if (!stock) {
-      setTimeout(() => {
-        this.listing.resetState();
-      }, 1000);
-    }
+  resetStock(isStock?: boolean): void {
+    this.listing.resetState();
     if (this.processService.transactionState) {
       this.processService.stockStateReset();
       this.processService.emitNewTransactionState();
@@ -128,6 +129,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
     if (this.processService.summaryData) {
       this.processService.updateSummaryData(null);
+    }
+
+    if (isStock) {
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/stock/listing']);
+      });
     }
   }
 

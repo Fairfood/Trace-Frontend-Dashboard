@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { Injectable } from '@angular/core';
 import { map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -7,7 +8,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { environment } from 'src/environments/environment';
 import {
-  headerOptions,
+  mapResults,
   successFormatter,
 } from 'src/app/shared/configs/app.methods';
 import {
@@ -19,6 +20,8 @@ const BASE_URL = environment.baseUrl;
 // services
 import { StorageService } from 'src/app/shared/service';
 import { CompanyProfileStoreService } from './company-profile-store.service';
+import { headerOptions } from 'fairfood-utils';
+import { IClaim } from '../claim/claim.model';
 /**
  * Service for managing company profiles.
  */
@@ -207,6 +210,20 @@ export class CompanyProfileService {
         headerOptions(HTTP_OPTION_4)
       )
       .pipe(map(successFormatter));
+  }
+
+  getCompanyClaims(): Observable<IClaim[]> {
+    return this.http
+      .get(BASE_URL + '/claims/?type=2', headerOptions(HTTP_OPTION_4))
+      .pipe(map(mapResults));
+  }
+
+  claimAttachCompany(params: any): Observable<any> {
+    return this.http.post(
+      BASE_URL + '/claims/node/attach/',
+      params,
+      headerOptions(HTTP_OPTION_4)
+    );
   }
 
   /**

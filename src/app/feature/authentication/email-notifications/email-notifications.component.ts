@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 
 import { LogoutDialogComponent } from '../logout-dialog/logout-dialog.component';
 import { LoaderComponent } from 'fairfood-utils';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-email-notifications',
@@ -21,6 +22,7 @@ import { LoaderComponent } from 'fairfood-utils';
     LogoutDialogComponent,
     LoaderComponent,
     MatDialogModule,
+    TranslateModule,
   ],
 })
 export class EmailNotificationsComponent implements OnInit, OnDestroy {
@@ -75,18 +77,18 @@ export class EmailNotificationsComponent implements OnInit, OnDestroy {
     if (this.queryParams.notification && this.queryParams.user) {
       this.sub = this.authService
         .getNotificationParams(this.queryParams.notification)
-        .subscribe(
-          (response: any) => {
+        .subscribe({
+          next: (response: any) => {
             const data = response.data;
             data.user_id = this.queryParams.user;
             this.queryParams.node_id = data.target_node;
             localStorage.setItem('notificationObject', JSON.stringify(data));
-            this.router.navigateByUrl('/home');
+            this.router.navigateByUrl('/dashboard');
           },
-          () => {
+          error: () => {
             window.location.href = environment.authUrl;
-          }
-        );
+          },
+        });
     } else {
       window.location.href = environment.authUrl;
     }
@@ -106,7 +108,7 @@ export class EmailNotificationsComponent implements OnInit, OnDestroy {
         // logout & redirect to login page
         this.authService.logout();
       } else {
-        this.router.navigateByUrl('/home');
+        this.router.navigateByUrl('/dashboard');
       }
     });
   }

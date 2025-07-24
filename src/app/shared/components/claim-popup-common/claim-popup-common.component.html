@@ -1,0 +1,72 @@
+<aside class="header ff-flex-between">
+    <div class="d-flex flex-row icon">
+        <mat-icon>verified_user</mat-icon>
+        <span class="modal-title">
+            Claim details
+        </span>
+    </div>
+    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+</aside>
+
+<section class="content flex-column">
+    <ng-container>
+        <article class="item d-flex flex-column">
+            <span class="key">Description</span>
+            <span class="value">
+                {{data?.description_full || '-'}}
+            </span>
+        </article>
+    </ng-container>
+</section>
+
+<section class="content-2  flex-column">
+    <ng-container>
+        <article class="item d-flex flex-column">
+            <span class="key">Details</span>
+            <div class="container">
+                <div class="column">
+                    <span class="value">Hash</span>
+                    <span class="data">{{ guardianClaims?.hash_value || '-' }}</span>
+                </div>
+                <div class="column">
+                    <span class="value">Token ID</span>
+                    <span class="data">{{ guardianClaims?.extra_info?.mintDocument?.tokenId || '-' }}</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column">
+                <span class="value">Status</span>
+                <div class="d-flex flex-row ff-flex-align-center data-status-container">
+                    <span class="data-verified link pointer" (click)="openGuardianUrl()">
+                        <span *ngIf="status == 1">{{'status.pending'|translate}}</span>
+                        <span *ngIf="status == 2"> {{'status.verified'|translate}}
+                        </span>
+                        <span *ngIf="status == 3">{{'status.rejected'|translate}}</span>
+                    </span>
+                    <!-- <div *ngIf="status != 2" class="check-status-container d-flex ff-flex-align-center pointer" (click)="checkStatus()">
+                        <img src="../../../../assets/images/check-status.svg" alt="" class="status-icon">
+                        <span class="check-status-text">Check status</span>
+                    </div> -->
+                </div>
+                <!-- <span class="data">{{status || '-'}}</span> -->
+            </div>
+            <div class="container">
+                <div class="column">
+                    <span class="value">Receipt name</span>
+                    <span class="data">{{ guardianClaims?.extra_info?.mintDocument?.username || '-' }}</span>
+                </div>
+                <div class="column">
+                    <span class="value">Token amount</span>
+                    <span class="data">{{ guardianClaims?.extra_info?.mintDocument?.transferAmount || '-' }}</span>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="column">
+                    <span class="value">Updated date</span>
+                    <span class="data">{{( guardianClaims?.updated_on * 1000 | date: 'dd MMMM y' )|| '-'}}</span>
+                </div>
+            </div>
+        </article>
+    </ng-container>
+</section>

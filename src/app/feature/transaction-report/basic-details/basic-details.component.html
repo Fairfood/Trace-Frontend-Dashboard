@@ -2,7 +2,8 @@
 <!-- External transactions include sent and receive stock  -->
 
 <h3 class="font-1-bold">
-    {{ transactionData.transaction === 'internal' && transactionData.type === 2 ? 'Removed stock details':'Source details' }}
+    {{ transactionData.transaction === 'internal' && transactionData.type === 2 ?
+    ('trReport.removedDetails'|translate):'transaction.sourceText'|translate }}
 </h3>
 <aside aria-label="Source details" class="d-flex source-content">
     <section class="content-area">
@@ -15,7 +16,7 @@
                 [ngTemplateOutletContext]="{label: 'Type', itemValue: transactionData?.source?.primary_operation?.name}">
             </ng-container>
             <article class="item">
-                <span class="key">Source address</span>
+                <span class="key">{{'transaction.sourceAddres'|translate}}</span>
                 <span class="value">
                     <app-common-wallet [type]="transactionData?.source_wallet?.wallet_type"
                         [url]="transactionData?.source_wallet?.explorer_url"
@@ -34,6 +35,9 @@
                     [ngTemplateOutletContext]="{label: 'Price', itemValue: transactionData?.priceText }">
                 </ng-container>
             </ng-container>
+            <ng-container *ngIf="transactionData?.remittance_type" [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Payment Method', itemValue: transactionData?.remittance_type}">
+            </ng-container>
         </ng-container>
         <ng-container *ngIf="transactionData.transaction === 'internal'">
             <ng-container [ngTemplateOutlet]="keyValuePair"
@@ -47,13 +51,16 @@
             <ng-container *ngIf="transactionData.type === 2" [ngTemplateOutlet]="keyValuePair"
                 [ngTemplateOutletContext]="{label: 'Reason for removing stock', itemValue: transactionData?.comment }">
             </ng-container>
+            <ng-container *ngIf="transactionData?.remittance_type" [ngTemplateOutlet]="keyValuePair"
+                [ngTemplateOutletContext]="{label: 'Payment Method', itemValue: transactionData?.remittance_type}">
+            </ng-container>
         </ng-container>
     </section>
 </aside>
 <ng-container *ngIf="transactionData.transaction === 'internal' && transactionData.type !==2 ">
 
     <h3 class="font-1-bold">
-        Destination details
+        {{'transaction.destinationDetails'|translate}}
     </h3>
     <aside aria-label="Source details" class="d-flex source-content no-broder">
         <section class="content-area">
@@ -69,11 +76,11 @@
 
 <!-- Note section only for external transaction like reversal, sent and receive stock  -->
 <ng-container *ngIf="transactionData.transaction === 'external' && transactionData.comment">
-    <h3 class="font-1-bold">Note</h3>
+    <h3 class="font-1-bold">{{'requests.note'|translate}}</h3>
     <aside aria-label="Notes" class="d-flex source-content">
         <section class="content-area">
             <article class="item">
-                <span class="key">Note</span>
+                <span class="key">{{'requests.note'|translate}}</span>
                 <span class="value" id="comments">
                     {{ transactionData.comment }}
                 </span>

@@ -98,6 +98,10 @@ export class GlobalStoreService extends BaseStoreService<IGlobal> {
     super(initialState);
   }
 
+  getCountryData(): any {
+    return this.state.countryData;
+  }
+
   /**
    * Updates the app constants in the global state.
    * @param data - New app constants data.

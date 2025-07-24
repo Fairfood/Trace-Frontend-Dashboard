@@ -5,9 +5,9 @@ import { CommonModule } from '@angular/common';
 // services
 import { TransactionReportService } from '../transaction-report.service';
 import { UtilService } from 'src/app/shared/service';
-// configs and other modules
+// configs and other components
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
-import { AttachementsTableModule } from '../../attachments-table/attachments-table.module';
+import { AttachementsTableComponent } from '../../attachments-table';
 
 const TABLE_COLUMNS: any[] = [
   {
@@ -33,7 +33,7 @@ const TABLE_COLUMNS: any[] = [
   templateUrl: './receipt.component.html',
   styleUrls: ['./receipt.component.scss'],
   standalone: true,
-  imports: [CommonModule, AttachementsTableModule],
+  imports: [CommonModule, AttachementsTableComponent],
 })
 export class ReceiptComponent implements OnInit, OnDestroy {
   @Input() transactionId: string;

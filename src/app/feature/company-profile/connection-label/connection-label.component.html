@@ -1,17 +1,17 @@
 <div class="team-members-table flex-column">
     <section class="header ff-flex-between">
         <h3 *ngIf="!addScreenVisible">
-            Connection labels
+            {{'connectionLabel.heading' | translate}}
         </h3>
         <h3 *ngIf="addScreenVisible">
-            {{isEdit?'Update connection label':'Create connection label'}}
+            {{isEdit?('connectionLabel.update' | translate):('connectionLabel.create' | translate)}}
         </h3>
         <aside class="ff-flex-start" aria-label="Action section">
             <app-buttons buttonType="stroked" (buttonClicked)="toggleAddScreen()">
-                {{!addScreenVisible?'Add connection label':'Cancel'}}
+                {{!addScreenVisible?('button.addConnectionLabel' | translate):('button.cancel' | translate)}}
             </app-buttons>
             <app-buttons buttonType="fill" *ngIf="addScreenVisible" (buttonClicked)="createNewLabel()">
-                {{isEdit?'Update label': 'Create label'}}
+                {{isEdit?('button.updateLabel' | translate): ('button.createLabel' | translate)}}
             </app-buttons>
         </aside>
 
@@ -51,11 +51,12 @@
                         </span>
                         <mat-menu class="mat-menu" #moreOptionsTeam="matMenu" xPosition="before">
                             <button *ngIf="memberType != 3" (click)="editStarted(element)" class="text-xs text-blue"
-                                mat-menu-item>Edit
+                                mat-menu-item>
+                                {{'misc.edit' | translate}}
                             </button>
                             <button *ngIf="memberType != 3" class="text-xs text-blue"
                                 (click)="removeConnectionLabel(element)" mat-menu-item>
-                                Remove
+                                {{'button.remove' | translate}}
                             </button>
                         </mat-menu>
                     </td>
@@ -64,20 +65,21 @@
         </table>
 
         <div class="no-data w-100" aria-label="" *ngIf="connectionLabelsCount === 0" [hidden]="dataLoading">
-            No connection labels found
+            {{'connectionLabel.noLabel' | translate}}
         </div>
 
-        <app-loader [loaderText]="'Loading labels'" [loaderType]="'type1'" *ngIf="dataLoading"
+        <app-loader loaderText="{{'loaderText.label' | translate}}" loaderType="type1" *ngIf="dataLoading"
             class="min-h-300"></app-loader>
     </section>
 
-    <app-ff-pagination [totalCount]="connectionLabelsCount" (paginationAction)="paginatorEvent($event)"
-        *ngIf="!addScreenVisible"></app-ff-pagination>
+    <!-- <app-ff-pagination [totalCount]="connectionLabelsCount" (paginationAction)="paginatorEvent($event)"
+        *ngIf="!addScreenVisible"></app-ff-pagination> -->
+        <app-ff-custom-pagination [totalCount]="connectionLabelsCount" (paginationAction)="paginatorEvent($event)"  *ngIf="!addScreenVisible"></app-ff-custom-pagination>
 
     <section class="add-member-form row" *ngIf="addScreenVisible" [formGroup]="labelForm">
         <aside class="col-lg-6 flex-column" aria-label="">
-            <app-ff-input label="Connection label *" [parentFormGroup]="labelForm" controlName="label" inputSize="full"
-                inputType="text" class="w-90">
+            <app-ff-input label="{{'connections.filterConnectionLabel' | translate}} *" [parentFormGroup]="labelForm"
+                controlName="label" inputSize="full" inputType="text" class="w-90">
             </app-ff-input>
             <ng-container [ngTemplateOutlet]="formErrorMessages" [ngTemplateOutletContext]="{formcontrol:'label'}">
             </ng-container>
@@ -85,7 +87,9 @@
         </aside>
         <aside class="col-lg-6 flex-column" aria-label="">
             <app-ff-multi-select-dropdown [dropdownOptions]="availableSupplyChains"
-                [defaultValue]="labelForm.controls.supplyChain.value || []" label="Supply chain *"
+                [isAllSelected]="labelForm.value.supplyChain?.length==availableSupplyChains?.length"
+                [multipleItems]="true" [itemCount]="labelForm.value.supplyChain?.length"
+                [defaultValue]="selectedIDs || []" label="{{'supplyChain.name' | translate}} *"
                 (selectionChange)="setSupplychain($event)" class="w-100"></app-ff-multi-select-dropdown>
             <ng-container [ngTemplateOutlet]="formErrorMessages"
                 [ngTemplateOutletContext]="{formcontrol:'supplyChain'}">
@@ -103,6 +107,6 @@
     <!-- showing required error message  -->
     <span class="error-message"
         *ngIf="labelForm.controls[formcontrol]?.errors?.required && (submitted || labelForm.controls[formcontrol]?.touched)">
-        This field is required *
+        {{'formValidation.commonValidationError' | translate}}
     </span>
 </ng-template>

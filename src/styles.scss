@@ -3,24 +3,18 @@
 @include mat.core();
 
 $trace-dashboard-v3-primary: mat.define-palette(mat.$indigo-palette);
-$trace-dashboard-v3-accent: mat.define-palette(
-  mat.$pink-palette,
-  A200,
-  A100,
-  A400
-);
+$trace-dashboard-v3-accent: mat.define-palette(mat.$pink-palette,
+    A200,
+    A100,
+    A400);
 
 $trace-dashboard-v3-warn: mat.define-palette(mat.$red-palette);
 
-$trace-dashboard-v3-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $trace-dashboard-v3-primary,
-      accent: $trace-dashboard-v3-accent,
-      warn: $trace-dashboard-v3-warn,
-    ),
-  )
-);
+$trace-dashboard-v3-theme: mat.define-light-theme((color: (primary: $trace-dashboard-v3-primary,
+        accent: $trace-dashboard-v3-accent,
+        warn: $trace-dashboard-v3-warn,
+      ),
+    ));
 
 @include mat.all-component-themes($trace-dashboard-v3-theme);
 
@@ -31,10 +25,14 @@ body {
   height: 100%;
   min-height: 100%;
 }
+
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-family: 'Moderat Regular', Roboto, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   padding: 0;
+  color: var(--dark, #003a60) !important;
 }
 
 :root {
@@ -104,9 +102,11 @@ body {
   --color-grey-dark1: #999999;
   --color-light-grey10: #d4d4d4;
   --color-light-grey11: #ccc;
+  --color-light-grey12: #e4ebef;
   --color-chip-inactive: #bbc0c3;
   --color-error-bg: #fef6f8;
   --color-mapping-bg: #ccedff;
+  --color-grey-dark2: #35667D;
   // font settings newly added
   --font-regular: 'Moderat Regular';
   --font-medium: 'Moderat Medium';
@@ -123,4 +123,55 @@ body {
   --font-weight-bold: bold;
   --font-weight-normal: normal;
   --font-weight-medium: medium;
+}
+
+.btn-white {
+  background: var(--color-white);
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  font-weight: normal;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.btn-red {
+  background: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  color: var(--color-white);
+  padding-left: 15px;
+  padding-right: 15px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.chip {
+  border-radius: 5px;
+  padding: 5px 10px;
+  width: fit-content;
+  background: var(--color-grey-dark2);
+  color: var(--color-white);
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+.pl-3 {
+  padding-left: 16px;
+}
+
+.page-input {
+  max-width: 73px !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  padding: 6px 12px !important;
+}
+
+.page-input:focus {
+  outline: none; 
+  border-color: var(--border-color); 
+}
+
+.no-data-image{
+  max-height: 250px;
+  margin-bottom:2px;
 }

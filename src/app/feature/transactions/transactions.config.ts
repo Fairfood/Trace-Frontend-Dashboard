@@ -16,11 +16,14 @@ import {
   FairFoodCustomTabComponent,
   SortCustomComponent,
   FfPaginationComponent,
+  FfCustomPaginationComponent,
 } from 'fairfood-utils';
 import { SearchBoxComponent } from 'src/app/shared/components/search-box';
 import { TransactionActionsComponent } from '../transaction-actions';
 import { FairFoodDropQuantityComponent } from 'src/app/shared/components/ff-drop-quantity';
 import { FairFoodDropDateComponent } from 'src/app/shared/components/ff-drop-date';
+import { TranslateModule } from '@ngx-translate/core';
+import { SyncBtnComponent } from 'src/app/shared/components/sync-btn/sync-btn.component';
 
 export const TR_IMPORTS = [
   CommonModule,
@@ -42,4 +45,7 @@ export const TR_IMPORTS = [
   FfPaginationComponent,
   FairFoodDropQuantityComponent,
   FairFoodDropDateComponent,
+  TranslateModule,
+  SyncBtnComponent,
+  FfCustomPaginationComponent,
 ];

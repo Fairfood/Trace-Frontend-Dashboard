@@ -7,6 +7,7 @@ import {
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { UtilService } from 'src/app/shared/service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -14,10 +15,16 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
-
+    const utilSpyObj = jasmine.createSpyObj('UtilService', [
+      'generateTotpToken',
+    ]);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, MatSnackBarModule],
-      providers: [AuthService, { provide: Router, useValue: routerSpyObj }],
+      providers: [
+        AuthService,
+        { provide: Router, useValue: routerSpyObj },
+        { provide: UtilService, useValue: utilSpyObj },
+      ],
     });
 
     authService = TestBed.inject(AuthService);

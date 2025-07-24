@@ -1,13 +1,12 @@
-<app-listing-info></app-listing-info>
-
-<section class="ff-table-container w-100" [ngClass]="selectedStocks?.length?'one-margin m-0': ''">
+<app-listing-info [archivePage]="archivePage"></app-listing-info>
+<section class="ff-table-container w-100" [ngClass]="selectedStocks?.length&&!archivePage?'one-margin m-0': ''">
     <table class="stock-listing-table" aria-label="stock listing table">
         <thead>
             <tr>
                 <th *ngFor="let item of displayedColumns" class="{{item?.class}}">
-                    <ng-container *ngIf="item.name === 'selection'">
-                        <span class="custom-checkbox" *ngIf="!selectedBatchesOnly">
-                            <mat-checkbox [checked]="selectAll$ | async"></mat-checkbox>
+                    <ng-container *ngIf="item.name === 'selection' && stocks?.length>0">
+                        <span class="custom-checkbox" *ngIf="!selectedBatchesOnly" id="selectAllWraper">
+                            <mat-checkbox [checked]="selectAll$ | async" id="selectAllCheckbox"></mat-checkbox>
                             <span class="overlay pointer" [matMenuTriggerFor]="selectList"></span>
                         </span>
 
@@ -15,16 +14,16 @@
                         <mat-menu class="mat-menu more-filters" #selectList="matMenu" xPosition="after">
                             <mat-radio-group id="selectAllOptions" aria-label="Select an option">
                                 <mat-radio-button value="page" class="font-1-normal text-xs text-blue radio-items"
-                                    (change)="radioButtonChanged($event)" [checked]="(selectingOptions$ | async)==='page'"
-                                    *ngIf="(selectingOptions$ | async)!=='all'">
+                                    (change)="radioButtonChanged($event)" [checked]="selectOptions ==='page'"
+                                    *ngIf="selectOptions !=='all'">
                                     Select current list ({{stocks?.length}})
                                 </mat-radio-button>
                                 <mat-radio-button value="all" class="font-1-normal text-xs text-blue radio-items"
-                                    [checked]="(selectingOptions$ | async)==='all'" (change)="radioButtonChanged($event)">
+                                    [checked]="selectOptions ==='all'" (change)="radioButtonChanged($event)">
                                     Select entire list ({{tableLength}})
                                 </mat-radio-button>
                             </mat-radio-group>
-                            <article *ngIf="(selectingOptions$ | async)" class="footer-selection font-1-medium pointer"
+                            <article *ngIf="selectOptions " class="footer-selection font-1-medium pointer"
                                 (click)="clearPageSelection()">
                                 Clear selection
                             </article>
@@ -48,7 +47,8 @@
             <tr *ngFor="let item of stocks; trackBy: trackByFn" class="pointer"
                 [ngClass]="{'selected': selectedStocks | listingRowSelection: item }">
                 <td class="mat-cell selection-column">
-                    <mat-checkbox [ngModel]="item.select" (change)="changeSelect($event, item)"></mat-checkbox>
+                    <mat-checkbox [ngModel]="item.select" (change)="changeSelect($event, item)"
+                        *ngIf="!selectedBatchesOnly"></mat-checkbox>
                 </td>
                 <td class="mat-cell stock-id-column" (click)="viewDetails(item)">
                     {{item?.stockId}}
@@ -63,17 +63,22 @@
                     {{item?.from}}
                 </td>
                 <td class="mat-cell normal-column" (click)="viewDetails(item)">
-                    {{item?.batch}}
+                    <span *ngIf="item?.batch.length>18" matTooltip="{{item?.batch}}">
+                        {{(item?.batch|slice:0:18)+'...'}}
+                    </span>
+                    <span *ngIf="item?.batch.length<=18">
+                        {{item?.batch}}
+                    </span>
                 </td>
                 <td class="mat-cell large-column">
                     <div [ngClass]="item?.select?'ff-flex-between':'ff-flex-start'">
                         <span>
                             {{item?.quantityAvailable.toFixed(2)}}
                         </span>
-                        <ng-container *ngIf="item.select">
+                        <ng-container *ngIf="item.select && !archivePage">
                             <article class="input-container-with-error">
                                 <label class="has-float-label">
-                                    <input type="number" min="1" [(ngModel)]="item.quantityNeeded"
+                                    <input type="number" min="1" [(ngModel)]="item.quantityNeeded" id="quantityNeeded"
                                         (keyup)="updateQuantityValue(item)" />
                                     <span class="label">Quantity needed(kg)</span>
                                 </label>
@@ -89,11 +94,11 @@
                     {{item?.referenceNo || '-'}}
                 </td>
                 <td class="mat-cell options-column" (click)="$event.stopPropagation()">
-                    <span class="pointer" [matMenuTriggerFor]="rowMenu">
+                    <span class="pointer" [matMenuTriggerFor]="rowMenu" id="moreOptions">
                         <mat-icon>more_vert</mat-icon>
                     </span>
                     <mat-menu class="mat-menu more-options" #rowMenu="matMenu" xPosition="before">
-                        <button class="text-xs text-blue" mat-menu-item (click)="viewDetails(item)">
+                        <button class="text-xs text-blue" id="viewDetails" mat-menu-item (click)="viewDetails(item)">
                             View details
                         </button>
                     </mat-menu>
@@ -102,12 +107,19 @@
         </tbody>
     </table>
 
-    <div class="no-data w-100" aria-label="" *ngIf="tableLength === 0 && !dataLoading">
-        No stock found
+    <section class="row-md pointer" *ngIf="tableLength > 10 && !selectedBatchesOnly && !dataLoading && scrollValue>0">
+        <article class="col-md-12  additional-rows ff-flex-center value-tr" (click)="clickAndLoadMore()">
+            + {{ scrollValue }} more rows
+        </article>
+    </section>
+
+    <div class="no-data w-100 flex-column" *ngIf="tableLength === 0 && !dataLoading">
+        <div>
+            <img class="no-data-image" src="../../../../assets/images/no_stock.svg" alt="">
+        </div>
+        <span>No stock found</span>
     </div>
 
-    <app-loader loaderText="Loading stock list" loaderType="type1" *ngIf="dataLoading" class="min-h-300"></app-loader>
+    <app-loader loaderText="Loading stock list" loaderType="type1" *ngIf="dataLoading" class="min-h-300"
+        id="stockTableLoader"></app-loader>
 </section>
-
-<app-ff-pagination [totalCount]="tableLength" (paginationAction)="paginatorEvent($event)"
-    [ngClass]="(hidePagination$ | async)?'hide': 'show'"></app-ff-pagination>

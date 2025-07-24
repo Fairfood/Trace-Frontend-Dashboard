@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { headerOptions } from 'fairfood-utils';
 import { Observable, Subject, map } from 'rxjs';
 
 import {
@@ -8,10 +9,7 @@ import {
   NotificationEvent,
   NotificationRequestType,
 } from 'src/app/shared/configs/app.constants';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { RouterService } from 'src/app/shared/service';
 import { environment } from 'src/environments/environment';
 const BASE_URL = environment.baseUrl;

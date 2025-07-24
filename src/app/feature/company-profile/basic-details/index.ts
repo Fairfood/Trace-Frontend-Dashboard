@@ -1,1 +1,1 @@
-export { BasicDetailsComponent } from './basic-details.component';
+export { BasicDetailsCompanyComponent } from './basic-details.component';

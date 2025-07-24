@@ -53,6 +53,8 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
   connectionTypeList: any[] = [];
   today = new Date();
   dataCount$ = this.store.dataCount$;
+  errorCount$ = this.store.errorCount$;
+  duplicateErrorCount = 0;
 
   inputFields = ['float', 'str', 'phone', 'latitude', 'longitude'];
 
@@ -78,6 +80,20 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
 
     this.errorRow$ = this.store.errorRows$;
     this.successData$ = this.store.dataRows$;
+
+    const subError = this.errorRow$.subscribe({
+      next: errorRows => {
+        this.duplicateErrorCount = errorRows.filter(item =>
+          item.errors.some(
+            (error: any) =>
+              error.key === 'duplicate' && error.reason === 'Duplicate Entry'
+          )
+        ).length;
+
+        console.log(this.duplicateErrorCount);
+      },
+    });
+    this.pageApis.push(subError);
 
     combineLatest([this.errorRow$, this.successData$]).subscribe(
       ([error, data]) => {
@@ -129,6 +145,7 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   trackByFn(index: number, item: any): any {
     return item.index;
   }
@@ -138,15 +155,28 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
     this.backendValidation(item);
   }
 
+  /**
+   * This method is called when the backend validation is done on individual row only
+   * ie, each row is validated.
+   * @param res any
+   * @param index number
+   */
   updateTableData(res: any, index: number): void {
     const { data, errors, data_count } = res;
 
+    /**
+     * If row is valid error will be empty array
+     * so the coresponding index row should be removed from errorRows
+     */
     if (errors.length === 0) {
       const newErros = [...this.store.currentErrorState()].filter(
         row => row.index !== index
       );
+      const errorCount = this.store.existingErrorCount() - 1;
       this.store.updateStateProp<any>('errorRows', newErros);
+      this.store.updateStateProp<any>('errorCount', errorCount);
     } else {
+      // otherwise update the errorRows with the new error state from BE
       const existingState = this.store.currentErrorState();
       const foundIndex = existingState.findIndex(
         f => f.index === errors[0].index
@@ -154,6 +184,7 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
       existingState[foundIndex] = errors[0];
       this.store.updateStateProp<any>('errorRows', existingState);
     }
+    // data state should be updated if there is any data from BE
     if (data.length) {
       const newData = [...data];
       this.store.updateStateProp<any>('dataRows', newData);
@@ -167,12 +198,16 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
       this.store.updateStateProp<any>('dataRows', [
         ...this.store.currentDataState(),
       ]);
+      this.store.updateStateProp<any>('errorCount', 0);
     } else {
       const error = this.store.currentErrorState();
       const newError = error.filter(
         (row: any, indexF: number) => indexF !== index
       );
       this.store.updateStateProp<any>('errorRows', newError);
+
+      const newErrorCount = this.store.existingErrorCount() - 1;
+      this.store.updateStateProp<any>('errorCount', newErrorCount);
     }
   }
 
@@ -210,10 +245,10 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
     const formattedDate = this.formatDate(event);
     item[key] = formattedDate;
     this.backendValidation(item);
-    this.dropdownMenuItem.closeMenu();
+    this.dropdownMenuItem?.closeMenu();
   }
 
-  private formatDate(date: Date): string {
+  formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = ('0' + (date.getMonth() + 1)).slice(-2);
     const day = ('0' + date.getDate()).slice(-2);
@@ -247,6 +282,10 @@ export class TemplateVerificationComponent implements OnInit, OnDestroy {
      * Remove template from store and go to step1
      */
     this.store.removeNewUplod();
+  }
+
+  isObject(value: any): boolean {
+    return value && typeof value === 'object' && !Array.isArray(value);
   }
 
   ngOnDestroy(): void {

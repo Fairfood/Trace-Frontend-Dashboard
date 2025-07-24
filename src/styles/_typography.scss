@@ -21,15 +21,15 @@
 }
 
 .font-1-bold {
-  font-family: 'Moderat Bold' !important;
+  font-family: var(--font-bold), sans-serif;
 }
 
 .font-1-medium {
-  font-family: 'Moderat Medium' !important;
+  font-family: var(--font-medium), sans-serif;
 }
 
 .font-1-normal {
-  font-family: 'Moderat Regular' !important;
+  font-family: var(--font-regular), sans-serif;
 }
 
 .ff-heading1 {

@@ -1,29 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* istanbul ignore file */
 import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { TranslateModule } from '@ngx-translate/core';
 import { LoaderComponent, FairFoodCustomTabComponent } from 'fairfood-utils';
-import { BasicDetailsComponent } from './basic-details';
-import { ProfileAvatarModule } from '../profile-avatar';
+import { BasicDetailsCompanyComponent } from './basic-details';
 import { TeamMembersComponent } from './team-members';
-import { DocumentationModule } from './documentation';
+import { DocumentsTabComponent } from './documentation';
 import { SupplyChainsComponent } from './supply-chains';
 import { WalletTabComponent } from './wallet-tab';
 import { ConnectionLabelComponent } from './connection-label';
 import { ActivitiesComponent } from './activities';
 import { CompanyClaimsComponent } from './company-claims';
+import { ProfileAvatarComponent } from 'src/app/shared/components/profile-avatar';
+import { ClaimsTabComponent } from './claims-tab/claims-tab.component';
 
 export const IMPORTS = [
   LoaderComponent,
-  ProfileAvatarModule,
   FairFoodCustomTabComponent,
-  BasicDetailsComponent,
+  BasicDetailsCompanyComponent,
   TeamMembersComponent,
-  DocumentationModule,
+  DocumentsTabComponent,
   SupplyChainsComponent,
   WalletTabComponent,
   ConnectionLabelComponent,
   ActivitiesComponent,
   CompanyClaimsComponent,
+  TranslateModule,
+  ProfileAvatarComponent,
+  ClaimsTabComponent,
 ];
 
 export const PROFILE_TABS_MORE: ICommonObj[] = [
@@ -48,10 +51,6 @@ export const PROFILE_TABS_MORE: ICommonObj[] = [
     id: 'claims',
     name: 'Claims',
   },
-  // {
-  //   id: 'excelTemplate',
-  //   name: 'Custom excel template',
-  // },
   {
     id: 'logs',
     name: 'Activity',
@@ -64,6 +63,10 @@ export const PROFILE_TABS = [
     name: 'Basic details',
   },
   {
+    id: 'claims',
+    name: 'Claims',
+  },
+  {
     id: 'team',
     name: 'Team members',
   },
@@ -74,10 +77,10 @@ export const OTHER_COMPANY_TABS = [
     id: 'basic',
     name: 'Basic details',
   },
-  // {
-  //   id: 'claims',
-  //   name: 'Claims',
-  // },
+  {
+    id: 'claims',
+    name: 'Claims',
+  },
   {
     id: 'logs',
     name: 'Activity',
@@ -87,58 +90,67 @@ export const OTHER_COMPANY_TABS = [
 export const BASIC_DETAILS = [
   {
     key: 'description_basic',
-    label: 'Description',
+    label: 'misc.desc',
     controlName: 'description',
     type: 'textarea',
+    required: false,
   },
   {
     key: 'street',
-    label: 'Street name *',
+    label: 'company.street',
     controlName: 'street',
     type: 'text',
+    required: true,
   },
   {
     key: 'country',
-    label: 'Country *',
+    label: 'company.country',
     controlName: 'country',
     type: 'dropdown',
     optionName: 'countryList',
     defaultValue: 'country',
+    required: true,
   },
   {
     key: 'province',
-    label: 'Province *',
+    label: 'company.province',
     controlName: 'province',
     type: 'dropdown',
     optionName: 'stateList',
     defaultValue: 'province',
+    required: true,
   },
   {
     key: 'city',
-    label: 'City/Village *',
+    label: 'company.city',
     controlName: 'city',
     type: 'text',
+    required: true,
   },
   {
     key: 'zipcode',
-    label: 'Postal code',
+    label: 'company.postal',
     controlName: 'zipCode',
     type: 'text',
+    required: false,
   },
   {
     key: 'latitude',
-    label: 'Latitude',
+    label: 'company.latitude',
     controlName: 'latitude',
     type: 'text',
+    required: false,
   },
   {
     key: 'longitude',
-    label: 'Longitude',
+    label: 'company.longitude',
     controlName: 'longitude',
     type: 'text',
+    required: false,
   },
 ];
 
+/* istanbul ignore next */
 export const connectionProfileDropdownValue = (
   selectedValue: string,
   formControlName: string,

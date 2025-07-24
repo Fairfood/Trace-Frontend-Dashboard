@@ -14,6 +14,8 @@ export interface IFilterToggleItems {
   dateFrom: string;
   searchString: string;
   createdFrom?: string;
+  archived: boolean;
+  searchBy?: string;
 }
 
 export interface ITableFilterProps {
@@ -23,23 +25,20 @@ export interface ITableFilterProps {
   orderBy?: string;
 }
 
-export interface IProgressBar {
-  progress: boolean;
-  value: number;
-}
-
 export interface IListingState {
   filters: IFilterToggleItems;
   tableProps: ITableFilterProps;
   selectAll: boolean;
   stockAction: boolean;
   selectedStocks: IStockTableRow[];
-  progressBarDetails: IProgressBar;
   viewSelected: boolean;
   enableSendStock: boolean;
   toggle: boolean;
   claimData: Partial<ICommonObj>[];
   selectingOptions: string | null;
+  hideViewSelected: boolean;
+  changedBatches: IBatches[];
+  batches: IBatches[];
 }
 
 export interface IStockFilter {
@@ -76,4 +75,23 @@ export interface IListingAPIResponse {
 export interface ITableAction {
   action: string;
   data: 'all' | 'selected' | 'none';
+}
+
+export interface IBatches {
+  batch: string;
+  quantity: number;
+}
+
+export interface FilterParams {
+  product: string;
+  claim: string;
+  supplier: string;
+  quantity_from: string;
+  quantity_to: string;
+  quantity_is: string;
+  date_on: string;
+  date_to: string;
+  date_from: string;
+  search: string;
+  created_from: string;
 }

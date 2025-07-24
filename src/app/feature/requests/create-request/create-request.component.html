@@ -2,7 +2,7 @@
     <h4>
         Request stock
     </h4>
-    <mat-icon class="pointer" (click)="close()">close</mat-icon>
+    <mat-icon class="pointer" (click)="close()" id="close">close</mat-icon>
 </section>
 
 <section class="main-div" *ngIf="dataLoaded" id="createtransparencyRequest">
@@ -10,7 +10,7 @@
         <article class="mb-20 flex-column">
             <label class="has-float-label custom-input"
                 [ngClass]="{'has-error': fcontrol.supplier.invalid && fcontrol.supplier.touched }">
-                <input placeholder=" " formControlName="supplier" type="text" class="stock"
+                <input placeholder=" " id="sendRequest" formControlName="supplier" type="text" class="stock"
                     [matAutocomplete]="fromFarmer" (input)="checkSupplier()" />
                 <span class="label">Send request to*</span>
                 <mat-icon>keyboard_arrow_down</mat-icon>
@@ -42,7 +42,7 @@
         <article class="mb-20 flex-column">
             <label class="has-float-label custom-input"
                 [ngClass]="{'has-error': fcontrol.product.invalid && fcontrol.product.touched }">
-                <input placeholder=" " formControlName="product" type="text" class="stock"
+                <input placeholder=" " id="product" formControlName="product" type="text" class="stock"
                     [matAutocomplete]="productSection" />
                 <span class="label">Product*</span>
                 <mat-icon>keyboard_arrow_down</mat-icon>
@@ -87,7 +87,10 @@
                 </app-ff-dropdown>
             </article>
         </div>
-        <ul class="supplied-for mb-20" *ngIf="claims.length">
+        <div class="claim-header pl-0">
+            <h4>Claims</h4>
+        </div>
+        <ul class="supplied-for claim-container mb-20" *ngIf="claims.length">
             <ng-container *ngFor="let claim of claims; let i = index">
                 <li [ngClass]="{'selected': claim.selected}" class="ff-flex-between" (click)="selectClaim(i)">
                     <span>
@@ -129,16 +132,16 @@
 <ng-template let-formcontrol="formcontrol" #formErrorMessages>
     <span class="error-message"
         *ngIf="fcontrol[formcontrol]?.errors?.required && (fcontrol[formcontrol]?.touched || submitted)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'product'">
         <article *ngIf="fcontrol.product.invalid && (fcontrol.product.touched || submitted)">
             <span *ngIf="fcontrol.product.errors.maxlength" class="error-message">
-                {{'productMaxLength'|translate}}
+                {{'formValidation.productMaxLength'|translate}}
             </span>
             <span *ngIf="fcontrol.product.errors.minlength" class="error-message">
-                {{'productMinLength'|translate}}
+                {{'formValidation.productMinLength'|translate}}
             </span>
         </article>
     </ng-container>
@@ -155,4 +158,9 @@
             Invalid price
         </span>
     </ng-container>
+
+    <ng-container *ngIf="(filteredOptionsSupplier$ | async)?.length === 0 && formcontrol === 'supplier' && !fcontrol[formcontrol]?.errors?.required">
+        <span class="error-message">No connections found</span>
+    </ng-container>
+
 </ng-template>

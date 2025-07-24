@@ -20,8 +20,8 @@ describe('FairFoodDropDateComponent', () => {
   let component: FairFoodDropDateComponent;
 
   beforeEach(() => {
+    const utilSpyObj = jasmine.createSpyObj('UtilService', ['customSnackBar']);
     TestBed.configureTestingModule({
-      declarations: [],
       imports: [
         CommonModule,
         MatMenuModule,
@@ -36,7 +36,13 @@ describe('FairFoodDropDateComponent', () => {
         MatSnackBarModule,
         HttpClientModule,
       ],
-      providers: [FormBuilder, UtilService],
+      providers: [
+        FormBuilder,
+        {
+          provide: UtilService,
+          useValue: utilSpyObj,
+        },
+      ],
     });
 
     fixture = TestBed.createComponent(FairFoodDropDateComponent);
@@ -48,8 +54,6 @@ describe('FairFoodDropDateComponent', () => {
   });
 
   it('should show validation error', () => {
-    spyOn(component.utils, 'customSnackBar');
-
     component.showValidationError();
 
     expect(component.utils.customSnackBar).toHaveBeenCalledWith(

@@ -8,7 +8,8 @@
         </aside>
     </section>
     <section class="top-box" *ngIf="!loading">
-        <app-profile-avatar [imageUrl]="profileData?.image" [avatar]="profileData?.avatar"></app-profile-avatar>
+        <app-profile-avatar [ngClass]="profileData?.claims.length>0?'profile-av':''" [imageUrl]="profileData?.image"
+            [avatar]="profileData?.avatar"></app-profile-avatar>
         <aside aria-label="important information" class="d-flex flex-column data">
             <article class="badges">
                 <span class="badge-ff text-xs"
@@ -24,7 +25,7 @@
                             fill="white" />
                     </svg>
 
-                    Consent {{profileData?.consent_status.toLowerCase()}}
+                    Consent {{profileData?.consent_status?.toLowerCase()}}
                 </span>
             </article>
             <span class="value-tr text-md font-1-bold">{{profileData?.name}}</span>
@@ -44,6 +45,19 @@
 
                 FF {{profileData?.cards[0]?.fairid}}
             </span>
+            <article class="d-flex flex-row">
+                <div *ngFor="let claim of profileData?.claims">
+                    <div class="claim-label-container ff-flex-align-center pointer"
+                        (click)="claim.claim_processor === 'guardian' ? gotoClaimTab() : openDialog(claim)">
+                        <div class="image-container">
+                            <img *ngIf="claim.claim_processor != 'guardian'" class="claim-icon" src="../../../assets/images/claim.svg" alt="">
+                            <img *ngIf="claim.claim_processor === 'guardian'" class="claim-icon-guardian" src="../../../assets/images/guardian-claim.svg" alt="">
+                        </div>
+                        <span class="claim-text">{{claim?.name}}</span>
+                        <mat-icon>keyboard_arrow_right</mat-icon>
+                    </div>
+                </div>
+            </article>
         </aside>
     </section>
     <section class="utils" *ngIf="!loading">
@@ -126,6 +140,12 @@
         </ng-container>
         <ng-container *ngIf="activeTabId === 'docs'">
             <app-docs [farmerId]="profileData.id" [isEditable]="profileData?.is_editable"></app-docs>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'carbon_emissions'">
+            <app-carbon-emissions></app-carbon-emissions>
+        </ng-container>
+        <ng-container *ngIf="activeTabId === 'claims'">
+            <app-claim-tab-common [nodeId]="profileData.id" (reloadParent)="onClaimsReloaded()"></app-claim-tab-common>
         </ng-container>
     </section>
 </div>

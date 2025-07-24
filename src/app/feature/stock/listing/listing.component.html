@@ -1,12 +1,11 @@
-<section class="ff-flex-align-center top-wrapper">
-    <app-search-box [placeholder]="'Search here'" [hideOptions]="false" [searchByOptions]="searchOptions"
-        [clearSearch]="clearSearch" (searchText)="searchFilter($event)" class="search-wrap"></app-search-box>
-    <app-listing-action class="filter-wrap" (filterChanged)="callStockApi(); clearSearch = true"></app-listing-action>
+<section class="ff-flex-align-center top-wrapper" *ngIf="!dataLoading">
+    <app-search-box  [autoFocus]="!!appliedFilterValues?.searchString" [placeholder]="'Search here'" [searchString]="appliedFilterValues?.searchString" [hideOptions]="false" [searchByOptions]="searchOptions"
+        [clearSearch]="clearSearch" (searchText)="searchFilter($event)" class="search-wrap" [selectedOption]="appliedFilterValues?.searchBy" (searchByOptionChange)="handleSearchByOptionChange($event)"></app-search-box>
+    <app-listing-action (getApi)="clearAndResetToDefault()" class="filter-wrap" (filterChanged)="callStockApi(); clearSearch = true"></app-listing-action>
 </section>
 
 <app-listing-filters *ngIf="toggleFilter" (filterChanged)="callStockApi()"></app-listing-filters>
 
-<app-stock-table [stocks]="stocks" [dataLoading]="dataLoading" [tableLength]="tableLength"
-    (rowSelection)="rowSelectionCondition($event)" (filterChanged)="callStockApi()">
-
+<app-stock-table [stocks]="stocks" [dataLoading]="dataLoading" [tableLength]="tableLength" [scrollValue]="scrollValue"
+    (rowSelection)="rowSelectionCondition($event)" (filterChanged)="callStockApi($event)">
 </app-stock-table>

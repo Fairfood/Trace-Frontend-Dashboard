@@ -1,16 +1,16 @@
 <section class="wallet-tab">
     <div class="header ff-flex-between mb-10">
-        <h3>{{walletCount}} wallets</h3>
+        <h3>{{walletCount}} {{'wallet.heading'|translate}}</h3>
     </div>
     <section class="ff-table-container w-100">
         <table aria-label="wallet">
             <thead>
                 <tr>
                     <th class="large-column pointer">
-                        Public address
+                        {{'wallet.address'|translate}}
                     </th>
                     <th class="normal-column">
-                        Status
+                        {{'claim.statusText'|translate}}
                     </th>
                 </tr>
             </thead>
@@ -22,18 +22,21 @@
                         </app-common-wallet>
                     </td>
                     <td class="mat-cell large-column">
-                        <span *ngIf="element.default">Active</span>
-                        <span *ngIf="!element.default">Inactive</span>
+                        <span *ngIf="element.default">{{'status.active'|translate}}</span>
+                        <span *ngIf="!element.default">{{'status.inactive'|translate}}</span>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <div class="no-data w-100" aria-label="" *ngIf="walletCount === 0" [hidden]="loader">
-            No wallet found
+        <div class="no-data w-100 flex-column" aria-label="" *ngIf="walletCount === 0" [hidden]="loader">
+            <div>
+                <img class="no-data-image" src="../../../../assets/images/no_wallet.svg" alt="">
+            </div>
+           <span> {{'wallet.noWallet'|translate}}</span>
         </div>
 
-        <app-loader [loaderText]="'Loading documents'" [loaderType]="'type1'" *ngIf="loader"
+        <app-loader [loaderText]="'loaderText.wallet'|translate" loaderType="type1" *ngIf="loader"
             class="min-h-300"></app-loader>
     </section>
 </section>

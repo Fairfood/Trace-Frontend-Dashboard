@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { CompanyProfileStoreService } from '../company-profile-store.service';
-import { HTTP_OPTION_4 } from 'src/app/shared/configs/app.constants';
-import { map, tap } from 'rxjs/operators';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
 import { Observable } from 'rxjs/internal/Observable';
+import { map, tap } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
+
+import { environment } from 'src/environments/environment';
+
+import { CompanyProfileStoreService } from '../company-profile-store.service';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { ICommonObj } from 'src/app/shared/configs/app.model';
+import { HTTP_OPTION_4 } from 'src/app/shared/configs/app.constants';
+
+import { headerOptions } from 'fairfood-utils';
 
 const BASE_URL = environment.baseUrl;
 @Injectable({
@@ -19,7 +21,8 @@ const BASE_URL = environment.baseUrl;
 export class TeamMemberService {
   constructor(
     private store: CompanyProfileStoreService,
-    private http: HttpClient
+    private http: HttpClient,
+    private translate: TranslateService
   ) {}
 
   /**
@@ -100,15 +103,15 @@ export class TeamMemberService {
   roleList(): ICommonObj[] {
     return [
       {
-        name: 'Admin',
+        name: this.translate.instant('roles.admin'),
         id: '1',
       },
       {
-        name: 'Member',
+        name: this.translate.instant('roles.member'),
         id: '2',
       },
       {
-        name: 'Viewer',
+        name: this.translate.instant('roles.viewer'),
         id: '3',
       },
     ];

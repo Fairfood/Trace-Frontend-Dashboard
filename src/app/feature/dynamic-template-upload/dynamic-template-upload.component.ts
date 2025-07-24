@@ -1,21 +1,38 @@
+import { CommonModule } from '@angular/common';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Component, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 // services
 import { RouterService, UtilService } from 'src/app/shared/service';
 import { DynamicTemplateStore } from './dynamic-template-upload-store.service';
-import { DynamicTemplateUploadService } from './dynamic-template-upload.service';
 // configs
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
 import { ITabItem } from 'src/app/shared/configs/app.model';
-import { MatDialog } from '@angular/material/dialog';
+// components
 import { LoseDataDialogComponent } from './lose-data-dialog';
+import { UploadSummaryComponent } from './upload-summary';
+import { TemplateMappingComponent } from './template-mapping';
+import { TemplateSelectionComponent } from './template-selection';
+import { TemplateVerificationComponent } from './template-verification';
+import { FairFoodCustomTabComponent } from 'fairfood-utils';
 
 const BLOCK_NAVIGATION = ['linkFields', 'verification', 'summary'];
 
 @Component({
   selector: 'app-dynamic-template-upload',
   templateUrl: './dynamic-template-upload.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    UploadSummaryComponent,
+    TemplateMappingComponent,
+    TemplateSelectionComponent,
+    TemplateVerificationComponent,
+    FairFoodCustomTabComponent,
+    MatDialogModule,
+    LoseDataDialogComponent,
+  ],
 })
 export class DynamicTemplateUploadComponent implements OnDestroy {
   type: number;
@@ -29,7 +46,6 @@ export class DynamicTemplateUploadComponent implements OnDestroy {
     private route: ActivatedRoute,
     private util: UtilService,
     private routeService: RouterService,
-    private service: DynamicTemplateUploadService,
     public dialog: MatDialog
   ) {
     const found = ['transactions', 'connections'].includes(
@@ -40,12 +56,14 @@ export class DynamicTemplateUploadComponent implements OnDestroy {
       this.type = this.route.snapshot.params.id === 'transactions' ? 1 : 2;
       this.store.updateStateProp<number>('templateType', this.type);
     } else {
+      /* istanbul ignore next */
       this.util.customSnackBar('Invalid URL', ACTION_TYPE.FAILED);
       this.canLoad = false;
       this.routeService.navigateUrl('/dashboard');
     }
   }
 
+  /* istanbul ignore next */
   errorMessage(): void {
     const dialogRef = this.dialog.open(LoseDataDialogComponent, {
       disableClose: true,

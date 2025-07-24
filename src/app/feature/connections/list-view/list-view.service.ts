@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 // config
 import { HTTP_OPTION_4 } from 'src/app/shared/configs/app.constants';
-import {
-  headerOptions,
-  successFormatter,
-} from 'src/app/shared/configs/app.methods';
+import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { RouterService, StorageService } from 'src/app/shared/service';
 
 import { environment } from 'src/environments/environment';
 import { NewConnectionFarmerService } from '../new-connection-farmer/new-connection-farmer.service';
 import { NewConnectionCompanyService } from '../new-connection-company';
+import { headerOptions } from 'fairfood-utils';
 const BASE_URL = environment.baseUrl;
 
 export interface IFilterMaster {
@@ -36,10 +35,20 @@ export class ListViewService {
     private storage: StorageService
   ) {}
 
-  getCompanyClaims(scope: string) {
+  getCompanyClaims(
+    scope: string,
+    nodeId?: string,
+    search?: string
+  ): Observable<any> {
     return this.http
       .get(
-        BASE_URL + '/claims/?limit=1000&type=2&scope=' + scope,
+        BASE_URL +
+          '/claims/?limit=1000&type=2&scope=' +
+          scope +
+          '&node=' +
+          nodeId +
+          '&search=' +
+          search,
         headerOptions(HTTP_OPTION_4)
       )
       .pipe(map(successFormatter));

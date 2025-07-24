@@ -16,14 +16,17 @@
   background-color: var(--color-table-row-active);
   display: flex;
   padding: 20px 30px;
+
   @include devices(desktop) {
     max-width: 70%;
   }
+
   .badge-white {
     background-color: var(--color-white);
     color: var(--color-primary-1) !important;
     display: flex;
     align-items: center;
+
     svg {
       margin-right: 5px;
     }
@@ -32,6 +35,7 @@
   .badge-ff {
     color: var(--color-white);
   }
+
   .badge-ff,
   .value-tr,
   .label-tr {
@@ -39,15 +43,17 @@
   }
 
   .data {
-    margin-left: 15px;
+    margin-left: 25px;
   }
 }
+
 .heading-section,
 .utils,
 .tab-content {
   ::ng-deep.tab-item {
     min-width: 120px;
   }
+
   @include devices(desktop) {
     max-width: 70%;
   }
@@ -58,6 +64,7 @@
   height: auto;
   transition: height 0.25s ease-in;
 }
+
 .badges {
   margin-bottom: 5px;
   display: flex;
@@ -66,21 +73,26 @@
 .first-row {
   justify-content: space-between;
   align-items: center;
+
   .icon-wrapper {
     padding: 20px 10px;
   }
+
   img,
   mat-icon {
     height: 54px;
     width: 54px;
     margin-right: 10px;
   }
+
   mat-icon {
     font-size: 50px;
   }
+
   .editing {
     align-self: flex-start;
     padding: 20px 10px;
+
     mat-icon {
       font-size: 18px;
       height: 18px;
@@ -93,14 +105,55 @@
 
 .location {
   margin: 5px 0;
+
   img {
     width: 30px;
     height: 20px;
     margin-right: 10px;
   }
 }
+
 .no-ref {
   padding: 0;
   margin-bottom: 10px;
   width: 100%;
+}
+
+.item .value-tr {
+  max-width: 250px;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.claim-label-container {
+  background: var(--color-white);
+  box-sizing: border-box;
+  // max-width: 220px;
+  margin-right: 10px;
+  border-radius: 5px;
+  // padding: 4px 10px;
+}
+
+.claim-icon {
+  width: 24px;
+}
+
+.claim-icon-guardian{
+  width: 20px;
+}
+
+.claim-text {
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0px 11px;
+}
+
+.image-container {
+  padding: 5px 2px 0px 5px;
+}
+
+.profile-av {
+  margin-top: 20px;
+  height: 109px;
+  width: 109px;
 }

@@ -1,72 +1,145 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatDialogModule,
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {
+  MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { of } from 'rxjs';
 import { ClaimService } from '../claim.service';
 import { ClaimDetailComponent } from './claim-detail.component';
+import { of } from 'rxjs';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { EventEmitter } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 describe('ClaimDetailComponent', () => {
   let component: ClaimDetailComponent;
   let fixture: ComponentFixture<ClaimDetailComponent>;
-  let mockDialogRef: MatDialogRef<ClaimDetailComponent>;
+  let mockDialogRef: Partial<MatDialogRef<ClaimDetailComponent>>;
+  let mockDialog: Partial<MatDialog>;
   let mockClaimService: Partial<ClaimService>;
 
-  beforeEach(() => {
-    mockDialogRef = jasmine.createSpyObj(['close']);
+  beforeEach(async () => {
+    mockDialogRef = {
+      close: jasmine.createSpy('close'),
+    };
+    mockDialog = {
+      open: jasmine.createSpy('open'),
+    };
     mockClaimService = {
-      getVerifiers: () => of([]),
+      getVerifiers: jasmine.createSpy('getVerifiers').and.returnValue(of([])),
     };
 
-    TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatDialogModule,
-        ClaimDetailComponent,
-      ],
+    const translateServiceMock = {
+      currentLang: '',
+      onLangChange: new EventEmitter<LangChangeEvent>(),
+      get: () => of(''),
+      instant: (key: string) => key,
+      onTranslationChange: new EventEmitter(),
+      onDefaultLangChange: new EventEmitter(),
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [ClaimDetailComponent],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: MatDialog, useValue: mockDialog },
         { provide: ClaimService, useValue: mockClaimService },
+        { provide: TranslateService, useValue: translateServiceMock },
       ],
-    });
+    }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ClaimDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    component.initForm();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize the form when verified_by is EXTERNAL_VERIFIER', () => {
-    component.data = { verified_by: 2, isEdit: false };
-    component.initForm();
-    expect(component.evidenceForm).toBeTruthy();
+  it('should initialize form on ngOnInit', () => {
+    spyOn(component, 'initForm').and.callThrough();
+    component.ngOnInit();
+    expect(component.initForm).toHaveBeenCalled();
   });
 
-  it('should initialize the form with verifier values when isEdit is true', () => {
+  it('should initialize form correctly', () => {
     component.data = {
       verified_by: 2,
       isEdit: true,
-      verifier: { name: 'Verifier Name' },
+      verifier: { name: 'Test Verifier' },
     };
     component.initForm();
-    expect(component.evidenceForm).toBeTruthy();
+    expect(component.evidenceForm.get('verifier').value).toBe('Test Verifier');
   });
 
-  it('should set verifier when setVerifier is called', () => {
-    const verifier = { id: 1, name: 'Verifier' };
-    component.setVerifier(verifier);
-    expect(component.data.verifier).toBe(verifier);
+  it('should initialize verifier autocomplete', fakeAsync(() => {
+    component.data = {
+      verified_by: 2,
+      isEdit: true,
+      verifier: { name: 'Test Verifier' },
+    };
+    component.initForm();
+    spyOn(component, 'initVerifierAutoComplete').and.callThrough();
+    component.ngOnInit();
+    tick(600); // Wait for debounceTime
+    expect(component.initVerifierAutoComplete).toHaveBeenCalled();
+  }));
+
+  it('should close dialog and reset data if not in edit mode', () => {
+    spyOn(component, 'dataResetIfAny').and.callThrough();
+    component.data = { isEdit: false };
+    component.close();
+    expect(component.dataResetIfAny).toHaveBeenCalled();
+    expect(component.dialogRef.close).toHaveBeenCalled();
   });
 
-  // Add more tests for other methods and interactions
+  it('should reset data if not in edit mode', () => {
+    component.data = {
+      criteria: [
+        { fields: [{ id: 'field1', value: 'value1', file: true }] },
+        { fields: [{ id: 'field2', value: 'value2', file: true }] },
+      ],
+      verifierAssigned: true,
+      verifier: { name: 'Test Verifier' },
+    };
+    component.dataResetIfAny();
+    expect(component.data.criteria[0].fields[0].value).toBeNull();
+    expect(component.data.criteria[0].fields[0].file).toBeFalsy();
+    expect(component.data.verifierAssigned).toBeFalsy();
+    expect(component.data.verifier).toBeNull();
+  });
+
+  it('should handle removing claims file', () => {
+    const mockField = {
+      id: 'field1',
+      file: true,
+      value: { field: 'field1', file: true },
+    };
+    component.removeClaimFile(mockField);
+    expect(mockField.file).toBeFalsy();
+    expect(mockField.value).toBeUndefined();
+    expect(
+      component.evidenceForm.controls[mockField.id]?.value
+    ).toBeUndefined();
+  });
+
+  it('should validate claims form and close dialog', () => {
+    component.evidenceForm = new FormGroup({
+      verifier: new FormControl('Test', Validators.required),
+    });
+    component.data = { selected: false };
+    component.claimValidation();
+    expect(component.data.selected).toBeTruthy();
+    expect(component.dialogRef.close).toHaveBeenCalledWith(component.data);
+  });
 });

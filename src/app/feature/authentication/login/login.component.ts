@@ -9,11 +9,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // config
 import { environment } from 'src/environments/environment';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
-const ERROR_MESSAGE = 'Something went wrong! Please try again.';
 
 // Services
 import { AuthService } from '../auth.service';
@@ -27,7 +27,7 @@ import { LoaderComponent } from 'fairfood-utils';
   selector: 'app-login',
   templateUrl: './login.component.html',
   standalone: true,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, TranslateModule],
 })
 export class LoginComponent implements OnInit, OnDestroy {
   magicLinkloading: boolean;
@@ -35,20 +35,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   checking = true;
   nodeId: any;
   transactionId: any;
-  pageApis: Subscription[];
   errorMessage: string;
   deviceId: string;
-  /* istanbul ignore next */
+  subscription: Subscription;
+
   constructor(
     public router: Router,
     public route: ActivatedRoute,
     public authService: AuthService,
     public utilService: UtilService,
     public themeService: ThemeService,
-    public storage: StorageService
-  ) {
-    this.pageApis = [];
-  }
+    public storage: StorageService,
+    private translate: TranslateService
+  ) {}
+
   /* istanbul ignore next */
   ngOnInit() {
     this.themeService.setTheme();
@@ -73,14 +73,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       const data = {
         validation_token: token,
         user_id,
-        device_id: user_id + Math.random(),
+        device_id: user_id + new Date().valueOf(),
         type,
         salt,
       };
       this.magicLinkLogin(data);
     } else {
       this.checking = false;
-      this.errorMessage = 'Invalid request redirecting to login page';
+      this.errorMessage = this.translate.instant('logout.redirect');
       window.location.href = environment.authUrl;
     }
   }
@@ -96,7 +96,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (isLoggedIn) {
       this.router.navigateByUrl('/');
     } else {
-      const api = this.authService.magicLogin(data).subscribe({
+      this.subscription = this.authService.magicLogin(data).subscribe({
         next: (res: any) => {
           if (res.success) {
             this.setUserData(res.data);
@@ -108,13 +108,13 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.authError();
         },
       });
-      this.pageApis.push(api);
     }
   }
 
+  /* istanbul ignore next */
   authError(): void {
     this.checking = false;
-    this.errorMessage = ERROR_MESSAGE;
+    this.errorMessage = this.translate.instant('formValidation.alert');
     setTimeout(() => {
       window.location.href = environment.authUrl + '/logout';
     }, 2000);
@@ -136,7 +136,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.router.navigateByUrl('/');
       } else {
         this.utilService.customSnackBar(
-          'Email not verified. Please contact admin',
+          this.translate.instant('logout.emailNotVerified'),
           ACTION_TYPE.FAILED
         );
         window.location.href = environment.authUrl;
@@ -144,7 +144,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  manageUser() {
+  manageUser(): void {
     if (this.nodeId) {
       this.storage.saveInStorage('companyID', this.nodeId);
     }
@@ -158,6 +158,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pageApis?.forEach(a => a.unsubscribe());
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

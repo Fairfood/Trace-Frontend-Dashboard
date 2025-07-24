@@ -7,13 +7,13 @@
 <section class="content flex-column">
     <ng-container *ngIf="!data?.isEdit">
         <article class="input-container-with-error">
-            <app-ff-dropdown label="Reference" [dropdownOptions]="refArray" inpuSize="profile"
+            <app-ff-dropdown label="{{'farmer.ref'|translate}}" [dropdownOptions]="refArray" inpuSize="profile"
                 [defaultValue]="refForm?.controls?.reference?.value" [hideSearch]="true"
                 [showRedBorder]="refForm?.controls?.reference?.errors && submitted"
                 (selectionChange)="dropdownChanged($event)" class="form-item"></app-ff-dropdown>
             <span class="error-message"
                 *ngIf="refForm?.controls?.reference?.errors?.required && (submitted || refForm?.controls?.reference?.touched)">
-                This field shouldn't be empty *
+                {{'formValidation.commonValidationError'|translate}}
             </span>
         </article>
     </ng-container>
@@ -23,15 +23,15 @@
         </span>
     </ng-container>
     <article class="input-container-with-error w-100">
-        <app-ff-input label="ID Number" [parentFormGroup]="refForm" [controlName]="'idNumber'" inputType="text"
-            class="form-item" inputSize="profile">
+        <app-ff-input label="{{'farmer.idNo'|translate}}" [parentFormGroup]="refForm" controlName="idNumber"
+            inputType="text" class="form-item" inputSize="profile">
         </app-ff-input>
     </article>
 </section>
 
 <section class="ff-flex-between action">
     <app-buttons buttonType="stroked" (buttonClicked)="close()">
-        Cancel
+        {{'button.cancel'|translate}}
     </app-buttons>
     <app-buttons buttonType="fill" (buttonClicked)="createReference()"
         [isDisabled]="!refForm.value.reference || loading">

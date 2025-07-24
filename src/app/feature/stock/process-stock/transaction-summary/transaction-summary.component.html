@@ -52,13 +52,13 @@
         </ng-container>
 
         <article class="item batches" *ngIf="currentAction !== 'receive'">
-            <span class="key">Batches added({{batchData.length}})</span>
+            <span class="key">Batches added({{transactionSummary.batches}})</span>
             <article class="ff-flex-align-center">
                 <span class="value text-overflow" title="{{batchData.slice(0,3).join(', ')}}">
                     {{batchData.slice(0,3).join(', ')}}
                 </span>
-                <span class="additional-count pointer" *ngIf="batchData.length>3">
-                    +{{batchData.length-3}}
+                <span class="additional-count pointer" *ngIf="transactionSummary.batches>3">
+                    +{{transactionSummary.batches-3}}
                 </span>
             </article>
         </article>
@@ -98,7 +98,7 @@
 
 <section class="w-100 finalize">
     <mat-checkbox class="text-sm text-blue font-1-normal" [(ngModel)]="checkFinalize"
-        (ngModelChange)="confirmTransaction(checkFinalize)" class="w-100">
+        (ngModelChange)="confirmTransaction(checkFinalize)" class="w-100" id="confirmTransaction">
         I confirm that the above information is correct.
     </mat-checkbox>
 </section>

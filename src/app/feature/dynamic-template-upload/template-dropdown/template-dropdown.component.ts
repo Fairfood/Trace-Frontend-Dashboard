@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import {
   Observable,
@@ -18,7 +19,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { LoaderComponent, ButtonsComponent } from 'fairfood-utils';
 // services
 import { DynamicTemplateUploadService } from '../dynamic-template-upload.service';
-
 import { DynamicTemplateStore } from '../dynamic-template-upload-store.service';
 
 @Component({
@@ -31,6 +31,7 @@ import { DynamicTemplateStore } from '../dynamic-template-upload-store.service';
     MatIconModule,
     ReactiveFormsModule,
     LoaderComponent,
+    TranslateModule,
   ],
   templateUrl: './template-dropdown.component.html',
   styleUrls: ['./template-dropdown.component.scss'],
@@ -61,7 +62,11 @@ export class TemplateDropdownComponent implements OnInit {
       switchMap(value => {
         this.templateLoader = true;
         return this.service.availableTemplates(this.uploadType, value).pipe(
-          finalize(() => (this.templateLoader = false)) // Hide loader on completion or error
+          finalize(() => {
+            setTimeout(() => {
+              this.templateLoader = false;
+            });
+          }) // Hide loader on completion or error
         );
       })
     );

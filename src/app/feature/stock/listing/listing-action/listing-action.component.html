@@ -1,6 +1,6 @@
 <article class="ff-flex-center">
     <span class="show-desktop-filter-icon">
-        <app-buttons buttonType="secondary" (buttonClicked)="filterClicked()">
+        <app-buttons buttonType="secondary" customId="showHideFilters" (buttonClicked)="filterClicked()">
             <ng-container *ngIf="toggleFilter">
                 <mat-icon>close</mat-icon>
                 <span class="button-text">Clear filters</span>
@@ -17,11 +17,27 @@
         </app-buttons>
     </span>
 </article>
+<article class="ff-flex-center" *ngIf="stockAction | async">
+    <span class="show-desktop-filter-icon">
+        <app-buttons *ngIf="pageType!='archiveStocks'" buttonType="secondary" customId="moveToArchive" (buttonClicked)="moveToArchive('moveToArchive')">
+            <ng-container>
+                <img src="../../../../assets/images/archive_icon.svg" alt="icon">
+                <span class="button-text">Move to archive</span>
+            </ng-container>
+        </app-buttons>
+        <app-buttons *ngIf="pageType=='archiveStocks'" buttonType="secondary" customId="moveToStocklist" (buttonClicked)="moveToArchive('moveToStock')">
+            <ng-container>
+                <img src="../../../../assets/images/unarchive_icon.svg" alt="icon">
+                <span class="button-text">Move back to Stock list</span>
+            </ng-container>
+        </app-buttons>
+    </span>
+</article>
 <article class="ff-flex-center" *ngIf="!(stockAction | async)">
-    <app-buttons buttonType="stroked" (buttonClicked)="createtransparencyRequest()">
+    <app-buttons *ngIf="pageType!='archiveStocks'" buttonType="stroked" customId="requestStock" (buttonClicked)="createtransparencyRequest()">
         Request stock
     </app-buttons>
-    <app-buttons buttonType="fill" [matMenuTriggerFor]="moreButtonOptionsReceive">
+    <app-buttons *ngIf="pageType!='archiveStocks'" buttonType="fill" customId="receiveStock" [matMenuTriggerFor]="moreButtonOptionsReceive">
         Receive stock
         <svg width="8" height="6" class="m-l-10" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 1L4 4L7 1" stroke="white" stroke-width="2" stroke-linecap="round" />
@@ -29,17 +45,18 @@
     </app-buttons>
     <mat-menu class="mat-menu more-button-receive" #moreButtonOptionsReceive="matMenu" xPosition="before">
         <ul class="button-action">
-            <li class="font-1-medium text-blue pointer" (click)="buttonAction('single')">
+            <li class="font-1-medium text-blue pointer" id="singleFarmerBtn" (click)="buttonAction('single')">
                 From single farmer
             </li>
-            <li class="font-1-medium text-blue pointer" (click)="buttonAction('multiple')">
+            <li class="font-1-medium text-blue pointer" id="multiFarmerBtn" (click)="buttonAction('multiple')">
                 From multiple farmers <span class="new-chip">Excel</span>
             </li>
         </ul>
     </mat-menu>
 </article>
 <article class="ff-flex-center" *ngIf="stockAction | async">
-    <app-buttons buttonType="stroked" [matMenuTriggerFor]="moreButtonOptions" [isDisabled]="!(sendStock | async)">
+    <app-buttons *ngIf="pageType!='archiveStocks'" buttonType="stroked" [matMenuTriggerFor]="moreButtonOptions" [isDisabled]="!(sendStock | async)"
+        customId="stockProcess">
         Process stock
         <svg width="8" height="6" viewBox="0 0 8 6" class="m-l-10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 1L4 4L7 1" stroke="#EA2553" stroke-width="2" stroke-linecap="round" />
@@ -48,13 +65,14 @@
     <mat-menu class="mat-menu more-button" #moreButtonOptions="matMenu" xPosition="before">
         <ul class="button-action">
             <ng-container *ngFor="let item of processButtons">
-                <li class="font-1-medium text-blue pointer" *ngIf="!item.hidden" (click)="buttonAction(item.id)">
+                <li class="font-1-medium text-blue pointer" [id]="item.id" *ngIf="!item.hidden"
+                    (click)="buttonAction(item.id)">
                     {{item.name}}
                 </li>
             </ng-container>
         </ul>
     </mat-menu>
-    <app-buttons buttonType="fill" (buttonClicked)="processStock('send')" [isDisabled]="!(sendStock | async)">
+    <app-buttons *ngIf="pageType!='archiveStocks'" buttonType="fill" (buttonClicked)="processStock('send')" [isDisabled]="!(sendStock | async)">
         Send stock
     </app-buttons>
 </article>

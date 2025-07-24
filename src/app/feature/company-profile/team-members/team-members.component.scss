@@ -25,7 +25,7 @@
   }
   .avatar-round {
     @include set-avatar-props(18px, var(--color-white), var(--font-color));
-    font-size: 10px;
+    font-size: 9px;
     margin-right: 12px;
   }
 }

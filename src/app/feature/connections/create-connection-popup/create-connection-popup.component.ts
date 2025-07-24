@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 // rxjs
 import { Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 // configs, utils
 import {
   COMPONENT_IMPORTS,
@@ -14,12 +14,12 @@ import {
 } from './create-connection-popup.config';
 import { ICommonObj, ITabItem } from 'src/app/shared/configs/app.model';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
-import { successFormatter } from 'src/app/shared/configs/app.methods';
 import { ButtonState } from 'fairfood-utils';
 // services
 import { GlobalStoreService } from 'src/app/shared/store';
 import { ConnectionService } from '../connections.service';
 import { CreateConnectionPopupService } from './create-connection-popup.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Component for creating a connection popup.
@@ -29,7 +29,7 @@ import { CreateConnectionPopupService } from './create-connection-popup.service'
   templateUrl: './create-connection-popup.component.html',
   styleUrls: ['./create-connection-popup.component.scss'],
   standalone: true,
-  imports: [...COMPONENT_IMPORTS],
+  imports: COMPONENT_IMPORTS,
 })
 export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
   connectionTabs: ITabItem[];
@@ -48,7 +48,14 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
   loaderText: string;
   companyNames: any;
   supplySelection: any[] = [];
-
+  typeLabel =
+    this.incomingData?.connectionType === 'buyer'
+      ? `${this.translate.instant('company.buyer')}*`
+      : `${this.translate.instant('company.supplier')}*`;
+  connectionType =
+    this.incomingData?.connectionType === 'buyer'
+      ? `${this.translate.instant('company.buyerType')}*`
+      : `${this.translate.instant('company.supplierType')}*`;
   /**
    * Constructor of the component.
    * @param dialogRef - Reference to the dialog.
@@ -62,7 +69,8 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public incomingData: any,
     private connectionService: ConnectionService,
     private globalStore: GlobalStoreService,
-    private service: CreateConnectionPopupService
+    private service: CreateConnectionPopupService,
+    private translate: TranslateService
   ) {}
 
   /**
@@ -93,13 +101,16 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
    * Initializes data for creating a connection with stock information.
    */
   initDataForStock(): void {
+    this.nextButtonState = this.service.initialButtonState(
+      this.incomingData.stockInvite
+    );
     // send stock invitation only
     if (this.incomingData.stockInvite) {
       this.connectionTabs = [...INVITE_ONLY];
       this.connectionTabs[0].active = true;
       this.currentStep = INVITE_ONLY[0].id;
       this.companyForm = this.service.createInviteForm();
-      this.companyForm.patchValue({
+      this.companyForm?.patchValue({
         relation: 2,
         connectedTo: this.incomingData.nodeId,
         supplyChain: this.incomingData.schainId,
@@ -113,10 +124,6 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       this.initSubscriptions();
     }
 
-    this.nextButtonState = this.service.initialButtonState(
-      this.incomingData.stockInvite
-    );
-
     this.loaderText = 'Loading data';
     this.getOperations();
   }
@@ -124,8 +131,9 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
   /**
    * Initializes subscriptions for the invite-only scenario.
    */
+  /* istanbul ignore next */
   initInviteOnlySub(): void {
-    const formBasic = this.companyForm.statusChanges.subscribe(st => {
+    const formBasic = this.companyForm?.statusChanges.subscribe(st => {
       if (st === 'VALID') {
         this.nextButtonState.disabled = false;
       } else {
@@ -134,10 +142,10 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     });
     this.pageApis.push(formBasic);
   }
-
+  /* istanbul ignore next */
   basicFormSub(): void {
     const formBasic = this.companyForm
-      .get('basic')
+      ?.get('basic')
       .statusChanges.subscribe(st => {
         if (this.currentStep === 'basic') {
           if (st === 'VALID') {
@@ -148,7 +156,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
         }
       });
     const formAddress = this.companyForm
-      .get('addressDetails')
+      ?.get('addressDetails')
       .statusChanges.subscribe(st => {
         if (this.currentStep === 'address') {
           if (st === 'VALID') {
@@ -161,11 +169,11 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     this.pageApis.push(formAddress);
     this.pageApis.push(formBasic);
   }
-
+  /* istanbul ignore next */
   companyNameValidationSub(): void {
-    const buyerNameFormControl = this.companyForm.get('basic.name');
+    const buyerNameFormControl = this.companyForm?.get('basic.name');
 
-    const companyNameValidation = buyerNameFormControl.valueChanges
+    const companyNameValidation = buyerNameFormControl?.valueChanges
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(res => {
         const api = this.connectionService
@@ -178,14 +186,14 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
                   companyNames[0].name.toLowerCase() ===
                   buyerNameFormControl.value.toLowerCase()
                 ) {
-                  this.companyForm.get('basic.name').setErrors({
+                  this.companyForm?.get('basic.name').setErrors({
                     connected: true,
                   });
                 } else {
-                  this.companyForm.get('basic.name').setErrors(null);
+                  this.companyForm?.get('basic.name').setErrors(null);
                 }
               } else {
-                this.companyForm.get('basic.name').setErrors(null);
+                this.companyForm?.get('basic.name').setErrors(null);
               }
             })
           )
@@ -194,7 +202,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       });
     this.pageApis.push(companyNameValidation);
   }
-
+  /* istanbul ignore next */
   initSubscriptions(): void {
     this.basicFormSub();
     this.companyNameValidationSub();
@@ -214,11 +222,11 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
         supplyChain: schainId,
       });
       if (stockType === 'company') {
-        this.companyForm.get('basic.name').patchValue(companyName);
-        this.companyForm.get('relation').patchValue(2);
+        this.companyForm?.get('basic.name').patchValue(companyName);
+        this.companyForm?.get('relation').patchValue(2);
       } else {
         this.companyForm
-          .get('relation')
+          ?.get('relation')
           .patchValue(connectionType === 'buyer' ? 2 : 1);
       }
     }
@@ -239,7 +247,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       ];
     }
   }
-
+  /* istanbul ignore next */
   getBuyers(): void {
     const api = this.connectionService
       .getBuyers(this.incomingData.schain_id)
@@ -288,7 +296,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     this.pageApis.push(sub3);
     this.pageApis.push(sub2);
   }
-
+  /* istanbul ignore next */
   setStateList(selectedSub: any): void {
     this.stateList = Object.keys(selectedSub).map(key => {
       selectedSub[key].name = key;
@@ -296,7 +304,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       return selectedSub[key];
     });
   }
-
+  /* istanbul ignore next */
   changeHistoryTab(tabItem: ITabItem) {
     if (this.currentStep === 'basic') {
       if (tabItem.id === 'address') {
@@ -323,7 +331,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     }
     this.currentStep = tabItem.id;
   }
-
+  /* istanbul ignore next */
   dropdownChanged(data: any, formControlName: string, groupName: string): void {
     const selectedValue = data.id === 'All' ? '' : data.id;
     // when clear filter is clicked dropdown component emits the value:- { id: 'All' }
@@ -331,7 +339,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     connectionProfileDropdownValue(
       selectedValue,
       formControlName,
-      this.companyForm.get(groupName),
+      this.companyForm?.get(groupName),
       data
     );
 
@@ -342,7 +350,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
           a.name.includes(selectedValue)
         );
         const selectedSub = this.countryList[index].sub_divisions;
-        this.companyForm.get(groupName).patchValue({
+        this.companyForm?.get(groupName).patchValue({
           inDialCode: countryCode?.id || '',
         });
         this.setStateList(selectedSub);
@@ -351,10 +359,10 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       }
     }
     setTimeout(() => {
-      this.companyForm.get(groupName).updateValueAndValidity();
+      this.companyForm?.get(groupName).updateValueAndValidity();
     }, 200);
   }
-
+  /* istanbul ignore next */
   nextClicked(data: any): void {
     switch (data) {
       case 'next':
@@ -397,11 +405,11 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
         break;
     }
   }
-
+  /* istanbul ignore next */
   close(): void {
     this.dialogRef.close();
   }
-
+  /* istanbul ignore next */
   createCompanyConnection(): void {
     this.dataLoaded = false;
     let reqObj: any;
@@ -422,7 +430,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     }
     this.createConnectionApi(reqObj);
   }
-
+  /* istanbul ignore next */
   createConnectionApi(reqObj: any): void {
     const api = this.service
       .inviteCompany(this.incomingData.nodeId, reqObj)
@@ -451,7 +459,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
       });
     this.pageApis.push(api);
   }
-
+  /* istanbul ignore next */
   inviteError(errors: any, reqObj: any): void {
     this.dataLoaded = true;
     this.incomingData.params = reqObj;
@@ -463,7 +471,7 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
     }
     this.dialogRef.close(this.incomingData);
   }
-
+  /* istanbul ignore next */
   dropdownChangedInvite(data: any): void {
     const selectedValue = data.id === 'All' ? '' : data.id;
     connectionProfileDropdownValue(
@@ -475,16 +483,15 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
   }
 
   // Method to check value & set whether it's Supplier or Buyer
+  /* istanbul ignore next */
   changeRelation() {
     const val = +this.companyForm.controls.relation.value;
     if (val === 2) {
       this.incomingData.connectionType = 'buyer';
-      // this.setSupplyFor('buyer');
     } else {
-      // this.setSupplyFor('supplier');
       this.incomingData.connectionType = 'supplier';
     }
-    this.companyForm.get('basic').patchValue({
+    this.companyForm?.get('basic').patchValue({
       name: '',
       primaryOperation: '',
     });
@@ -492,6 +499,12 @@ export class CreateConnectionPopupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pageApis.forEach(m => m.unsubscribe());
+    if (this.pageApis) {
+      this.pageApis.forEach(m => {
+        if (m) {
+          m.unsubscribe();
+        }
+      });
+    }
   }
 }

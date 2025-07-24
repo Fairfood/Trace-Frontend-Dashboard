@@ -7,8 +7,8 @@
                     <article class="mb-20">
                         <label class="has-float-label custom-input"
                             [ngClass]="{'has-error': stockItems.at(i).get('productName').invalid && stockItems.at(i).get('productName').touched }">
-                            <input placeholder=" " formControlName="productName" type="text" class="stock"
-                                [matAutocomplete]="productSection" />
+                            <input placeholder=" " id="destinationProduct" formControlName="productName" type="text"
+                                class="stock" [matAutocomplete]="productSection" />
                             <span class="label">Destination product*</span>
                             <span class="new-chip" *ngIf="item.value.newProductMessage">New</span>
                             <mat-icon>keyboard_arrow_down</mat-icon>
@@ -19,9 +19,10 @@
                                     Available products
                                 </span>
                                 <mat-option *ngIf="productLoader">
-                                    <app-loader [noText]="true"></app-loader>
+                                    <app-loader [noText]="true" loaderType="type2"></app-loader>
                                 </mat-option>
-                                <ng-container *ngFor="let item of convertFilterProducts[i] | async">
+                                <ng-container
+                                    *ngFor="let item of (convertFilterProducts[i] | async);let k=index; trackBy:trackByFn">
                                     <ng-container *ngIf="!productLoader">
                                         <mat-option [value]="item.name" (click)="selectDestinationProduct(item, i)">
                                             {{ item.name }}
@@ -59,15 +60,14 @@
                             </app-ff-dropdown>
                         </article>
                         <article class="stock-convert-item ff-flex-end mb-20">
-                            <app-buttons buttonType="stroked"
+                            <app-buttons buttonType="stroked" customId="addBtn"
                                 *ngIf="(stockItems.controls?.length - 1) === i"
                                 [isDisabled]="!stockItems.controls[stockItems.controls.length -1].valid"
                                 (buttonClicked)="addMore()">
                                 Add
                             </app-buttons>
-                            <app-buttons buttonType="stroked" buttonSize="medium"
-                                *ngIf="stockItems.controls?.length > 1"
-                                (buttonClicked)="removeField(i)">
+                            <app-buttons buttonType="stroked" buttonSize="medium" customId="deleteBtn"
+                                *ngIf="stockItems.controls?.length > 1" (buttonClicked)="removeField(i)">
                                 <svg width="20" height="20" viewBox="0 0 9 12" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -95,7 +95,7 @@
         <article class="w-50-ff">
             <article class="mb-20">
                 <label class="has-float-label custom-input">
-                    <input placeholder=" " matInput [matDatepicker]="trDate" [max]="maxDate"
+                    <input placeholder=" " id="transactionDate" matInput [matDatepicker]="trDate" [max]="maxDate"
                         formControlName="transactionDate" type="text" class="date-picker" readonly />
                     <span class="label">Transaction date*</span>
                     <mat-icon class="pointer" (click)="trDate.open()">calendar_today</mat-icon>
@@ -119,16 +119,16 @@
 <ng-template let-formcontrol="formcontrol" let-formgroup="formgroup" #formErrorMessages>
     <span class="error-message"
         *ngIf="formgroup[formcontrol]?.errors?.required && (formgroup[formcontrol]?.touched || submitted)">
-        {{'commonValidationError'|translate}}
+        {{'formValidation.commonValidationError'|translate}}
     </span>
 
     <ng-container *ngIf="formcontrol === 'productName'">
         <article *ngIf="formgroup[formcontrol].invalid && (formgroup[formcontrol].touched || submitted)">
             <span *ngIf="formgroup[formcontrol]?.errors.maxlength" class="error-message">
-                {{'productMaxLength'|translate}}
+                {{'formValidation.productMaxLength'|translate}}
             </span>
             <span *ngIf="formgroup[formcontrol].errors.minlength" class="error-message">
-                {{'productMinLength'|translate}}
+                {{'formValidation.productMinLength'|translate}}
             </span>
         </article>
     </ng-container>

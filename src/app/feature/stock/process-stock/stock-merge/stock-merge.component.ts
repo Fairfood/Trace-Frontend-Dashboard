@@ -1,51 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  finalize,
-  map,
-  startWith,
-  switchMap,
-} from 'rxjs/operators';
-
+// config
 import {
   ButtonNav,
   StepValues,
-  StockButtonState,
   TransactionState,
 } from '../process-stock.config';
 import { UNITS } from 'src/app/shared/configs/app.constants';
+import { MERGE_CONFIG } from './stock-merge.config';
 // services
-import { StockService } from '../../stock.service';
 import { StockProcessService } from '../stock-process.service';
-import { GlobalStoreService } from 'src/app/shared/store';
+import { ProcessStockCommonComponent } from '../process-stock-common.component';
+
 @Component({
   selector: 'app-stock-merge',
   templateUrl: './stock-merge.component.html',
   styleUrls: ['./stock-merge.component.scss'],
+  standalone: true,
+  imports: MERGE_CONFIG,
 })
-export class StockMergeComponent implements OnInit {
+export class StockMergeComponent
+  extends ProcessStockCommonComponent
+  implements OnInit
+{
   @Output() nextPage = new EventEmitter();
-  loader = true;
-  units = UNITS;
+  // units = UNITS;
   maxDate = new Date();
   mergeForm: FormGroup = this.processService.mergeStockForm();
-  productLoader: boolean;
-  productFilterOptions: Observable<any>;
-  nextButtonState: StockButtonState;
-  newProduct: boolean;
-  pageApis: Subscription[] = [];
   listingInfo: any;
-  products: any[];
+  buttonConfiguration = {
+    validText: 'Merge stock',
+    addProduct: 'Add product & Merge stock',
+  };
 
-  constructor(
-    private processService: StockProcessService,
-    private stockService: StockService,
-    private globalStore: GlobalStoreService
-  ) {
+  constructor(public processService: StockProcessService) {
+    super();
     this.nextButtonState = {
       action: 'init',
       disabled: true,
@@ -55,8 +45,15 @@ export class StockMergeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getProductsList();
+    this.getProductsList('merge');
+    this.productSubscription(this.mergeForm.controls);
+    this.productNameChanges(this.mergeForm.controls);
+    this.formChanges();
+    this.dataChanges();
     this.listingInfo = this.processService.getListingInfo();
+  }
+
+  formChanges(): void {
     const form = this.mergeForm.statusChanges.subscribe(val => {
       this.nextButtonState = this.processService.stepOneFormChanges(
         this.newProduct,
@@ -64,21 +61,10 @@ export class StockMergeComponent implements OnInit {
         'Merge stock'
       );
     });
-    const change2 = this.ccontrol.productName.valueChanges
-      .pipe(debounceTime(800), distinctUntilChanged())
-      .subscribe(value => {
-        if (value) {
-          const found = this.products.find(
-            p => p.name.toLowerCase() === value.toLowerCase()
-          );
-          if (found) {
-            this.newProduct = false;
-          } else {
-            this.newProduct = true;
-          }
-        }
-      });
+    this.pageApis.push(form);
+  }
 
+  dataChanges(): void {
     // when navigating between tabs data should be retained
     const dataSub = this.processService
       .currentTransactionState()
@@ -95,63 +81,10 @@ export class StockMergeComponent implements OnInit {
         }
       });
     this.pageApis.push(dataSub);
-    this.pageApis.push(form);
-    this.pageApis.push(change2);
-  }
-
-  // get all available product list
-  getProductsList(): void {
-    const API_CALL = this.globalStore.supplychainProducts$.subscribe({
-      next: (res: any) => {
-        this.products = res;
-        this.productSubscription();
-      },
-      error: () => {
-        this.products = [];
-      },
-    });
-    this.pageApis.push(API_CALL);
-  }
-
-  productSubscription(): void {
-    this.loader = false;
-    this.productFilterOptions = this.ccontrol.productName.valueChanges.pipe(
-      debounceTime(600),
-      startWith(''),
-      map(val => val ?? ''),
-      switchMap((value: string) => {
-        setTimeout(() => {
-          this.productLoader = true;
-        });
-        return this.productFilter(value);
-      })
-    );
-  }
-
-  private productFilter(keyword: string): any {
-    return this.stockService
-      .searchProduct(keyword)
-      .pipe(finalize(() => (this.productLoader = false)));
   }
 
   get ccontrol() {
     return this.mergeForm.controls;
-  }
-
-  selectProduct(item: any): void {
-    if (item) {
-      this.mergeForm.patchValue({
-        product: item.id,
-      });
-      this.newProduct = false;
-      this.nextButtonState.buttonText = 'Merge stock';
-    } else {
-      this.mergeForm.patchValue({
-        product: -1,
-      });
-      this.newProduct = true;
-      this.nextButtonState.buttonText = 'Add product & Merge stock';
-    }
   }
 
   navigationOutOfComponent(type: ButtonNav): void {
@@ -163,6 +96,7 @@ export class StockMergeComponent implements OnInit {
       }
     } else {
       this.processService.navigateToStockListing();
+      this.resetNewProduct();
     }
   }
 
@@ -174,13 +108,15 @@ export class StockMergeComponent implements OnInit {
       // product_name formcontrol value is used
       const api = this.stockService
         .createProduct(this.ccontrol.productName.value)
-        .subscribe((res: any) => {
-          if (res.success) {
-            this.mergeForm.patchValue({
-              product: res.data.id,
-            });
-            this.formSubmit();
-          }
+        .subscribe({
+          next: (data: any) => {
+            if (data) {
+              this.mergeForm.patchValue({
+                product: data.id,
+              });
+              this.formSubmit();
+            }
+          },
         });
       this.pageApis.push(api);
     }
@@ -200,7 +136,7 @@ export class StockMergeComponent implements OnInit {
         product: productName,
         transactionDate: date,
       });
-      this.nextPage.emit(true);
+      this.nextPage.emit();
     }
   }
 }

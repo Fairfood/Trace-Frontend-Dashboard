@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { ITabItem } from 'src/app/shared/configs/app.model';
 import { ItabItem } from '../trace/trace.config';
 

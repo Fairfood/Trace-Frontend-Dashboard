@@ -1,7 +1,7 @@
 <span class="search-b ff-flex-between">
-  <input class="text-xs text-blue" [formControl]="keywordControl" placeholder="{{placeholder}}"
+  <input #searchInput class="text-xs text-blue" [formControl]="keywordControl" [(ngModel)]="keyword" placeholder="{{placeholder}}"
     [ngClass]="{'w-100': hideOptions}" id="serachBox"/>
-  <aside class="search-by" [matMenuTriggerFor]="serachByMenu" *ngIf="!hideOptions">
+  <aside class="search-by" id="searchBy" [matMenuTriggerFor]="serachByMenu" *ngIf="!hideOptions">
     <span class="label ff-flex-align-center">Search by</span>
     <span class="selected ff-flex-align-center text-overflow">
       {{searchByOption?.name}}
@@ -17,7 +17,7 @@
 </span>
 <mat-menu class="serach-by" #serachByMenu="matMenu" xPosition="after">
   <ul>
-    <li *ngFor="let item of searchByOptions;let i=index" (click)="searchByOption = item">
+    <li *ngFor="let item of searchByOptions;let i=index" (click)="onOptionSelect(item)">
       <mat-radio-button [checked]="searchByOption?.id === item.id" id="radioButton{{i}}">
         {{ item.name }}
       </mat-radio-button>

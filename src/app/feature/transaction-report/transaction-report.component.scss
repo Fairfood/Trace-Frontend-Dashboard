@@ -6,6 +6,7 @@
   border-radius: 3px;
   margin-top: 15px;
   background-color: var(--color-filter-active);
+
   @include devices(desktop) {
     max-width: 70%;
   }
@@ -13,6 +14,7 @@
 
 .reject {
   padding: 10px 20px;
+
   .value-tr {
     margin-left: 10px;
   }
@@ -21,9 +23,11 @@
 .top-box {
   padding: 35px;
   flex-wrap: wrap;
+
   @include devices(tablet-md) {
     padding-right: 10px;
   }
+
   @include devices(laptop) {
     padding-right: 0;
   }
@@ -38,8 +42,10 @@
       width: 69%;
     }
   }
+
   .qr-code {
     margin-top: 25px;
+
     @include devices(tablet-md) {
       width: 30%;
       padding-left: 10px;
@@ -55,6 +61,7 @@
   list-style: none;
   padding-top: 15px;
   flex-wrap: wrap;
+
   li {
     background-color: var(--color-white);
     color: var(--font-color);
@@ -62,18 +69,23 @@
     position: relative;
     padding: 2px;
     padding-right: 10px;
-    border: 1px solid var(--color-primary-3);
+    border: 1px solid var(--color-filter-active);
     font-family: var(--font-regular);
+
     .claim-icon {
       margin-right: 10px;
       background-color: rgba(175, 235, 255, 0.48);
+      height: 35px;
+      width: 35px;
     }
+
     mat-icon {
       height: 35px;
       width: 35px;
       font-size: 18px;
       display: flex !important;
     }
+
     .claim {
       max-width: 220px;
     }
@@ -84,6 +96,7 @@
   margin-top: 15px;
   flex-wrap: wrap;
 }
+
 .loader-container {
   min-height: 500px;
 }
@@ -112,12 +125,15 @@
   font-family: var(--font-bold);
   cursor: pointer;
   margin-right: 10px;
+
   @include devices(laptop) {
     font-size: 14px;
   }
+
   @include devices(desktop) {
     font-size: 16px;
   }
+
   svg {
     margin-right: 10px;
   }
@@ -129,16 +145,50 @@
   margin-left: 10px;
   color: var(--color-secondary);
   margin-right: 0;
+
   mat-icon {
     font-size: 18px;
     height: 24px;
     width: 24px;
-    padding-top: 4px;
+    padding-top: 10px;
   }
 }
 
+// .heading-section {
+//   @include devices(desktop) {
+//     max-width: 70%;
+//   }
+// }
+
+.archive-title {
+  font-size: var(--font-size-paragraph2);
+  font-weight: 500;
+  color: var(--font-color);
+  margin: 0px 10px;
+}
+
+.mb-3 {
+  margin-bottom: 3px;
+}
+
 .heading-section {
-  @include devices(desktop) {
-    max-width: 70%;
+  display: block;
+
+  @include devices(tablet-md) {
+    display: flex;
   }
+}
+
+.btns {
+  display: block;
+
+  @include devices(tablet-md) {
+    display: flex;
+  }
+}
+
+.pending-img {
+  padding-right: 10px;
+  width: 34px;
+  height: 34px;
 }

@@ -1,7 +1,7 @@
 <div class="page-container">
     <section class="heading-section">
         <h1 class="page-heading">
-            Add connection
+            {{'connections.addConnection'|translate}}
         </h1>
     </section>
 
@@ -12,20 +12,19 @@
     <section class="content" *ngIf="!loading">
         <ng-container *ngIf="currentStep === tabGroup[0].id">
             <!-- from stock page  -->
-            <p class="info font-1-normal" *ngIf="incomingData?.stock">
-                You are adding this company as your <span class="font-1-bold">Tier 1</span> buyer
+            <p class="info font-1-normal" *ngIf="incomingData?.stock" [innerHtml]="'connections.fromStock'|translate">
             </p>
             <!-- add buyer or supplier button clicked  -->
-            <p class="info font-1-normal" *ngIf="!incomingData?.stock && !incomingData?.fullView">
-                You are adding connection to <span class="font-1-bold">{{incomingData?.full_name}}</span>
+            <p class="info font-1-normal" *ngIf="!incomingData?.stock && !incomingData?.fullView"
+                [innerHtml]="'connections.addBuyerText'|translate:{name: incomingData?.full_name}|safeHtml">
             </p>
             <ng-container [formGroup]="miscForm">
                 <!-- while clicking on the add connection button from listview  -->
                 <article class="p20 col-md-6 with-error" *ngIf="incomingData?.fullView">
                     <mat-radio-group class="text-blue" formControlName="relation" (change)="changeRelation()"
                         aria-label="Select an option">
-                        <mat-radio-button [value]="1">Supplier</mat-radio-button>
-                        <mat-radio-button [value]="2">Buyer</mat-radio-button>
+                        <mat-radio-button [value]="1">{{'types.supplier' | translate}}</mat-radio-button>
+                        <mat-radio-button [value]="2">{{'types.buyer' | translate}}</mat-radio-button>
                     </mat-radio-group>
                 </article>
             </ng-container>
@@ -36,8 +35,8 @@
             <section [formGroup]="detailsForm" class="col-md-6">
 
                 <article class="with-error col-md-12">
-                    <app-ff-input [label]="incomingData?.connectionType === 'buyer'? 'Buyer name*': 'Supplier name*'"
-                        [parentFormGroup]="detailsForm" [controlName]="'name'" inputSize="full" inputType="text">
+                    <app-ff-input [label]="typeLabel" [parentFormGroup]="detailsForm" controlName="name"
+                        inputSize="full" inputType="text">
                     </app-ff-input>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
                         [ngTemplateOutletContext]="{formcontrol:'name', formgroup: detailsForm}">
@@ -45,10 +44,8 @@
                 </article>
                 <aside class="d-flex w-100" aria-label="second row">
                     <article class="w-50-cc with-error m-r-12">
-                        <app-ff-dropdown
-                            [label]="incomingData?.connectionType === 'buyer'? 'Buyer type*': 'Supplier type*'"
-                            [dropdownOptions]="operationTypes" inputClass="profile"
-                            [defaultValue]="detailsForm.get('primaryOperation').value"
+                        <app-ff-dropdown [label]="connectionType" [dropdownOptions]="operationTypes"
+                            inputClass="profile" [defaultValue]="detailsForm.get('primaryOperation').value"
                             [showRedBorder]="detailsForm | showRequiredError: 'primaryOperation'"
                             (selectionChange)="dropdownChanged($event, 'primaryOperation', detailsForm)">
                         </app-ff-dropdown>
@@ -57,8 +54,8 @@
                         </ng-container>
                     </article>
                     <article class="w-50-cc with-error">
-                        <app-ff-input label="Registration number" [parentFormGroup]="detailsForm"
-                            [controlName]="'identificationNo'" inputSize="full" inputType="text">
+                        <app-ff-input label="{{'company.regNo'|translate}}" [parentFormGroup]="detailsForm"
+                            controlName="identificationNo" inputSize="full" inputType="text">
                         </app-ff-input>
                     </article>
                 </aside>
@@ -70,10 +67,12 @@
 
         <div class="row-md" *ngIf="currentStep === tabGroup[1].id">
             <section [formGroup]="addressForm" class="col-md-6">
-                <h3 class="text-blue font-1-bold col-md-12 with-error">Address details</h3>
+                <h3 class="text-blue font-1-bold col-md-12 with-error">
+                    {{'connections.addressDetails'|translate}}
+                </h3>
                 <aside class="with-error col-md-12" aria-label="street name input box">
-                    <app-ff-input label="Street name*" [parentFormGroup]="addressForm" [controlName]="'street'"
-                        inputSize="profile" inputType="text">
+                    <app-ff-input label="{{'company.street'|translate}}*" [parentFormGroup]="addressForm"
+                        controlName="street" inputSize="profile" inputType="text">
                     </app-ff-input>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
                         [ngTemplateOutletContext]="{formcontrol:'street', formgroup: addressForm}">
@@ -81,8 +80,8 @@
                 </aside>
                 <aside class="d-flex w-100" aria-label="second row">
                     <article class="w-50-cc with-error m-r-12">
-                        <app-ff-dropdown label="Country*" [dropdownOptions]="countryList" inputClass="profile"
-                            [defaultValue]="addressForm.get('country').value"
+                        <app-ff-dropdown label="{{'company.country'|translate}}*" [dropdownOptions]="countryList"
+                            inputClass="profile" [defaultValue]="addressForm.get('country').value"
                             [showRedBorder]="addressForm | showRequiredError: 'country'"
                             (selectionChange)="dropdownChanged($event, 'country', addressForm)">
                         </app-ff-dropdown>
@@ -91,8 +90,8 @@
                         </ng-container>
                     </article>
                     <article class="w-50-cc with-error">
-                        <app-ff-dropdown label="Province*" [dropdownOptions]="stateList" inputClass="profile"
-                            [defaultValue]="addressForm.get('province').value"
+                        <app-ff-dropdown label="{{'company.province'|translate}}*" [dropdownOptions]="stateList"
+                            inputClass="profile" [defaultValue]="addressForm.get('province').value"
                             [showRedBorder]="addressForm | showRequiredError: 'province'"
                             (selectionChange)="dropdownChanged($event, 'province', addressForm)">
                         </app-ff-dropdown>
@@ -103,32 +102,34 @@
                 </aside>
                 <aside class="d-flex w-100" aria-label="third row">
                     <article class="w-50-cc with-error m-r-12">
-                        <app-ff-input label="City/Village*" [parentFormGroup]="addressForm" [controlName]="'city'"
-                            inputSize="profile" inputType="text">
+                        <app-ff-input label="{{'company.city'|translate}}*" [parentFormGroup]="addressForm"
+                            controlName="city" inputSize="profile" inputType="text">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'city', formgroup: addressForm}">
                         </ng-container>
                     </article>
                     <article class="w-50-cc with-error">
-                        <app-ff-input label="Postal code" [parentFormGroup]="addressForm" [controlName]="'zipcode'"
-                            inputSize="profile" inputType="text">
+                        <app-ff-input label="{{'company.postal'|translate}}" [parentFormGroup]="addressForm"
+                            controlName="zipcode" inputSize="profile" inputType="text">
                         </app-ff-input>
                     </article>
                 </aside>
-                <h3 class="text-blue font-1-bold col-md-12 with-error">Contact details</h3>
+                <h3 class="text-blue font-1-bold col-md-12 with-error">
+                    {{'companyProfile.subHeading'|translate}}
+                </h3>
                 <aside class="d-flex w-100" aria-label="contact first row">
                     <article class="w-50-cc with-error m-r-12">
-                        <app-ff-input label="First name*" [parentFormGroup]="addressForm" [controlName]="'inFirstName'"
-                            inputSize="profile" inputType="text">
+                        <app-ff-input label="{{'user.firstName'|translate}}*" [parentFormGroup]="addressForm"
+                            controlName="inFirstName" inputSize="profile" inputType="text">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'inFirstName', formgroup: addressForm}">
                         </ng-container>
                     </article>
                     <article class="w-50-cc with-error">
-                        <app-ff-input label="Last name*" [parentFormGroup]="addressForm" [controlName]="'inLastName'"
-                            inputSize="profile" inputType="text">
+                        <app-ff-input label="{{'user.lastName'|translate}}*" [parentFormGroup]="addressForm"
+                            controlName="inLastName" inputSize="profile" inputType="text">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'inLastName', formgroup: addressForm}">
@@ -136,8 +137,8 @@
                     </article>
                 </aside>
                 <aside class="with-error col-md-12" aria-label="contact second row">
-                    <app-ff-input label="Email*" [parentFormGroup]="addressForm" [controlName]="'inEmail'"
-                        inputSize="profile" inputType="text">
+                    <app-ff-input label="{{'user.email'|translate}}*" [parentFormGroup]="addressForm"
+                        controlName="inEmail" inputSize="profile" inputType="text">
                     </app-ff-input>
                     <ng-container [ngTemplateOutlet]="formErrorMessages"
                         [ngTemplateOutletContext]="{formcontrol:'inEmail', formgroup: addressForm}">
@@ -145,18 +146,19 @@
                 </aside>
                 <aside class="d-flex w-100" aria-label="fourth row">
                     <article class="w-50-cc with-error m-r-12">
-                        <app-ff-dropdown label="Country code*" [dropdownOptions]="countryCodeList" inputClass="profile"
-                            [defaultValue]="addressForm.get('inDialCode').value"
-                            [showRedBorder]="addressForm | showRequiredError: 'inDialCode'"
-                            (selectionChange)="dropdownChanged($event, 'inDialCode', addressForm)">
+                        <app-ff-dropdown label="{{'company.countryCode'|translate}}*"
+                            [dropdownOptions]="countryCodeList" inputClass="profile"
+                            [defaultValue]="addressForm.get('dialCode').value"
+                            [showRedBorder]="addressForm | showRequiredError: 'dialCode'"
+                            (selectionChange)="dropdownChanged($event, 'dialCode', addressForm)">
                         </app-ff-dropdown>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
-                            [ngTemplateOutletContext]="{formcontrol:'inDialCode', formgroup: addressForm}">
+                            [ngTemplateOutletContext]="{formcontrol:'dialCode', formgroup: addressForm}">
                         </ng-container>
                     </article>
                     <article class="w-50-cc with-error">
-                        <app-ff-input label="Contact number*" [parentFormGroup]="addressForm" [controlName]="'inMobile'"
-                            inputSize="profile" inputType="text">
+                        <app-ff-input label="{{'company.mobile'|translate}}*" [parentFormGroup]="addressForm"
+                            controlName="inMobile" inputSize="profile" inputType="text">
                         </app-ff-input>
                         <ng-container [ngTemplateOutlet]="formErrorMessages"
                             [ngTemplateOutletContext]="{formcontrol:'inMobile', formgroup: addressForm}">
@@ -180,17 +182,17 @@
                     </app-connection-mapping>
                 </ng-container>
                 <article class="with-error w-100 mt-20">
-                    <app-ff-input label="Invitation message" [parentFormGroup]="miscForm" [controlName]="'message'"
-                        inputSize="profile" [isTextarea]="true" class="form-items w-100">
+                    <app-ff-input label="{{'connections.invite'|translate}}" [parentFormGroup]="miscForm"
+                        controlName="message" inputSize="profile" [isTextarea]="true" class="form-items w-100">
                     </app-ff-input>
                 </article>
                 <p class="info font-1-normal with-error">
-                    By clicking on invite connection an invitation will be send to this organization to participate in
-                    your {{incomingData?.chainName}} supply chain.
+                    {{'connections.inviteInfo'|translate:{chainName: incomingData?.chainName} }}
                 </p>
                 <p class="with-error">
-                    <mat-checkbox class="text-sm text-blue font-1-normal w-100" formControlName="silentInvite">
-                        Do not send an invitation (map connection silently)
+                    <mat-checkbox class="text-sm text-blue font-1-normal w-100" formControlName="silentInvite"
+                        id="silentInvite">
+                        {{'connections.dontSent'|translate}}
                     </mat-checkbox>
                 </p>
             </section>
@@ -199,7 +201,7 @@
             </aside>
         </div>
         <article class="w-100 row-md">
-            <app-action-buttons [buttonPrevText]="prevButton" [buttonNextState]="nextButtonState"
+            <app-action-buttons [buttonPrevText]="prevButton" [buttonNextState]="nextButtonState" [customId]="buttonId"
                 (buttonsClicked)="buttonAction($event)" aria-label="action section"
                 class="col-md-6"></app-action-buttons>
         </article>
@@ -213,41 +215,50 @@
 <!-- validation error section  -->
 <ng-template let-formcontrol="formcontrol" let-formgroup="formgroup" #formErrorMessages>
     <span class="error-message" *ngIf="formgroup | showRequiredError: formcontrol">
-        This field shouldn't be empty *
+        {{'formValidation.commonValidationError'|translate}}
     </span>
     <ng-container
         *ngIf="formcontrol === 'name' && detailsForm.get('name').value && detailsForm.get(formcontrol).errors?.connected">
         <span class="error-message">
-            Company already exist
+            {{'formValidation.companyExist'|translate}}
         </span>
     </ng-container>
 
     <ng-container *ngIf="formcontrol === 'inMobile' && addressForm?.get(formcontrol)?.touched">
         <span class="error-message" *ngIf="addressForm?.get(formcontrol)?.errors?.pattern">
-            Invalid mobile number
+            {{'formValidation.invalidMobile'|translate}}
         </span>
         <span class="error-message" *ngIf="addressForm?.get(formcontrol)?.errors?.minlength">
-            Invalid mobile number
+            {{'formValidation.invalidMobile'|translate}}
         </span>
     </ng-container>
     <ng-container *ngIf="formcontrol === 'message'">
         <span class="error-message"
             *ngIf="miscForm.get(formcontrol)?.errors?.maxlength && miscForm.get(formcontrol)?.touched">
-            Please reduce the length of description
+            {{'formValidation.reduceDesc'|translate}}
         </span>
     </ng-container>
+    <ng-container *ngIf="formcontrol === 'inEmail' && addressForm?.get(formcontrol)?.touched">
+        <span class="error-message" *ngIf="addressForm?.get(formcontrol)?.errors?.email">
+            {{'formValidation.emailValidation'|translate}}
+        </span>
+    </ng-container>
+
+    <ng-container *ngIf="addressForm?.get(formcontrol)?.touched || detailsForm?.get(formcontrol)?.touched">
+        <span class="error-message"
+            *ngIf="addressForm.get(formcontrol)?.errors?.notOnlyWhitespace && (!addressForm.get(formcontrol)?.errors?.required)
+            || detailsForm.get(formcontrol)?.errors?.notOnlyWhitespace && (!detailsForm.get(formcontrol)?.errors?.required)">
+            {{ 'formValidation.whiteSpaceErr' | translate }}
+        </span>
+    </ng-container>
+
 </ng-template>
 
 <ng-template #taggingInfo>
-    <p class="info font-1-normal text-blue">
-        <ng-container *ngIf="incomingData.connectionType ==='buyer'">
-            Products sold to <span class="font-1-bold">{{detailsForm.get('name')?.value}}</span>
-            purchased from,
-        </ng-container>
-
-        <ng-container *ngIf="incomingData.connectionType ==='supplier'">
-            Products purchased from <span class="font-1-bold">{{detailsForm.get('name')?.value}}</span>
-            are supplied to,
-        </ng-container>
+    <p *ngIf="incomingData.connectionType ==='buyer'" class="info font-1-normal text-blue"
+        [innerHtml]="'connections.buyerTag'|translate: {name:detailsForm.get('name')?.value }|safeHtml">
+    </p>
+    <p *ngIf="incomingData.connectionType ==='supplier'" class="info font-1-normal text-blue"
+        [innerHtml]="'connections.buyerTag'|translate: {name:detailsForm.get('name')?.value }|safeHtml">
     </p>
 </ng-template>

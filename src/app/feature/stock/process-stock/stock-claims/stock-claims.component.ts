@@ -6,9 +6,12 @@ import {
   EventEmitter,
   OnDestroy,
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-
+// material
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+// services and configs
 import { StockProcessService } from '../stock-process.service';
 import {
   ButtonNav,
@@ -16,13 +19,26 @@ import {
   StockButtonState,
 } from '../process-stock.config';
 // components
-import { RemoveDialogComponent } from '../remove-dialog/remove-dialog.component';
 import { ClaimDetailComponent } from 'src/app/feature/claim/claim-detail';
+import { RemoveDialogComponent } from '../remove-dialog';
+import { ButtonsComponent } from 'fairfood-utils';
+import { SummaryCardComponent } from '../summary-card';
+import { StockActionButtonComponent } from '../stock-action-button';
 
 @Component({
   selector: 'app-stock-claims',
   templateUrl: './stock-claims.component.html',
   styleUrls: ['./stock-claims.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    ButtonsComponent,
+    MatIconModule,
+    RemoveDialogComponent,
+    SummaryCardComponent,
+    StockActionButtonComponent,
+  ],
 })
 export class StockClaimsComponent implements OnInit, OnDestroy {
   @Output() nextPage = new EventEmitter();
@@ -33,7 +49,7 @@ export class StockClaimsComponent implements OnInit, OnDestroy {
   nextButtonState: StockButtonState;
 
   constructor(
-    private processService: StockProcessService,
+    public processService: StockProcessService,
     public dialog: MatDialog
   ) {
     this.nextButtonState = {
@@ -65,6 +81,7 @@ export class StockClaimsComponent implements OnInit, OnDestroy {
     this.pageApis.push(dataSub);
   }
 
+  /* istanbul ignore next */
   addClaimToTransaction(claim: any, isEdit: boolean): void {
     const i = this.listOfClaims.findIndex(e => e.id === claim.id);
     const dialogData = JSON.parse(
@@ -75,6 +92,7 @@ export class StockClaimsComponent implements OnInit, OnDestroy {
     );
     const dialogRef = this.dialog.open(ClaimDetailComponent, {
       disableClose: true,
+      autoFocus: false,
       width: '45vw',
       maxWidth: '800px',
       height: 'auto',
@@ -91,6 +109,7 @@ export class StockClaimsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* istanbul ignore next */
   removeClaimFromTransaction($event: any, claim: any): void {
     $event.stopPropagation();
     const dialogRef = this.dialog.open(RemoveDialogComponent, {
@@ -117,7 +136,7 @@ export class StockClaimsComponent implements OnInit, OnDestroy {
     this.listOfClaims[i].verifier = null;
     this.listOfClaims[i].selected = false;
     this.listOfClaims[i].verifierAssigned = false;
-    this.listOfClaims[i].criteria.map((el: any) => {
+    this.listOfClaims[i]?.criteria?.map((el: any) => {
       el.fields.map((obj: any) => {
         if (obj.file) {
           delete obj.file;

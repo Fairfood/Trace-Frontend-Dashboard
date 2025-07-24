@@ -1,0 +1,87 @@
+// @import 'src/styles/utils';
+// @include key-value-pair;
+.header {
+    border-bottom: 1px solid var(--color-light-grey5);
+    padding: 20px 35px 20px 35px;
+}
+
+.key {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--font-color);
+    margin-bottom: 12px
+}
+
+.value {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--font-color-2);
+    text-align: justify;
+}
+
+.content {
+    padding: 20px 35px;
+}
+
+.content-2 {
+    padding: 0px 35px 20px 35px;
+}
+
+.data {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--font-color);
+    padding-bottom: 20px;
+    padding-top: 10px;
+}
+
+.f-div {
+    margin-right: 100px;
+}
+
+.view-btn {
+    margin-left: 25px;
+}
+
+.carbon-icon {
+    margin-right: 8px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--font-color);
+    padding-top: 5px;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 16px;
+    /* space between columns */
+}
+
+.column {
+    flex: 1;
+    /* makes both columns take equal width */
+    display: flex;
+    flex-direction: column;
+}
+
+.text-truncate {
+    max-width: 250px;
+    display: inline-block;
+}
+
+::ng-deep #custom-btn .lg.ff-btn-stroked {
+    padding: 7px 20px !important;
+}
+
+.evidence {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--font-color);
+    padding-bottom: 20px;
+    padding-top: 10px;
+}

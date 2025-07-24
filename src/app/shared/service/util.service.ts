@@ -12,8 +12,9 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { GlobalStoreService } from '../store/global-store.service';
 import { SnackBarComponent } from '../components/snack-bar/snack-bar.component';
 // configs
-import { headerOptions, successFormatter } from '../configs/app.methods';
+import { successFormatter } from '../configs/app.methods';
 import {
+  ACTION_TYPE,
   HTTP_OPTION_1,
   HTTP_OPTION_2,
   HTTP_OPTION_3,
@@ -26,6 +27,8 @@ import {
   INode,
   IProductMaster,
 } from '../configs/app.model';
+import { TranslateService } from '@ngx-translate/core';
+import { headerOptions } from 'fairfood-utils';
 const BASE_URL = environment.baseUrl;
 
 const mapFn = (res: any): ICommonObj[] => {
@@ -51,12 +54,14 @@ export class UtilService {
   mapInitialized$ = new BehaviorSubject<boolean>(false);
   allSupplyChain$ = new BehaviorSubject<boolean>(false);
   linkedTransparencyRequestData: any;
+  externalId = new BehaviorSubject<boolean>(false);
 
   constructor(
     private snackBar: MatSnackBar,
     private http: HttpClient,
     private store: GlobalStoreService,
-    private storage: StorageService
+    private storage: StorageService,
+    private translate: TranslateService
   ) {}
 
   /**
@@ -169,19 +174,22 @@ export class UtilService {
       .pipe(map(successFormatter));
   }
 
-  loadGoogleMaps(): Observable<boolean> {
+  loadGoogleMaps(): void {
     const url = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapKey}`;
 
-    return this.http.jsonp(url, 'callback').pipe(
-      map(() => true),
-      catchError((err: Error) => {
-        console.log(err);
-        return throwError(false);
-      }),
-      tap((status: boolean) => {
-        this.mapInitialized$.next(status);
-      })
-    );
+    this.http
+      .jsonp(url, 'callback')
+      .pipe(
+        map(() => true),
+        catchError((err: Error) => {
+          console.log(err);
+          return throwError(() => false);
+        }),
+        tap((status: boolean) => {
+          this.mapInitialized$.next(status);
+        })
+      )
+      .subscribe();
   }
 
   validateCompanyname(companyName: string): Observable<any> {
@@ -235,11 +243,12 @@ export class UtilService {
   }
 
   getCompany(): Observable<ICommonAPIResponse<INode>> {
-    const supplyChainId = this.localSupplyChainData();
+    const supplyChainId =
+      this.localSupplyChainData() === null ? '' : this.localSupplyChainData();
     return this.http
       .get(
         BASE_URL +
-          '/supply-chain/connections/?search=&limit=100&supply_chain=' +
+          '/supply-chain/connections/?search=&limit=200&supply_chain=' +
           supplyChainId,
         headerOptions(HTTP_OPTION_3)
       )
@@ -275,5 +284,59 @@ export class UtilService {
           this.store.setConnectedCompanies(result);
         })
       );
+  }
+
+  transactionRejectMessage(type: 'fail' | 'success'): void {
+    const message =
+      type === 'fail'
+        ? this.translate.instant('transaction.snackbar.rejectFailed')
+        : this.translate.instant('transaction.snackbar.rejected');
+
+    this.customSnackBar(
+      message,
+      type === 'fail' ? ACTION_TYPE.FAILED : ACTION_TYPE.SUCCESS
+    );
+  }
+
+  getNotificationSettings(node_id: string): Observable<any> {
+    return this.http
+      .get(
+        `${BASE_URL}/communications/email-configs/?node=${node_id}`,
+        headerOptions(HTTP_OPTION_3)
+      )
+      .pipe(map(successFormatter));
+  }
+
+  updateNotificationSettings(data: any): Observable<any> {
+    return this.http.post(
+      `${BASE_URL}/communications/email-configs/`,
+      data,
+      headerOptions(HTTP_OPTION_3)
+    );
+  }
+
+  fetchCompanyDetails(companyId: string): Observable<any> {
+    return this.http
+      .get(
+        `${BASE_URL}/supply-chain/company/${companyId}/`,
+        headerOptions(HTTP_OPTION_3)
+      )
+      .pipe(
+        map((d: any) => {
+          const { data } = d;
+          data.external_id
+            ? this.externalId.next(true)
+            : this.externalId.next(false);
+          return data;
+        })
+      );
+  }
+
+  checkStatus(claim: string, nodeId: string) {
+    return this.http.get(
+      BASE_URL +
+        `/guardian/claim-status/?guardian_claim=${claim}&filter_value=${nodeId}`,
+      headerOptions(HTTP_OPTION_4)
+    );
   }
 }

@@ -1,8 +1,9 @@
 /* istanbul ignore file */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { getCustomCookie } from './shared/configs/app.methods';
 import { environment } from 'src/environments/environment';
+import { AuthService } from './feature/authentication/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: [],
 })
 export class AppComponent implements OnInit {
+  private readonly auth = inject(AuthService);
   constructor(private translate: TranslateService) {
     translate.setDefaultLang('en');
     translate.use('en');
@@ -24,12 +26,14 @@ export class AppComponent implements OnInit {
     const impersonate = getCustomCookie('userData');
     if (impersonate !== 'no-match') {
       const userData = JSON.parse(impersonate);
+      const { nodeId, id_token } = userData;
       localStorage.removeItem('userData');
       localStorage.removeItem('companyID');
       localStorage.setItem('impersonate', 'true');
       localStorage.setItem('isFairfoodUserLoggedin', 'true');
       localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('companyID', userData.nodeId);
+      localStorage.setItem('companyID', nodeId);
+      localStorage.setItem('id_token', id_token);
       document.cookie.split(';').forEach(function (c) {
         document.cookie =
           c.trim().split('=')[0] +
@@ -68,5 +72,26 @@ export class AppComponent implements OnInit {
         }
       }
     });
+    setInterval(() => {
+      this.checkUserLoginStatus();
+    }, 5000);
+  }
+
+  isUserLoggedIn(): boolean {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [key, value] = cookie.trim().split('=');
+      if (key === 'isFairfoodUserLoggedIn' && value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Handle logout if user logs out from the first app
+  checkUserLoginStatus(): void {
+    if (!this.isUserLoggedIn()) {
+      this.auth.logout();
+    }
   }
 }

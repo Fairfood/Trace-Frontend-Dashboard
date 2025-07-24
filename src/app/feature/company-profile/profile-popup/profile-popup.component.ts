@@ -9,58 +9,44 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
-import { TeamMemberService } from '../team-members/team-member.service';
+import { TeamMemberService } from '../team-members';
 import { ButtonsComponent } from 'fairfood-utils';
+import { DocumentationService } from '../documentation/documentation.service';
 
 @Component({
   selector: 'app-profile-popup',
   templateUrl: './profile-popup.component.html',
   styleUrls: ['./profile-popup.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatDialogModule, ButtonsComponent, MatIconModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    ButtonsComponent,
+    MatIconModule,
+    TranslateModule,
+  ],
 })
 export class ProfilePopupComponent {
   pageApis: Subscription[] = [];
   constructor(
     public dialogRef: MatDialogRef<ProfilePopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private memberService: TeamMemberService
+    private memberService: TeamMemberService,
+    private docService: DocumentationService
   ) {}
 
   actionButton(): void {
-    const { text, member } = this.data;
     if (this.data?.type === 'make') {
-      const type = text === 'admin' ? 1 : text === 'member' ? 2 : 3;
-      const api = this.memberService
-        .updateRole(member?.id, type)
-        .subscribe(res => {
-          if (res.success) {
-            this.dialogRef.close(true);
-          } else {
-            this.dialogRef.close(false);
-          }
-        });
-      this.pageApis.push(api);
-    }
-    // else if (this.data?.type === 'deleteDoc') {
-    //   const api = this.companyService.deleteDoc(file).subscribe(res => {
-    //     if (res.success) {
-    //       this.dialogRef.close(true);
-    //     } else {
-    //       this.dialogRef.close(false);
-    //     }
-    //   });
-    //   this.pageApis.push(api);
-    // } else if (
-    //   this.data?.type === 'deleteTemplate' ||
-    //   this.data?.type === 'removeLabel' ||
-    //   this.data?.type === 'removeClaim'
-    // ) {
-    //   this.dialogRef.close(true);
-    // }
-    else {
-      const api = this.memberService.removeMember(member?.id).subscribe(res => {
+      const {
+        text,
+        member: { id },
+      } = this.data;
+      this.makeAsAMember(id, text);
+    } else if (this.data?.type === 'deleteDoc') {
+      const { id } = this.data?.file || {};
+      const api = this.docService.deleteDoc(id).subscribe(res => {
         if (res.success) {
           this.dialogRef.close(true);
         } else {
@@ -68,7 +54,43 @@ export class ProfilePopupComponent {
         }
       });
       this.pageApis.push(api);
+    } else if (
+      this.data?.type === 'deleteTemplate' ||
+      this.data?.type === 'removeLabel' ||
+      this.data?.type === 'removeClaim'
+    ) {
+      this.dialogRef.close(true);
+    } else {
+      const {
+        text,
+        member: { id },
+      } = this.data;
+      this.removeMember(id);
     }
+  }
+
+  makeAsAMember(id: string, text: string): void {
+    const textCondition = text === 'member' ? 2 : 3;
+    const type = text === 'admin' ? 1 : textCondition;
+    const api = this.memberService.updateRole(id, type).subscribe(res => {
+      if (res.success) {
+        this.dialogRef.close(true);
+      } else {
+        this.dialogRef.close(false);
+      }
+    });
+    this.pageApis.push(api);
+  }
+
+  removeMember(id: string): void {
+    const api = this.memberService.removeMember(id).subscribe(res => {
+      if (res.success) {
+        this.dialogRef.close(true);
+      } else {
+        this.dialogRef.close(false);
+      }
+    });
+    this.pageApis.push(api);
   }
 
   closePopup(): void {

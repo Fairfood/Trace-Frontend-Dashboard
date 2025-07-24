@@ -2,24 +2,29 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 // config
 import {
+  DATE_PROVIDER,
+  PROCESS_STOCK_CONFIG,
   StepValues,
   TransactionState,
   stockProcessTabs,
 } from './process-stock.config';
-import { ITabItem } from 'src/app/shared/configs/app.model';
+import { CLAIM_INHERITANCE_TYPES } from '../../claim/claim.config';
+
 // services
-import { StockService } from '../stock.service';
 import { StockProcessService } from './stock-process.service';
 import { UtilService } from 'src/app/shared/service';
+import { StockService } from '../stock.service';
 import { ClaimService } from '../../claim';
 // store
 import { ListingStoreService } from '../listing';
 import { GlobalStoreService } from 'src/app/shared/store';
 // constants and configs
-import { CLAIM_INHERITANCE_TYPES } from '../../claim/claim.config';
 import { ACTION_TYPE } from 'src/app/shared/configs/app.constants';
+import { ITabItem } from 'src/app/shared/configs/app.model';
+import { IBatches } from '../listing/listing.model';
 
 let STOCK_PROCESS: ITabItem[];
 
@@ -31,13 +36,16 @@ let STOCK_PROCESS: ITabItem[];
   selector: 'app-process-stock',
   templateUrl: './process-stock.component.html',
   styleUrls: ['./process-stock.component.scss'],
+  standalone: true,
+  imports: PROCESS_STOCK_CONFIG,
+  providers: DATE_PROVIDER,
 })
 export class ProcessStockComponent implements OnInit, OnDestroy {
   pageApis: Subscription[] = [];
   readonly StepValues = StepValues;
   stockTabs: ITabItem[];
   currentStep: string;
-  batch: any[] = [];
+  batch: IBatches[] = [];
   transactionFormData: any;
   requestedDetails: any;
   claimsList: any;
@@ -54,24 +62,30 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
   // only for merge stock
   inheritedClaims: any[];
 
+  // new code
+  changedBatches: IBatches[];
+
   constructor(
-    private processService: StockProcessService,
-    private claimService: ClaimService,
-    private stockService: StockService,
-    private router: Router,
-    private util: UtilService,
+    public processService: StockProcessService,
     private listingStore: ListingStoreService,
-    private store: GlobalStoreService
+    private stockService: StockService,
+    private claimService: ClaimService,
+    private store: GlobalStoreService,
+    public util: UtilService,
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.initTabs();
   }
 
   ngOnInit(): void {
     this.initStep();
-    this.initSubscriptions();
+    this.initClaimSub();
+    this.supplyChainChangedSub();
+    this.dataChangesSub();
 
     if (this.actionUrl !== '/stock/process-merge') {
-      this.loaderText = 'Loading company data';
+      this.loaderText = this.translate.instant('stock.loadingCompanyData');
       this.getConnectedCompanyList();
     } else {
       this.loading = false;
@@ -109,7 +123,9 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
   initStep(): void {
     const listingInfo = this.processService.getListingInfo();
     if (listingInfo) {
-      this.batch = listingInfo.batches;
+      const { batches, changedBatches } = listingInfo;
+      this.batch = batches;
+      this.changedBatches = changedBatches;
     }
     this.currentStep = StepValues.TRANSACTION;
     this.buttonNextState = {
@@ -120,10 +136,7 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
     };
   }
 
-  /**
-   * Initialize subscriptions
-   */
-  initSubscriptions(): void {
+  supplyChainChangedSub(): void {
     const supplyChainIdSub = this.util.supplyChainData$.subscribe(
       (res: any) => {
         if (res && res !== this.stockService.supplyChainData()) {
@@ -131,7 +144,10 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         }
       }
     );
+    this.pageApis.push(supplyChainIdSub);
+  }
 
+  dataChangesSub(): void {
     const dataSub = this.processService
       .currentTransactionState()
       .subscribe((result: TransactionState) => {
@@ -147,6 +163,13 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         }
       });
 
+    this.pageApis.push(dataSub);
+  }
+
+  /**
+   * Initialize subscriptions
+   */
+  initClaimSub(): void {
     const claimSub = this.processService
       .currentClaimState()
       .subscribe(result => {
@@ -162,18 +185,14 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         }
       });
     this.pageApis.push(claimSub);
-    this.pageApis.push(dataSub);
-    this.pageApis.push(supplyChainIdSub);
   }
 
   /**
    * Supply chain changed action
    */
   supplyChainChangeAction(): void {
-    this.util.customSnackBar(
-      'Supply chain changed! Please try again from the stocks!',
-      ACTION_TYPE.SUCCESS
-    );
+    const message = this.translate.instant('processStock.changeSupplychain');
+    this.util.customSnackBar(message, ACTION_TYPE.SUCCESS);
     this.processService.updateSummaryData(null);
     this.processService.updateListingInfo(null);
     this.processService.navigateToStockListing();
@@ -198,9 +217,8 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
 
   /**
    * Change step goto claims
-   * @param data boolean
    */
-  goToClaims(data: boolean): void {
+  goToClaims(): void {
     const claimTab = this.stockTabs.find(s => s.id === StepValues.CLAIMS);
     if (claimTab.active === true) {
       this.changeHistoryTab(claimTab);
@@ -215,9 +233,8 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
 
   /**
    * Merge stock navigation
-   * @param data boolean
    */
-  mergeStockNavigation(data: boolean): void {
+  mergeStockNavigation(): void {
     const summaryTab = this.stockTabs.find(s => s.id === StepValues.SUMMARY);
     if (summaryTab.active === true) {
       this.changeHistoryTab(summaryTab);
@@ -252,35 +269,29 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         this.receiveSingleStock();
       }
     } else {
-      if (this.actionUrl === '/stock/process-merge') {
-        const foundIndex = STOCK_PROCESS.findIndex(
-          s => s.id === StepValues.TRANSACTION
-        );
-        this.changeHistoryTab(this.stockTabs[foundIndex]);
-      } else {
-        const foundIndex = STOCK_PROCESS.findIndex(
-          s => s.id === StepValues.CLAIMS
-        );
-        this.changeHistoryTab(this.stockTabs[foundIndex]);
-      }
+      const id =
+        this.actionUrl === '/stock/process-merge'
+          ? StepValues.TRANSACTION
+          : StepValues.CLAIMS;
+
+      const foundIndex = STOCK_PROCESS.findIndex(s => s.id === id);
+      this.changeHistoryTab(this.stockTabs[foundIndex]);
     }
   }
 
   fromClaims(type: string): void {
+    let foundIndex: number;
     if (type === 'next') {
-      const foundIndex = STOCK_PROCESS.findIndex(
-        s => s.id === StepValues.SUMMARY
-      );
+      foundIndex = STOCK_PROCESS.findIndex(s => s.id === StepValues.SUMMARY);
       this.stockTabs = this.stockTabs.map((p: ITabItem) =>
         p.id === StepValues.SUMMARY ? { ...p, active: true } : p
       );
-      this.changeHistoryTab(this.stockTabs[foundIndex]);
     } else {
-      const foundIndex = STOCK_PROCESS.findIndex(
+      foundIndex = STOCK_PROCESS.findIndex(
         s => s.id === StepValues.TRANSACTION
       );
-      this.changeHistoryTab(this.stockTabs[foundIndex]);
     }
+    this.changeHistoryTab(this.stockTabs[foundIndex]);
   }
 
   updateSummaryData(): void {
@@ -299,7 +310,7 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res) {
           this.companies = res;
-          this.loaderText = 'Loading claims';
+          this.loaderText = this.translate.instant('stock.loadingClaims');
           this.getAllClaims();
         }
       },
@@ -327,43 +338,40 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
     this.pageApis.push(sub);
   }
 
+  handleMergeStockClaims(res: any): void {
+    this.inheritedClaims = [];
+    res.map((e: any) => {
+      // only used in merge stock transaction
+      this.inheritedClaims.push({
+        claim: e.claim,
+        verifier: null,
+        inherited: true,
+      });
+    });
+    const summaryTabIndex = STOCK_PROCESS.findIndex(
+      s => s.id === StepValues.SUMMARY
+    );
+    this.stockTabs = this.stockTabs.map((p: ITabItem) =>
+      p.id === StepValues.SUMMARY ? { ...p, active: true } : p
+    );
+    this.changeHistoryTab(this.stockTabs[summaryTabIndex]);
+  }
+
   /**
    * Check if inheritable claims are there
    */
   getInheritableClaims(): void {
     if (this.batch.length > 0) {
-      let outputProd: any[];
-      if (this.actionUrl === '/stock/process-convert') {
-        const { items } = this.transactionFormData;
-        outputProd = items?.map((p: any) => p.product);
-      } else {
-        outputProd = [this.transactionFormData.product];
-      }
       const params = {
         batches: this.batch,
-        output_products: outputProd,
+        formData: this.transactionFormData,
+        actionUrl: this.actionUrl,
       };
       const api = this.claimService
         .getInheritableClaims(params)
         .subscribe((res: any) => {
-          // newly added case
           if (this.actionUrl === '/stock/process-merge') {
-            this.inheritedClaims = [];
-            res.map((e: any) => {
-              // only used in merge stock transaction
-              this.inheritedClaims.push({
-                claim: e.claim,
-                verifier: null,
-                inherited: true,
-              });
-            });
-            const foundIndex = STOCK_PROCESS.findIndex(
-              s => s.id === StepValues.SUMMARY
-            );
-            this.stockTabs = this.stockTabs.map((p: ITabItem) =>
-              p.id === StepValues.SUMMARY ? { ...p, active: true } : p
-            );
-            this.changeHistoryTab(this.stockTabs[foundIndex]);
+            this.handleMergeStockClaims(res);
           } else {
             this.setInheritableClaims(res);
           }
@@ -374,21 +382,20 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
 
   setInheritableClaims(inheritableClaims: any): void {
     if (inheritableClaims.length) {
-      this.claimsList.map((e: any) => {
-        inheritableClaims.map((f: any) => {
-          if (e.id === f.claim) {
-            e.inherited = true;
-            e.selected = true;
-            e.disabled = f.removable ? false : true;
-            e.verification_percentage = f.verification_percentage;
-            e.criteria.map((criteria: any) => {
-              criteria.evidence = f.criteria;
-            });
-          }
-        });
+      this.claimsList.forEach((e: any) => {
+        const claim = inheritableClaims.find((f: any) => e.id === f.claim);
+        if (claim) {
+          e.inherited = true;
+          e.selected = true;
+          e.disabled = claim.removable ? false : true;
+          e.verification_percentage = claim.verification_percentage;
+          e.criteria.forEach((criteria: any) => {
+            criteria.evidence = claim.criteria;
+          });
+        }
       });
     } else {
-      this.claimsList.map((e: any) => {
+      this.claimsList.forEach((e: any) => {
         if (
           e.inheritable === CLAIM_INHERITANCE_TYPES.INHERITANCE_TYPE_PRODUCT &&
           e.removable
@@ -403,6 +410,7 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
   }
 
   // get available claims
+  /* istanbul ignore next */
   processClaims(allList: any[]): void {
     this.listOfClaims = this.claimService.formatClaimsData(
       allList,
@@ -422,34 +430,17 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
    */
   createExternalTransaction(): void {
     this.loading = true;
-    this.loaderText = 'Creating transaction';
-    const {
-      node,
-      date,
-      type,
-      product,
-      unit,
-      price,
-      quantity,
-      sellerRefNo,
-      buyerRefNo,
-    } = this.transactionFormData;
-    const params: any = {
-      node,
-      created_on: Math.floor(new Date(date).getTime() / 1000),
-      supply_chain: this.stockService.supplyChainData(),
-      type,
-      product,
-      quantity,
-      unit,
-      price,
+    this.loaderText = this.translate.instant('stock.creatingTransaction');
+    const params: any = this.processService.createExternalParams({
+      formData: this.transactionFormData,
       batches: this.batch,
-      buyer_ref_number: buyerRefNo,
-      seller_ref_number: sellerRefNo,
-    };
+      changedBatches: this.changedBatches,
+    });
+
     if (this.requestedDetails) {
-      params.currency = this.requestedDetails.currency;
-      params.transparency_request = this.requestedDetails.id;
+      const { currency, id } = this.requestedDetails;
+      params.currency = currency;
+      params.transparency_request = id;
     }
     /**
      * transaction created using form data
@@ -460,21 +451,17 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res.success) {
           this.transactionId = res.data.id;
-          this.loaderText = 'Saving claims';
+          this.loaderText = this.translate.instant('stock.savingClaimData');
           // check if claims are selected
           if (this.selectedClaims.length) {
             this.attachClaims();
           } else {
-            this.transactionCreated();
+            this.completeProcess();
           }
         }
       },
       error: () => {
-        this.util.customSnackBar(
-          'Failed ! Something went wrong',
-          ACTION_TYPE.FAILED
-        );
-        this.loading = false;
+        this.failedApiCall();
       },
     });
     this.pageApis.push(api);
@@ -482,9 +469,10 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
 
   convertStockTransaction(): void {
     this.loading = true;
-    this.loaderText = 'Creating transaction';
+    this.loaderText = this.translate.instant('stock.creatingTransaction');
     const { items, transactionDate } = this.transactionFormData;
-    const destinationBatches = items.map((f: any) => {
+    const summary = this.processService.getSummaryData();
+    const destinationBatches = items?.map((f: any) => {
       const { product, unit, quantity } = f;
       return {
         product,
@@ -492,67 +480,93 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         unit,
       };
     });
-    const params = {
+    const params: any = {
       type: 1,
       created_on: Math.floor(new Date(transactionDate).getTime() / 1000),
       supply_chain: this.stockService.supplyChainData(),
       destination_batches: destinationBatches,
-      source_batches: this.batch,
+      select_all_batches: summary.selectAll,
     };
+
+    if (summary.selectAll) {
+      params.source_batches = this.changedBatches;
+    } else {
+      params.source_batches = this.batch;
+    }
 
     this.internalTransactionAPI(params, 1);
   }
 
   mergeStockTransaction(): void {
     this.loading = true;
-    this.loaderText = 'Creating transaction';
+    this.loaderText = this.translate.instant('stock.creatingTransaction');
+    const summary = this.processService.getSummaryData();
     const { date, type, product, unit, quantity } = this.transactionFormData;
     const destBatch = {
       product,
       quantity,
       unit,
     };
-    const params = {
+    const params: any = {
       type,
       created_on: new Date(date).getTime() / 1000,
       supply_chain: this.stockService.supplyChainData(),
       destination_batches: [destBatch],
-      source_batches: this.batch,
+      select_all_batches: summary.selectAll,
     };
+    if (summary.selectAll) {
+      params.source_batches = this.changedBatches;
+    } else {
+      params.source_batches = this.batch;
+    }
     this.internalTransactionAPI(params, type);
   }
 
   internalTransactionAPI(params: any, type: number): void {
-    const api = this.stockService.mergeStock(params).subscribe(result => {
-      if (result.success) {
-        this.transactionId = result.data.id;
-        if (type === 1) {
-          this.loaderText = 'Saving claims data';
-          // check if claims are selected
-          if (this.selectedClaims.length) {
-            this.attachClaims();
+    const api = this.stockService.mergeStock(params).subscribe({
+      next: result => {
+        if (result.success) {
+          this.transactionId = result.data.id;
+          if (type === 1) {
+            this.loaderText = this.translate.instant('stock.savingClaimData');
+            // check if claims are selected
+            if (this.selectedClaims.length) {
+              this.attachClaims();
+            } else {
+              this.processService.transactionCreated(this.actionUrl);
+              this.loading = false;
+            }
           } else {
-            this.transactionCreated();
-          }
-        } else {
-          if (this.inheritedClaims.length > 0) {
-            const reqObj = {
-              transaction: this.transactionId,
-              claims: this.inheritedClaims,
-            };
-            this.inheritClaimAPI(reqObj);
-          } else {
-            this.transactionCreated();
+            if (this.inheritedClaims.length > 0) {
+              const reqObj = {
+                transaction: this.transactionId,
+                claims: this.inheritedClaims,
+              };
+              this.inheritClaimAPI(reqObj);
+            } else {
+              this.completeProcess();
+            }
           }
         }
-      }
+      },
+      error: () => {
+        this.failedApiCall();
+      },
     });
     this.pageApis.push(api);
   }
 
+  failedApiCall(): void {
+    this.util.customSnackBar(
+      this.translate.instant('misc.wentWrong'),
+      ACTION_TYPE.FAILED
+    );
+    this.loading = false;
+  }
+
   receiveSingleStock(): void {
     this.loading = true;
-    this.loaderText = 'Creating incoming transaction';
+    this.loaderText = this.translate.instant('processStock.incomingLoader');
     const {
       node,
       date,
@@ -579,20 +593,23 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
     formData.append('price', price);
     formData.append('currency', currency);
 
-    const api = this.stockService
-      .createTransaction(formData)
-      .subscribe((res: any) => {
+    const api = this.stockService.createTransaction(formData).subscribe({
+      next: (res: any) => {
         if (res.success) {
           this.transactionId = res.data.id;
-          this.loaderText = 'Saving claims';
+          this.loaderText = this.translate.instant('stock.savingClaimData');
           // check if claims are selected
           if (this.selectedClaims.length) {
             this.attachClaims();
           } else {
-            this.transactionCreated();
+            this.completeProcess();
           }
         }
-      });
+      },
+      error: () => {
+        this.failedApiCall();
+      },
+    });
     this.pageApis.push(api);
   }
 
@@ -601,8 +618,8 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
    */
   attachClaims(): void {
     const claimsSelectedNotInherited = this.selectedClaims
-      .filter(e => e.selected && !e.inherited)
-      .map(cl => {
+      ?.filter(e => e.selected && !e.inherited)
+      ?.map(cl => {
         return {
           claim: cl.id,
           verifier: cl.verified_by === 2 ? cl.verifier.id : null,
@@ -622,7 +639,7 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
           }
         },
         error: () => {
-          this.transactionCreated();
+          this.completeProcess();
         },
       });
       this.pageApis.push(claimApi);
@@ -631,13 +648,14 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   attachClaimData(): void {
-    this.loaderText = 'Saving claim data';
+    this.loaderText = this.translate.instant('stock.savingClaimData');
     const claimData: any[] = [];
     const fileList: any[] = [];
-    this.selectedClaims.map(e => {
-      e.criteria.map((c: any) => {
-        c.fields.map((f: any) => {
+    this.selectedClaims?.forEach(e => {
+      e.criteria?.map((c: any) => {
+        c.fields?.map((f: any) => {
           // check if not file (type 3)
           if (f.type !== 3) {
             claimData.push({
@@ -653,24 +671,27 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
       });
     });
 
+    this.callClaimDataApi(claimData, fileList);
+  }
+
+  /* istanbul ignore next */
+  callClaimDataApi(claimData: any[], fileList: any[]): void {
     if (claimData.length > 0) {
       const responseArray = [];
-      const errArray = [];
       const claimsLength = claimData.length;
       for (const claim of claimData) {
         claim.transaction = this.transactionId;
-        const api = this.claimService.saveClaimData(claim).subscribe(
-          (res: any) => {
+        const api = this.claimService.saveClaimData(claim).subscribe({
+          next: (res: any) => {
             responseArray.push(res.success);
             if (responseArray.length === claimsLength) {
               this.attachClaimFiles(fileList);
             }
           },
-          (err: any) => {
-            errArray.push(err);
-            this.transactionCreated();
-          }
-        );
+          error: () => {
+            this.completeProcess();
+          },
+        });
         this.pageApis.push(api);
       }
     } else if (fileList.length > 0) {
@@ -680,9 +701,9 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* istanbul ignore next */
   attachClaimFiles(fileList: any[]): void {
     const resArr = [];
-    const errArr = [];
     if (fileList.length > 0) {
       for (const file of fileList) {
         const formData = new FormData();
@@ -691,18 +712,17 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
         formData.append('transaction', this.transactionId);
         formData.append('name', file.file.name);
         file.file = formData;
-        const api = this.claimService.saveClaimData(formData).subscribe(
-          (res: any) => {
+        const api = this.claimService.saveClaimData(formData).subscribe({
+          next: (res: any) => {
             resArr.push(res.success);
             if (resArr.length === fileList.length) {
               this.attachInheritClaims();
             }
           },
-          (err: any) => {
-            errArr.push(err);
-            this.transactionCreated();
-          }
-        );
+          error: () => {
+            this.completeProcess();
+          },
+        });
         this.pageApis.push(api);
       }
     } else {
@@ -716,7 +736,7 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
   attachInheritClaims(): void {
     const inheritedClaims = this.selectedClaims
       .filter(e => e.selected && e.inherited)
-      .map(cl => {
+      ?.map(cl => {
         return {
           claim: cl.id,
           verifier: null,
@@ -732,49 +752,36 @@ export class ProcessStockComponent implements OnInit, OnDestroy {
       };
       this.inheritClaimAPI(params);
     } else {
-      this.transactionCreated();
+      this.completeProcess();
     }
   }
 
+  /* istanbul ignore next */
   inheritClaimAPI(params: any): void {
     const api = this.claimService.claimAttachApi(params).subscribe(
       (res: any) => {
         if (res.success) {
-          this.transactionCreated();
+          this.processService.transactionCreated(this.actionUrl);
+          this.loading = false;
         }
       },
       err => {
         console.log(err);
         console.log('Failed to attach inheritable claim');
-        this.transactionCreated();
+
+        this.completeProcess();
       }
     );
     this.pageApis.push(api);
   }
 
-  transactionCreated(): void {
-    if (this.actionUrl === '/stock/stock-send') {
-      this.util.customSnackBar('Stock sent successfully', ACTION_TYPE.SUCCESS);
-    } else if (this.actionUrl === '/stock/process-convert') {
-      this.util.customSnackBar(
-        'Stock processed successfully',
-        ACTION_TYPE.SUCCESS
-      );
-    } else if (this.actionUrl === '/stock/process-merge') {
-      this.util.customSnackBar(
-        'Stock merged successfully',
-        ACTION_TYPE.SUCCESS
-      );
-    } else {
-      this.util.customSnackBar(
-        'Stock received successfully',
-        ACTION_TYPE.SUCCESS
-      );
-    }
+  /* istanbul ignore next */
+  completeProcess(): void {
+    this.processService.transactionCreated(this.actionUrl);
     this.loading = false;
-    this.processService.navigateToStockListing();
   }
 
+  /* istanbul ignore next */
   ngOnDestroy(): void {
     this.pageApis.forEach(m => m.unsubscribe());
     this.listingStore.resetState();

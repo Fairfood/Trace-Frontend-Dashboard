@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { environment } from 'src/environments/environment';
 
@@ -19,6 +20,7 @@ import { LogoutDialogComponent } from '../logout-dialog/logout-dialog.component'
     MatDialogModule,
     LoaderComponent,
     LogoutDialogComponent,
+    TranslateModule,
   ],
 })
 export class InviteMemberComponent implements OnInit {

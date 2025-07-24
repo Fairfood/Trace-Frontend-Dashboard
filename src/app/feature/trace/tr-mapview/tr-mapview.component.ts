@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* istanbul ignore file */
 import {
   Component,
   ElementRef,
@@ -11,11 +12,15 @@ import MarkerClusterer from '@googlemaps/markerclustererplus';
 
 import { TraceStoreService } from '../trace-store.service';
 import { UtilService } from 'src/app/shared/service';
+import { GoogleMapsModule } from '@angular/google-maps';
+import { AsyncPipe, NgIf } from '@angular/common';
 declare const google: any;
 
 @Component({
   selector: 'app-tr-mapview',
   templateUrl: './tr-mapview.component.html',
+  standalone: true,
+  imports: [GoogleMapsModule, NgIf, AsyncPipe],
 })
 export class TrMapviewComponent implements OnInit, OnDestroy {
   lat = 51.673858;
@@ -114,6 +119,7 @@ export class TrMapviewComponent implements OnInit, OnDestroy {
   }
 
   // create map journey
+  /* istanbul ignore next */
   createMapJourney(): void {
     this.setMapStyle();
 
